@@ -15,13 +15,17 @@ Differences:
 
 ### Usage
 
-The tool is a wrapper, which invokes various CLI commands to package the WAR.
+The tool is a wrapper, which invokes various CLI commands to package the WAR. After the build the generated WAR file will be put to `tmp/output/${artifactId}.war`.
 
 ```shell
 java -jar war-packager-cli.jar -configPath=mywar.yml -version=1.0-SNAPSHOT -tmpDir=tmp
 ```
 
-After the build the generated WAR file will be put to `tmp/output/${artifactId}.war`.
+To run the tool in a demo mode with [this config](./war-packager-cli/src/main/resources/io/jenkins/tools/warpackager/cli/config/sample.yml), just use the following command:
+
+```shell
+java -jar war-packager-cli.jar -demo
+```
 
 #### Prerequisites
 
