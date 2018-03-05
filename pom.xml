@@ -1,0 +1,56 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.jenkins-ci</groupId>
+    <artifactId>jenkins</artifactId>
+    <version>1.40</version>
+  </parent>
+
+  <properties>
+    <java.level>8</java.level>
+  </properties>
+
+  <groupId>io.jenkins.tools.war-packager</groupId>
+  <artifactId>war-packager-pom</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <name>Jenkins WAR Packager Parent POM</name>
+  <description>Parent POM for packaging custom Jenkins WARs</description>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>war-packager-cli</module>
+    <!-- TODO: Maven module -->
+  </modules>
+
+  <licenses>
+    <license>
+      <name>The MIT license</name>
+      <url>http://www.opensource.org/licenses/mit-license.php</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+<!-- TODO: needs to be hosted first
+  <scm>
+    <connection>scm:git:ssh://git@github.com/jenkinsci/plugin-compat-tester.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/plugin-compat-tester.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
+-->
+
+  <repositories>
+    <repository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>repo.jenkins-ci.org</id>
+      <url>https://repo.jenkins-ci.org/public/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+</project>

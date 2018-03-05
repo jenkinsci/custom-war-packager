@@ -1,0 +1,25 @@
+bundle:
+  groupId: "io.github.oleg-nenashev"
+  artifactId: "mywar"
+  description: "Just a WAR auto-generation-sample"
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.107
+plugins:
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "matrix-project"
+    source:
+      version: 1.9
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "durable-task"
+    source:
+      git: https://github.com/jglick/durable-task-plugin.git
+      branch: watch-JENKINS-38381
+systemProperties: {
+    jenkins.model.Jenkins.slaveAgentPort: "50000",
+    jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
+
+# TODO: Support System Groovy Scripts Bundling
+
