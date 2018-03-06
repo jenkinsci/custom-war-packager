@@ -1,8 +1,7 @@
-package io.jenkins.tools.warpackager.cli.impl;
+package io.jenkins.tools.warpackager.lib.impl;
 
-import io.jenkins.tools.warpackager.cli.CliOptions;
-import io.jenkins.tools.warpackager.cli.config.Config;
-import io.jenkins.tools.warpackager.cli.config.DependencyInfo;
+import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
@@ -18,6 +17,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Builds WAR according to the specified config.
  * @author Oleg Nenashev
  * @since TODO
  */
@@ -25,24 +25,22 @@ public class Builder {
 
     private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
 
-    private final CliOptions options;
     private final File buildRoot;
     private final Config config;
 
     // Context
-    Map<String, String> versionOverrides = new HashMap<>();
+    private Map<String, String> versionOverrides = new HashMap<>();
 
 
-    public Builder(CliOptions options, Config config) {
-        this.options = options;
+    public Builder(Config config) {
         this.config = config;
-        this.buildRoot = new File(options.getTmpDir(), "build");
+        this.buildRoot = new File(config.buildSettings.getTmpDir(), "build");
     }
 
     public void build() throws IOException, InterruptedException {
 
         // Cleanup the temporary directory
-        final File tmpDir = options.getTmpDir();
+        final File tmpDir = config.buildSettings.getTmpDir();
 
         if (tmpDir.exists()) {
             LOGGER.log(Level.INFO, "Cleaning up the temporary directory {0}", tmpDir);
@@ -59,7 +57,7 @@ public class Builder {
         // Generate POM
         File warBuildDir = new File(tmpDir, "output");
         Files.createDirectories(warBuildDir.toPath());
-        POMGenerator gen = new POMGenerator(options, config);
+        POMGenerator gen = new POMGenerator(config);
         Model model = gen.generatePOM(versionOverrides);
         gen.writePOM(model, warBuildDir);
 

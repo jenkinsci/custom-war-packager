@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.cli;
 
+import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import org.kohsuke.args4j.Option;
 
 import javax.annotation.CheckForNull;
@@ -11,10 +12,10 @@ public class CliOptions {
     @Option(name = "-configPath", usage = "Path to the configuration YAML. See the tool's README for format")
     public File configPath;
 
-    @Option(name = "-tmpDir", usage = "Temporary directory for generated files and the output WAR. Defaults to 'tmp'")
+    @Option(name = "-tmpDir", usage = "Temporary directory for generated files and the output WAR. Defaults to '" + BuildSettings.DEFAULT_TMP_DIR_NAME + "'")
     public File tmpDir;
 
-    @Option(name = "-version", usage = "Version of WAR to be set. Defaults to '1.0-SNAPSHOT'")
+    @Option(name = "-version", usage = "Version of WAR to be set. Defaults to '" + BuildSettings.DEFAULT_VERSION + "'")
     public String version;
 
     @Option(name = "-demo", usage = "Enables demo mode with predefined config file")
@@ -27,12 +28,12 @@ public class CliOptions {
 
     @Nonnull
     public File getTmpDir() {
-        return tmpDir != null ? tmpDir : new File("tmp");
+        return tmpDir != null ? tmpDir : BuildSettings.DEFAULT_TMP_DIR;
     }
 
     @Nonnull
     public String getVersion() {
-        return version != null ? version : "1.0-SNAPSHOT";
+        return version != null ? version : BuildSettings.DEFAULT_VERSION;
     }
 
     public boolean isDemo() {

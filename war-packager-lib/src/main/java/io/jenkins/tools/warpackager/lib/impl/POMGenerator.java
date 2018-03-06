@@ -1,8 +1,7 @@
-package io.jenkins.tools.warpackager.cli.impl;
+package io.jenkins.tools.warpackager.lib.impl;
 
-import io.jenkins.tools.warpackager.cli.CliOptions;
-import io.jenkins.tools.warpackager.cli.config.Config;
-import io.jenkins.tools.warpackager.cli.config.DependencyInfo;
+import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
@@ -25,11 +24,9 @@ import java.util.Map;
  */
 public class POMGenerator {
 
-    private final CliOptions options;
     private final Config config;
 
-    public POMGenerator(CliOptions options, Config config) {
-        this.options = options;
+    public POMGenerator(Config config) {
         this.config = config;
     }
 
@@ -39,7 +36,7 @@ public class POMGenerator {
         model.setGroupId(config.bundle.groupId);
         model.setArtifactId(config.bundle.artifactId);
         model.setDescription(config.bundle.description);
-        model.setVersion(options.getVersion());
+        model.setVersion(config.buildSettings.getVersion());
 
         // WAR Dependency
         Dependency dep = config.war.toDependency(versionOverrides);

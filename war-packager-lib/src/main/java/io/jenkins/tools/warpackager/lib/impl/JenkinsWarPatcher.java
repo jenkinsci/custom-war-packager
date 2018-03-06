@@ -1,4 +1,4 @@
-package io.jenkins.tools.warpackager.cli.impl;
+package io.jenkins.tools.warpackager.lib.impl;
 
 //TODO: This code should finally go to the Standard Maven HPI Plugin
 

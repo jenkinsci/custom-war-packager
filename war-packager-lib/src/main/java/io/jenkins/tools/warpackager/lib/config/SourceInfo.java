@@ -1,4 +1,4 @@
-package io.jenkins.tools.warpackager.cli.config;
+package io.jenkins.tools.warpackager.lib.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
