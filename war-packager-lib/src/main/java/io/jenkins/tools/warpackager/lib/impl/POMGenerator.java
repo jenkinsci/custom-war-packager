@@ -108,6 +108,7 @@ public class POMGenerator {
         }
 
         // Also add System Properties
+        /*
         Xpp3Dom systemPropertiesDom = new Xpp3Dom("systemProperties");
         for (Map.Entry<String, String> entry : config.systemProperties.entrySet()) {
             Xpp3Dom node = new Xpp3Dom(entry.getKey());
@@ -115,6 +116,7 @@ public class POMGenerator {
             systemPropertiesDom.addChild(node);
         }
         dom.addChild(systemPropertiesDom);
+*/
 
         return dom;
     }
