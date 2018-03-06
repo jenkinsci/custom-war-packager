@@ -9,6 +9,8 @@
 
   <properties>
     <java.level>8</java.level>
+    <!-- Version of Maven Components -->
+    <maven.version>3.5.0</maven.version>
   </properties>
 
   <groupId>io.jenkins.tools.war-packager</groupId>
@@ -21,7 +23,7 @@
   <modules>
     <module>war-packager-lib</module>
     <module>war-packager-cli</module>
-    <!-- TODO: Maven module -->
+    <module>war-packager-maven-plugin</module>
   </modules>
 
   <licenses>

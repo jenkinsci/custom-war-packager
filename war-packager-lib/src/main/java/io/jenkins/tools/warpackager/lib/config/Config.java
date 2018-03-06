@@ -59,4 +59,9 @@ public class Config {
         }
         throw new FileNotFoundException("Cannot find the configuration file " + configPath);
     }
+
+    // TODO: make the destination configurable
+    public File getOutputWar() {
+        return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + ".war");
+    }
 }
