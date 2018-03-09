@@ -15,17 +15,59 @@ Differences:
 
 ### Usage
 
-The tool is a wrapper, which invokes various CLI commands to package the WAR. After the build the generated WAR file will be put to `tmp/output/${artifactId}.war`.
+The tool offers a CLI interface and a Maven Plugin wrapper.
+
+### CLI
+
 
 ```shell
 java -jar war-packager-cli.jar -configPath=mywar.yml -version=1.0-SNAPSHOT -tmpDir=tmp
 ```
+
+After the build the generated WAR file will be put to `tmp/output/${artifactId}.war`.
 
 To run the tool in a demo mode with [this config](./war-packager-cli/src/main/resources/io/jenkins/tools/warpackager/cli/config/sample.yml), just use the following command:
 
 ```shell
 java -jar war-packager-cli.jar -demo
 ```
+
+Invoke the tool without options without options to get a full CLI options list.
+
+### Maven
+
+Maven plugin runs the packager and generates the artifact.
+The artifact will be put to "target/war-packager-maven-plugin/output/target/${bundle.artifactId}.war"
+and added to the project artifacts.
+
+```xml
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>io.jenkins.tools.war-packager</groupId>
+        <artifactId>war-packager-pom</artifactId>
+        <version>@project.version@</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>custom-war</goal>
+            </goals>
+            <configuration>
+              <configFilePath>spotcheck.yml</configFilePath>
+              <warVersion>1.1-SNAPSHOT</warVersion>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+```
+
+Note that this plugin invokes Maven-in-Maven, 
+and that it won't pass build options to the plugin.
+Configuration file can be used to configure the downstream builder.
 
 #### Prerequisites
 
