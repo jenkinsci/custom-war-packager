@@ -25,9 +25,11 @@ import java.util.Map;
 public class POMGenerator {
 
     private final Config config;
+    private final String outputFileSuffix;
 
-    public POMGenerator(Config config) {
+    public POMGenerator(Config config, String outputFileSuffix) {
         this.config = config;
+        this.outputFileSuffix = outputFileSuffix;
     }
 
     public Model generatePOM(Map<String, String> versionOverrides) throws IOException {
@@ -95,7 +97,7 @@ public class POMGenerator {
 
     private Object generateCustomWarGoalConfiguration() {
         Map<String, String> config = new HashMap<>();
-        config.put("outputFile", "${project.build.directory}/${project.artifactId}.war");
+        config.put("outputFile", "${project.build.directory}/${project.artifactId}" + outputFileSuffix + ".war");
         return generateCustomWarGoalConfigurationDom(config);
     }
 

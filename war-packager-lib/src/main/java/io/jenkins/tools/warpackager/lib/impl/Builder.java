@@ -57,7 +57,7 @@ public class Builder {
         // Generate POM
         File warBuildDir = new File(tmpDir, "output");
         Files.createDirectories(warBuildDir.toPath());
-        POMGenerator gen = new POMGenerator(config);
+        POMGenerator gen = new POMGenerator(config, "-packaged");
         Model model = gen.generatePOM(versionOverrides);
         gen.writePOM(model, warBuildDir);
 
@@ -65,9 +65,11 @@ public class Builder {
         processFor(warBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true");
 
         // Add System properties
-        File warFile = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
-        JenkinsWarPatcher patcher = new JenkinsWarPatcher(warFile);
-        patcher.addSystemProperties(config.systemProperties);
+        File srcWar = new File(warBuildDir, "target/" + config.bundle.artifactId + "-packaged.war");
+        File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
+        try (JenkinsWarPatcher patcher = new JenkinsWarPatcher(srcWar, dstWar)) {
+            patcher.addSystemProperties(config.systemProperties);
+        }
     }
 
     private void buildIfNeeded(DependencyInfo dep) throws IOException, InterruptedException {
