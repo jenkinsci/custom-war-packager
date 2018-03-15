@@ -99,16 +99,13 @@ plugins:
     source:
       git: https://github.com/jglick/durable-task-plugin.git
       branch: watch-JENKINS-38381
-# TODO: System Properties support Not fully implemented yet
-#systemProperties: {
-#     jenkins.model.Jenkins.slaveAgentPort: "50000",
-#     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
-# TODO: Groovy hooks support is not implemented yet
-#groovy-hooks:
-#  init:
-#    source: 
-#      git: https://github.com/oleg-nenashev/test-init-scripts.git
-#      dir: scripts
+systemProperties: {
+     jenkins.model.Jenkins.slaveAgentPort: "50000",
+     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
+groovyHooks:
+  - type: "init"
+    source: 
+      dir: scripts
 ```
 
 ### Limitations

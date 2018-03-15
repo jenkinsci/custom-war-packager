@@ -4,6 +4,8 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
@@ -48,13 +50,15 @@ public class JenkinsWarPatcher {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsWarPatcher.class.getName());
 
+    private final Config config;
     private final File srcWar;
     private final File dstDir;
 
-    public JenkinsWarPatcher(@Nonnull File src, @Nonnull File dstDir) throws IOException {
+    public JenkinsWarPatcher(@Nonnull Config config, @Nonnull File src, @Nonnull File dstDir) throws IOException {
         if (src.equals(dstDir)) {
             throw new IOException("Source and destination are the same: " + src);
         }
+        this.config = config;
         this.srcWar = src;
         this.dstDir = dstDir;
         Files.createDirectories(dstDir.toPath());
@@ -89,6 +93,30 @@ public class JenkinsWarPatcher {
             FileUtils.deleteDirectory(p);
         }
         return this;
+    }
+
+    public JenkinsWarPatcher addHooks(@Nonnull Map<String, File> hooks) throws IOException {
+        for (Map.Entry<String, File> hookSrc : hooks.entrySet()) {
+            final String hookId = hookSrc.getKey();
+            GroovyHookInfo hook = config.getHookById(hookId);
+            addHook(hook, hookSrc.getValue());
+        }
+
+        return this;
+    }
+
+    public void addHook(@Nonnull GroovyHookInfo hook, File path) throws IOException {
+        File targetDir = new File(dstDir, "WEB-INF/" + hook.type + ".groovy.d");
+        if (!targetDir.exists()) {
+            Files.createDirectories(targetDir.toPath());
+        }
+
+        if (path.isFile()) {
+            Files.copy(path.toPath(), new File(targetDir, path.getName()).toPath());
+        } else {
+            FileUtils.copyDirectory(path, targetDir);
+        }
+
     }
 
     @Nonnull

@@ -30,7 +30,10 @@ public class Config {
     public PackageInfo bundle;
     public DependencyInfo war;
     public Collection<DependencyInfo> plugins;
+    @CheckForNull
     public Map<String, String> systemProperties;
+    @CheckForNull
+    public Collection<GroovyHookInfo> groovyHooks;
 
     private static Config load(@Nonnull InputStream istream) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -63,5 +66,19 @@ public class Config {
     // TODO: make the destination configurable
     public File getOutputWar() {
         return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + ".war");
+    }
+
+    @CheckForNull
+    public GroovyHookInfo getHookById(@Nonnull String id) {
+        if (groovyHooks == null) {
+            return null;
+        }
+
+        for (GroovyHookInfo hook : groovyHooks) {
+            if (id.equals(hook.id)) {
+                return hook;
+            }
+        }
+        return null;
     }
 }

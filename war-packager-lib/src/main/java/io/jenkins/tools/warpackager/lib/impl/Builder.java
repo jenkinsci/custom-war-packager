@@ -2,12 +2,15 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
+import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
+import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -55,6 +58,14 @@ public class Builder {
             buildIfNeeded(plugin);
         }
 
+        // Prepare Groovy Hooks
+        Map<String, File> hooks = new HashMap<>();
+        if (config.groovyHooks != null) {
+            for (GroovyHookInfo hook : config.groovyHooks) {
+                hooks.put(hook.id, checkoutIfNeeded(hook.id, hook.source));
+            }
+        }
+
         // Generate POM
         File warBuildDir = new File(tmpDir, "prebuild");
         Files.createDirectories(warBuildDir.toPath());
@@ -71,15 +82,42 @@ public class Builder {
         File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
 
         // Patch WAR
-        JenkinsWarPatcher patcher = new JenkinsWarPatcher(srcWar, explodedWar)
+        JenkinsWarPatcher patcher = new JenkinsWarPatcher(config, srcWar, explodedWar)
                 .removeMetaInf()
-                .addSystemProperties(config.systemProperties);
+                .addSystemProperties(config.systemProperties)
+                .addHooks(hooks);
 
         File warOutputDir = new File(tmpDir, "output");
         SimpleManifest manifest = SimpleManifest.parseFile(srcWar);
         MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
         processFor(warOutputDir, "mvn", "clean", "package");
+    }
+
+    //TODO: Merge with buildIfNeeded
+    private File checkoutIfNeeded(@Nonnull String id, @Nonnull SourceInfo source) throws IOException, InterruptedException {
+        File componentBuildDir = new File(buildRoot, id);
+        Files.createDirectories(componentBuildDir.toPath());
+
+        switch (source.getType()) {
+            case FILESYSTEM:
+                assert source.dir != null;
+                return new File(source.dir);
+            case GIT:
+                LOGGER.log(Level.INFO, "Will checkout {0} from git: {1}", new Object[] {id, source});
+                break;
+            default:
+                throw new IOException("Unsupported checkout source: " + source.getType());
+        }
+
+        // Git checkout and build
+        processFor(componentBuildDir, "git", "clone", source.git, ".");
+        String checkoutId = source.getCheckoutId();
+        if (checkoutId != null) {
+            processFor(componentBuildDir, "git", "checkout", checkoutId);
+        }
+        String commit = readFor(componentBuildDir, "git", "log", "--format=%H", "-n", "1");
+        return componentBuildDir;
     }
 
     private void buildIfNeeded(DependencyInfo dep) throws IOException, InterruptedException {
