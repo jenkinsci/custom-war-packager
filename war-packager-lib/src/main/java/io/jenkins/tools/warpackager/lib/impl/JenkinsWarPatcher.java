@@ -4,6 +4,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
 import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -25,6 +26,8 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -41,43 +44,51 @@ import java.util.zip.ZipOutputStream;
  * @author Oleg Nenashev
  * @since TODO
  */
-public class JenkinsWarPatcher implements Closeable {
+public class JenkinsWarPatcher {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsWarPatcher.class.getName());
 
     private final File srcWar;
-    private final ZipOutputStream ostream;
+    private final File dstDir;
 
-    public JenkinsWarPatcher(@Nonnull File src, @Nonnull File dst) throws IOException {
-        if (src.equals(dst)) {
+    public JenkinsWarPatcher(@Nonnull File src, @Nonnull File dstDir) throws IOException {
+        if (src.equals(dstDir)) {
             throw new IOException("Source and destination are the same: " + src);
         }
         this.srcWar = src;
-        ostream = new ZipOutputStream(new FileOutputStream(dst));
-        copy(new HashSet<>(Arrays.asList("WEB-INF/web.xml")));
-    }
-
-    @Override
-    public void close() throws IOException {
-        ostream.close();
+        this.dstDir = dstDir;
+        Files.createDirectories(dstDir.toPath());
+        explode(new HashSet<>(Arrays.asList("WEB-INF/web.xml")));
     }
 
     @Nonnull
-    private void copy(@Nonnull Set<String> excludes) throws IOException {
+    private void explode(@Nonnull Set<String> excludes) throws IOException {
         try (ZipFile zip = new ZipFile(srcWar)) {
             Enumeration<? extends ZipEntry> it = zip.entries();
             while (it.hasMoreElements()) {
                 ZipEntry e = it.nextElement();
-                if (!excludes.contains(e.getName())) {
-                    ostream.putNextEntry(e);
-                    try(InputStream content = zip.getInputStream(e)) {
-                        ostream.write(IOUtils.toByteArray(content));
+                if (!excludes.contains(e.getName()) && !e.isDirectory()) {
+                    File f = new File(dstDir, e.getName());
+                    Path parent = f.toPath().getParent();
+                    if (!Files.exists(parent)) {
+                        Files.createDirectories(parent);
+                    }
+                    try(InputStream content = zip.getInputStream(e) ; FileOutputStream out = new FileOutputStream(f)) {
+                        out.write(IOUtils.toByteArray(content));
                     }
                 }
             }
         } catch (Exception ex) {
             throw new IOException("Failed copy " + srcWar, ex);
         }
+    }
+
+    public JenkinsWarPatcher removeMetaInf() throws IOException {
+        File p = new File(dstDir, "META-INF");
+        if (p.exists()) {
+            FileUtils.deleteDirectory(p);
+        }
+        return this;
     }
 
     @Nonnull
@@ -95,23 +106,23 @@ public class JenkinsWarPatcher implements Closeable {
 
     @Nonnull
     private void writeXMLResource(String path, Document doc) throws IOException {
-        ZipEntry e = new ZipEntry(path);
-        ostream.putNextEntry(e);
-
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        try {
+        File out = new File(dstDir, path);
+        Path parent = out.toPath().getParent();
+        if (!Files.exists(parent)) {
+            Files.createDirectories(parent);
+        }
+        try(FileOutputStream ostream = new FileOutputStream(out)) {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
             DOMSource source = new DOMSource(doc);
-            StreamResult result = new StreamResult(baos);
+            StreamResult result = new StreamResult(ostream);
             transformer.transform(source, result);
         } catch (TransformerException ex) {
-            throw new IOException("", ex);
+            throw new IOException("Failed to generate the XML resource", ex);
         }
-        ostream.write(baos.toByteArray());
     }
 
-    public void addSystemProperties(Map<String, String> systemProperties) throws IOException {
+    public JenkinsWarPatcher addSystemProperties(Map<String, String> systemProperties) throws IOException {
 
         LOGGER.log(Level.WARNING, "The logic support only System properties using the jenkins.util.SystemProperties engine");
 
@@ -149,6 +160,7 @@ public class JenkinsWarPatcher implements Closeable {
         }
 
         writeXMLResource("WEB-INF/web.xml", doc);
+        return this;
     }
 
     @CheckForNull

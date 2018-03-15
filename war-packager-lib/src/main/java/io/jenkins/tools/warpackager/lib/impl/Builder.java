@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
+import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
@@ -55,21 +56,30 @@ public class Builder {
         }
 
         // Generate POM
-        File warBuildDir = new File(tmpDir, "output");
+        File warBuildDir = new File(tmpDir, "prebuild");
         Files.createDirectories(warBuildDir.toPath());
-        POMGenerator gen = new POMGenerator(config, "-packaged");
+        MavenHPICustomWARPOMGenerator gen = new MavenHPICustomWARPOMGenerator(config, "-prebuild");
         Model model = gen.generatePOM(versionOverrides);
         gen.writePOM(model, warBuildDir);
 
         // Build WAR using Maven HPI plugin
-        processFor(warBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true");
+        processFor(warBuildDir, "mvn", "clean", "package");
 
         // Add System properties
-        File srcWar = new File(warBuildDir, "target/" + config.bundle.artifactId + "-packaged.war");
+        File srcWar = new File(warBuildDir, "target/" + config.bundle.artifactId + "-prebuild.war");
+        File explodedWar = new File(warBuildDir, "exploded-war");
         File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
-        try (JenkinsWarPatcher patcher = new JenkinsWarPatcher(srcWar, dstWar)) {
-            patcher.addSystemProperties(config.systemProperties);
-        }
+
+        // Patch WAR
+        JenkinsWarPatcher patcher = new JenkinsWarPatcher(srcWar, explodedWar)
+                .removeMetaInf()
+                .addSystemProperties(config.systemProperties);
+
+        File warOutputDir = new File(tmpDir, "output");
+        SimpleManifest manifest = SimpleManifest.parseFile(srcWar);
+        MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
+        finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
+        processFor(warOutputDir, "mvn", "clean", "package");
     }
 
     private void buildIfNeeded(DependencyInfo dep) throws IOException, InterruptedException {
