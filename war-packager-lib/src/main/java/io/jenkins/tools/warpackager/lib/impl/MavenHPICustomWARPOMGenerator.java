@@ -19,15 +19,18 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Generates pom.xml for Maven HPI Plugin's custom-war step.
  * @author Oleg Nenashev
  * @since TODO
  */
-public class POMGenerator {
+public class MavenHPICustomWARPOMGenerator {
 
     private final Config config;
+    private final String outputFileSuffix;
 
-    public POMGenerator(Config config) {
+    public MavenHPICustomWARPOMGenerator(Config config, String outputFileSuffix) {
         this.config = config;
+        this.outputFileSuffix = outputFileSuffix;
     }
 
     public Model generatePOM(Map<String, String> versionOverrides) throws IOException {
@@ -35,7 +38,9 @@ public class POMGenerator {
         model.setModelVersion("4.0.0");
         model.setGroupId(config.bundle.groupId);
         model.setArtifactId(config.bundle.artifactId);
-        model.setDescription(config.bundle.description);
+        if (config.bundle.description != null) {
+            model.setDescription(config.bundle.description);
+        }
         model.setVersion(config.buildSettings.getVersion());
 
         // WAR Dependency
@@ -95,7 +100,7 @@ public class POMGenerator {
 
     private Object generateCustomWarGoalConfiguration() {
         Map<String, String> config = new HashMap<>();
-        config.put("outputFile", "${project.build.directory}/${project.artifactId}.war");
+        config.put("outputFile", "${project.build.directory}/${project.artifactId}" + outputFileSuffix + ".war");
         return generateCustomWarGoalConfigurationDom(config);
     }
 

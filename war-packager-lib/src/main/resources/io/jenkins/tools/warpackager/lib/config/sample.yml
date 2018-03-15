@@ -1,6 +1,8 @@
 bundle:
   groupId: "io.github.oleg-nenashev"
   artifactId: "mywar"
+  vendor: "Custom WAR Packager"
+  title: "MyWAR (built by Custom WAR Packager)"
   description: "Just a WAR auto-generation-sample"
 war:
   groupId: "org.jenkins-ci.main"

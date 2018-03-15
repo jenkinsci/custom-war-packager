@@ -2,6 +2,8 @@ package io.jenkins.tools.warpackager.lib.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import javax.annotation.CheckForNull;
+
 /**
  * @author Oleg Nenashev
  * @since TODO
@@ -12,6 +14,8 @@ public class SourceInfo {
     public String git;
     public String branch;
     public String commit;
+    @CheckForNull
+    public String dir;
 
     public boolean isReleasedVersion() {
         return version != null;
@@ -24,6 +28,10 @@ public class SourceInfo {
 
         if (git != null) {
             return Type.GIT;
+        }
+
+        if (dir != null) {
+            return Type.FILESYSTEM;
         }
 
         return Type.UNKNOWN;
@@ -40,6 +48,8 @@ public class SourceInfo {
                 return version;
             case GIT:
                 return String.format("git: %s, checkout: %s", git, getCheckoutId());
+            case FILESYSTEM:
+                return String.format("filesystem: %s", dir);
             default:
                 return "unknown source";
         }
@@ -48,6 +58,7 @@ public class SourceInfo {
     public enum Type {
         MAVEN_REPO,
         GIT,
+        FILESYSTEM,
         UNKNOWN
     }
 }
