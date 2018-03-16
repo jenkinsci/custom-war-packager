@@ -185,7 +185,7 @@ public class Builder {
 
     private boolean artifactExists(File buildDir, DependencyInfo dep, String version) throws IOException, InterruptedException {
         String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
-        int res = runFor(buildDir, "mvn", "dependency:get", "-Dartifact=" + gai, "-o");
+        int res = runFor(buildDir, "mvn", "dependency:get", "-Dartifact=" + gai, "-Dtransitive=false", "-o");
         return res == 0;
     }
 
