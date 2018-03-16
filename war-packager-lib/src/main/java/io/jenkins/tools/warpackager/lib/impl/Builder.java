@@ -79,10 +79,9 @@ public class Builder {
         // Add System properties
         File srcWar = new File(warBuildDir, "target/" + config.bundle.artifactId + "-prebuild.war");
         File explodedWar = new File(warBuildDir, "exploded-war");
-        File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
 
         // Patch WAR
-        JenkinsWarPatcher patcher = new JenkinsWarPatcher(config, srcWar, explodedWar)
+        new JenkinsWarPatcher(config, srcWar, explodedWar)
                 .removeMetaInf()
                 .addSystemProperties(config.systemProperties)
                 .addHooks(hooks);
@@ -92,6 +91,9 @@ public class Builder {
         MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
         processFor(warOutputDir, "mvn", "clean", "package");
+
+        // TODO: Support custom output destinations
+        // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
     }
 
     //TODO: Merge with buildIfNeeded
@@ -102,6 +104,7 @@ public class Builder {
         switch (source.getType()) {
             case FILESYSTEM:
                 assert source.dir != null;
+                LOGGER.log(Level.INFO, "Will checkout {0} from local directory: {1}", new Object[] {id, source.dir});
                 return new File(source.dir);
             case GIT:
                 LOGGER.log(Level.INFO, "Will checkout {0} from git: {1}", new Object[] {id, source});
@@ -117,6 +120,7 @@ public class Builder {
             processFor(componentBuildDir, "git", "checkout", checkoutId);
         }
         String commit = readFor(componentBuildDir, "git", "log", "--format=%H", "-n", "1");
+        LOGGER.log(Level.INFO, "Checked out {0}, commitId: {1}", new Object[] {id, commit});
         return componentBuildDir;
     }
 

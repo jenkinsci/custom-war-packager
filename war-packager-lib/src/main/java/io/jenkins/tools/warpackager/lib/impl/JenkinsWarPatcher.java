@@ -2,8 +2,6 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 //TODO: This code should finally go to the Standard Maven HPI Plugin
 
-import com.sun.org.apache.xml.internal.security.utils.XMLUtils;
-import com.sun.xml.internal.ws.policy.privateutil.PolicyUtils;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import org.apache.commons.io.FileUtils;
@@ -22,8 +20,6 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
-import java.io.ByteArrayOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -39,7 +35,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
-import java.util.zip.ZipOutputStream;
 
 /**
  * Custom stub for patching WAR files
@@ -73,16 +68,13 @@ public class JenkinsWarPatcher {
                 ZipEntry e = it.nextElement();
                 if (!excludes.contains(e.getName()) && !e.isDirectory()) {
                     File f = new File(dstDir, e.getName());
-                    Path parent = f.toPath().getParent();
-                    if (!Files.exists(parent)) {
-                        Files.createDirectories(parent);
-                    }
+                    createParentDirIfNotExists(f);
                     try(InputStream content = zip.getInputStream(e) ; FileOutputStream out = new FileOutputStream(f)) {
                         out.write(IOUtils.toByteArray(content));
                     }
                 }
             }
-        } catch (Exception ex) {
+        } catch (IOException ex) {
             throw new IOException("Failed copy " + srcWar, ex);
         }
     }
@@ -99,6 +91,9 @@ public class JenkinsWarPatcher {
         for (Map.Entry<String, File> hookSrc : hooks.entrySet()) {
             final String hookId = hookSrc.getKey();
             GroovyHookInfo hook = config.getHookById(hookId);
+            if (hook == null) {
+                throw new IOException("Cannot find metadata for the hook with ID=" + hookId);
+            }
             addHook(hook, hookSrc.getValue());
         }
 
@@ -135,10 +130,7 @@ public class JenkinsWarPatcher {
     @Nonnull
     private void writeXMLResource(String path, Document doc) throws IOException {
         File out = new File(dstDir, path);
-        Path parent = out.toPath().getParent();
-        if (!Files.exists(parent)) {
-            Files.createDirectories(parent);
-        }
+        createParentDirIfNotExists(out);
         try(FileOutputStream ostream = new FileOutputStream(out)) {
             TransformerFactory transformerFactory = TransformerFactory.newInstance();
             Transformer transformer = transformerFactory.newTransformer();
@@ -147,6 +139,17 @@ public class JenkinsWarPatcher {
             transformer.transform(source, result);
         } catch (TransformerException ex) {
             throw new IOException("Failed to generate the XML resource", ex);
+        }
+    }
+
+    private static void createParentDirIfNotExists(@Nonnull File file) throws IOException {
+        Path p = file.toPath();
+        Path parent = p.getParent();
+        if (parent == null) {
+            throw new IOException("The specified path has no parent directory: " + file);
+        }
+        if (!Files.exists(parent)) {
+            Files.createDirectories(parent);
         }
     }
 
