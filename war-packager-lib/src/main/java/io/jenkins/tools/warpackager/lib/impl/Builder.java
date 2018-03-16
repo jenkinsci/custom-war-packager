@@ -153,10 +153,15 @@ public class Builder {
             processFor(componentBuildDir, "git", "checkout", checkoutId);
         }
         String commit = readFor(componentBuildDir, "git", "log", "--format=%H", "-n", "1");
+
+        // Install artifact with default version
+        // TODO: Make it optional, required for cross-dependencies between objects
+        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true");
+
+        // Build artifact with a custom version
         String baseVersion = readFor(componentBuildDir,"mvn", "-q", "org.codehaus.mojo:exec-maven-plugin:1.3.1:exec", "-Dexec.executable=echo", "--non-recursive", "-Dexec.args='${project.version}'").replace("-SNAPSHOT", "");
         String newVersion = String.format("%s-%s-%s-SNAPSHOT", baseVersion, checkoutId != null ? checkoutId : "default", commit);
         LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
-
         processFor(componentBuildDir,"mvn", "versions:set", "-DnewVersion=" + newVersion);
         versionOverrides.put(dep.artifactId, newVersion);
         processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true");
