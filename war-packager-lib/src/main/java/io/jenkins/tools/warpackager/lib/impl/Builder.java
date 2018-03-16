@@ -149,41 +149,38 @@ public class Builder {
         // Git checkout and build
         String commit = dep.source.commit;
         final String checkoutId = dep.source.getCheckoutId();
-        if (commit == null) { // we will need to checkout to determine the commit and caching status
-            processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
-            if (checkoutId != null) {
-                processFor(componentBuildDir, "git", "checkout", checkoutId);
-            }
-            commit = readFor(componentBuildDir, "git", "log", "--format=%H", "-n", "1");
+        if (commit == null) { // we use ls-remote to fetch the commit ID
+            String res = readFor(componentBuildDir, "git", "ls-remote", dep.source.git, checkoutId != null ? checkoutId : "master");
+            commit = res.split("\\s+")[0];
         }
 
-        String baseVersion = readFor(componentBuildDir,"mvn", "-q", "org.codehaus.mojo:exec-maven-plugin:1.3.1:exec", "-Dexec.executable=echo", "--non-recursive", "-Dexec.args='${project.version}'");
-        String newVersion = String.format("%s-%s-%s-SNAPSHOT", baseVersion.replace("-SNAPSHOT", ""), checkoutId != null ? checkoutId : "default", commit);
+        //TODO if caching is disabled, aa nice-looking version can be retrieved
+        // We cannot retrieve actual base version here without checkout. 256.0 prevents dependency check failures
+        String newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
+        versionOverrides.put(dep.artifactId, newVersion);
 
         // TODO: add no-cache option?
-        if (artifactExists(componentBuildDir, dep, baseVersion) && artifactExists(componentBuildDir, dep, baseVersion)) {
-            LOGGER.log(Level.INFO, "Both snapshot version exist for {0}: {1} and {2}. Skipping the build",
-                    new Object[] {dep, baseVersion, newVersion});
+        if (artifactExists(componentBuildDir, dep, newVersion)) {
+            LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
+                    new Object[] {dep, newVersion});
             return;
         } else {
-            LOGGER.log(Level.INFO, "Some snapshots are missing for {0}: {1} and {2}. Will run the build",
-                    new Object[] {dep, baseVersion, newVersion});
+            LOGGER.log(Level.INFO, "Snapshot is missing for {0}: {1}. Will run the build",
+                    new Object[] {dep, newVersion});
         }
 
-        if (dep.source.commit != null) { // here we checkout the commit if we had not done it before
-            processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
-            processFor(componentBuildDir, "git", "checkout", dep.source.commit);
-        }
+        processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
+        processFor(componentBuildDir, "git", "checkout", commit);
+        //String baseVersion = readFor(componentBuildDir,"mvn", "-q", "org.codehaus.mojo:exec-maven-plugin:1.3.1:exec", "-Dexec.executable=echo", "--non-recursive", "-Dexec.args='${project.version}'");
 
         // Install artifact with default version
         // TODO: Make it optional, required for cross-dependencies between objects
-        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true");
+        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
 
         // Build artifact with a custom version
         LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
         processFor(componentBuildDir,"mvn", "versions:set", "-DnewVersion=" + newVersion);
-        versionOverrides.put(dep.artifactId, newVersion);
-        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true");
+        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
     }
 
     private boolean artifactExists(File buildDir, DependencyInfo dep, String version) throws IOException, InterruptedException {
