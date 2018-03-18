@@ -24,6 +24,7 @@
     <module>war-packager-lib</module>
     <module>war-packager-cli</module>
     <module>war-packager-maven-plugin</module>
+    <module>demo/external-logging-elasticsearch</module>
   </modules>
 
   <licenses>

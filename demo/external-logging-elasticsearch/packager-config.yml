@@ -18,6 +18,10 @@ plugins:
     artifactId: "scm-api"
     source:
       version: 2.2.6
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-aggregator"
+    source:
+      version: 2.5
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "durable-task"
     source:
