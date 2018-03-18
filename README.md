@@ -104,6 +104,7 @@ systemProperties: {
      jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
 groovyHooks:
   - type: "init"
+    id: "initScripts"
     source: 
       dir: scripts
 ```

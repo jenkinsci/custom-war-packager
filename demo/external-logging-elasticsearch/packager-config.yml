@@ -1,0 +1,66 @@
+bundle:
+  groupId: "io.jenkins.tools.war-packager.demo.external-task-logging"
+  artifactId: "custom-war"
+  vendor: "Jenkins project"
+  title: ""
+  description: "Jenkins External Task Logging demo for Elasticsearch, packaged as a single WAR file. It automatically configures logging on startup"
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.107
+plugins:
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "structs"
+    source:
+      version: 1.10
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "scm-api"
+    source:
+      version: 2.2.6
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-aggregator"
+    source:
+      version: 2.5
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "durable-task"
+    source:
+      git: https://github.com/jglick/durable-task-plugin.git
+      branch: watch-JENKINS-38381
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-api"
+    source:
+      git: https://github.com/jglick/workflow-api-plugin.git
+      branch: logs-JENKINS-38381
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-step-api"
+    source:
+      version: 2.13
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-support"
+    source:
+      git: https://github.com/jglick/workflow-support-plugin.git
+      branch: logs-JENKINS-38381
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-job"
+    source:
+      git: https://github.com/jglick/workflow-job-plugin.git
+      branch: logs-JENKINS-38381
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-durable-task-step"
+    source:
+      git: https://github.com/jglick/workflow-durable-task-step-plugin.git
+      branch: watch-JENKINS-38381
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "logstash"
+    source:
+      git: https://github.com/jglick/logstash-plugin.git
+      branch: logs-JENKINS-38381
+systemProperties: {
+    jenkins.model.Jenkins.slaveAgentPort: "50000",
+    jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
+groovyHooks:
+  - type: "init"
+    id: "initScripts"
+    source:
+      dir: src/main/groovy

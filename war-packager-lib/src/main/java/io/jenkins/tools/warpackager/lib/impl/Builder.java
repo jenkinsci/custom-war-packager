@@ -147,28 +147,60 @@ public class Builder {
         }
 
         // Git checkout and build
-        processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
-        String checkoutId = dep.source.getCheckoutId();
-        if (checkoutId != null) {
-            processFor(componentBuildDir, "git", "checkout", checkoutId);
+        String commit = dep.source.commit;
+        final String checkoutId = dep.source.getCheckoutId();
+        if (commit == null) { // we use ls-remote to fetch the commit ID
+            String res = readFor(componentBuildDir, "git", "ls-remote", dep.source.git, checkoutId != null ? checkoutId : "master");
+            commit = res.split("\\s+")[0];
         }
-        String commit = readFor(componentBuildDir, "git", "log", "--format=%H", "-n", "1");
-        String baseVersion = readFor(componentBuildDir,"mvn", "-q", "org.codehaus.mojo:exec-maven-plugin:1.3.1:exec", "-Dexec.executable=echo", "--non-recursive", "-Dexec.args='${project.version}'").replace("-SNAPSHOT", "");
-        String newVersion = String.format("%s-%s-%s-SNAPSHOT", baseVersion, checkoutId != null ? checkoutId : "default", commit);
-        LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
 
-        processFor(componentBuildDir,"mvn", "versions:set", "-DnewVersion=" + newVersion);
+        //TODO if caching is disabled, aa nice-looking version can be retrieved
+        // We cannot retrieve actual base version here without checkout. 256.0 prevents dependency check failures
+        String newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
         versionOverrides.put(dep.artifactId, newVersion);
-        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true");
+
+        // TODO: add no-cache option?
+        if (artifactExists(componentBuildDir, dep, newVersion)) {
+            LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
+                    new Object[] {dep, newVersion});
+            return;
+        } else {
+            LOGGER.log(Level.INFO, "Snapshot is missing for {0}: {1}. Will run the build",
+                    new Object[] {dep, newVersion});
+        }
+
+        processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
+        processFor(componentBuildDir, "git", "checkout", commit);
+        //String baseVersion = readFor(componentBuildDir,"mvn", "-q", "org.codehaus.mojo:exec-maven-plugin:1.3.1:exec", "-Dexec.executable=echo", "--non-recursive", "-Dexec.args='${project.version}'");
+
+        // Install artifact with default version
+        // TODO: Make it optional, required for cross-dependencies between objects
+        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+
+        // Build artifact with a custom version
+        LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
+        processFor(componentBuildDir,"mvn", "versions:set", "-DnewVersion=" + newVersion);
+        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+    }
+
+    private boolean artifactExists(File buildDir, DependencyInfo dep, String version) throws IOException, InterruptedException {
+        String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
+        int res = runFor(buildDir, "mvn", "dependency:get", "-Dartifact=" + gai, "-Dtransitive=false", "-o");
+        return res == 0;
     }
 
     private void processFor(File buildDir, String ... args) throws IOException, InterruptedException {
         ProcessBuilder bldr = new ProcessBuilder(args).inheritIO();
-        bldr.directory(buildDir);
-        int res = bldr.start().waitFor();
+        int res = runFor(buildDir, args);
         if (res != 0) {
             throw new IOException("Command failed with exit code " + res + ": " + StringUtils.join(bldr.command(), ' '));
         }
+    }
+
+    private int runFor(File buildDir, String ... args) throws IOException, InterruptedException {
+        ProcessBuilder bldr = new ProcessBuilder(args).inheritIO();
+        bldr.directory(buildDir);
+        return bldr.start().waitFor();
     }
 
     private String readFor(File buildDir, String ... args) throws IOException, InterruptedException {
