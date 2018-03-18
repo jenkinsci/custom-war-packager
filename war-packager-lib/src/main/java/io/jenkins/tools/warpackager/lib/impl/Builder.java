@@ -4,21 +4,21 @@ import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
+import io.jenkins.tools.warpackager.lib.util.MavenHelper;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
 
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.*;
 
 /**
  * Builds WAR according to the specified config.
@@ -58,6 +58,13 @@ public class Builder {
             buildIfNeeded(plugin);
         }
 
+        // Prepare library patches
+        if (config.libPatches != null) {
+            for(DependencyInfo library : config.libPatches) {
+                buildIfNeeded(library);
+            }
+        }
+
         // Prepare Groovy Hooks
         Map<String, File> hooks = new HashMap<>();
         if (config.groovyHooks != null) {
@@ -84,6 +91,7 @@ public class Builder {
         new JenkinsWarPatcher(config, srcWar, explodedWar)
                 .removeMetaInf()
                 .addSystemProperties(config.systemProperties)
+                .replaceLibs(versionOverrides)
                 .addHooks(hooks);
 
         File warOutputDir = new File(tmpDir, "output");
@@ -160,7 +168,7 @@ public class Builder {
         versionOverrides.put(dep.artifactId, newVersion);
 
         // TODO: add no-cache option?
-        if (artifactExists(componentBuildDir, dep, newVersion)) {
+        if (MavenHelper.artifactExists(componentBuildDir, dep, newVersion)) {
             LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
                     new Object[] {dep, newVersion});
             return;
@@ -182,37 +190,4 @@ public class Builder {
         processFor(componentBuildDir,"mvn", "versions:set", "-DnewVersion=" + newVersion);
         processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
     }
-
-    private boolean artifactExists(File buildDir, DependencyInfo dep, String version) throws IOException, InterruptedException {
-        String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
-        int res = runFor(buildDir, "mvn", "dependency:get", "-Dartifact=" + gai, "-Dtransitive=false", "-o");
-        return res == 0;
-    }
-
-    private void processFor(File buildDir, String ... args) throws IOException, InterruptedException {
-        ProcessBuilder bldr = new ProcessBuilder(args).inheritIO();
-        int res = runFor(buildDir, args);
-        if (res != 0) {
-            throw new IOException("Command failed with exit code " + res + ": " + StringUtils.join(bldr.command(), ' '));
-        }
-    }
-
-    private int runFor(File buildDir, String ... args) throws IOException, InterruptedException {
-        ProcessBuilder bldr = new ProcessBuilder(args).inheritIO();
-        bldr.directory(buildDir);
-        return bldr.start().waitFor();
-    }
-
-    private String readFor(File buildDir, String ... args) throws IOException, InterruptedException {
-        ProcessBuilder bldr = new ProcessBuilder(args);
-        bldr.directory(buildDir);
-        Process proc = bldr.start();
-        int res = proc.waitFor();
-        String out = IOUtils.toString(proc.getInputStream(), Charset.defaultCharset()).trim();
-        if (res != 0) {
-            throw new IOException("Command failed with exit code " + res + ": " + StringUtils.join(bldr.command(), ' ') + ". " + out);
-        }
-        return out;
-    }
-
 }

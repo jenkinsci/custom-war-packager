@@ -3,9 +3,12 @@ package io.jenkins.tools.warpackager.lib.impl;
 //TODO: This code should finally go to the Standard Maven HPI Plugin
 
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
+import io.jenkins.tools.warpackager.lib.util.MavenHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,10 +32,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -84,6 +89,49 @@ public class JenkinsWarPatcher {
         if (p.exists()) {
             FileUtils.deleteDirectory(p);
         }
+        return this;
+    }
+
+    public JenkinsWarPatcher replaceLibs(Map<String, String> versionOverrides) throws IOException, InterruptedException {
+        if (config.libPatches == null) {
+            // nothing to replace
+            return this;
+        }
+
+        File libsDir = new File(dstDir, "WEB-INF/lib");
+        for (DependencyInfo lib : config.libPatches) {
+            String effectiveVersion = versionOverrides.get(lib.artifactId);
+            if (effectiveVersion == null) {
+                if (!lib.source.isReleasedVersion()) {
+                    throw new IOException("Cannot resolve new version for library " + lib);
+                }
+                effectiveVersion = lib.source.version;
+            }
+
+            List<Path> paths = Files.find(libsDir.toPath(), 1, (path, basicFileAttributes) -> {
+                //TODO: this matcher is a bit lame, it may suffer from false positives
+                if (String.valueOf(path.getFileName()).startsWith(lib.artifactId)) {
+                    return true;
+                }
+                return false;
+            }).collect(Collectors.toList());
+            if (paths.size() > 1) {
+                throw new IOException("Bug in Jenkins WAR Packager, cannot find unique lib JAR for artifact " + lib.artifactId
+                    + ". Candidates: " + StringUtils.join(paths, ","));
+            } else if (paths.size() == 1) {
+                Path oldFile = paths.get(0);
+                LOGGER.log(Level.INFO, "Replacing the existing library {0} by version {1}. Original File: {2}",
+                        new Object[] {lib.artifactId, effectiveVersion, oldFile.getFileName()});
+                Files.delete(oldFile);
+            } else {
+                LOGGER.log(Level.INFO, "Adding new library {0} with version {1}",
+                        new Object[] {lib.artifactId, effectiveVersion});
+            }
+
+            File newJarFile = new File(libsDir, lib.artifactId + "-" + effectiveVersion + ".jar");
+            MavenHelper.downloadArtifact(dstDir, lib, effectiveVersion, newJarFile);
+        }
+
         return this;
     }
 

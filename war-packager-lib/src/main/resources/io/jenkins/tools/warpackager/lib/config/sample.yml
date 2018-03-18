@@ -19,6 +19,11 @@ plugins:
     source:
       git: https://github.com/jglick/durable-task-plugin.git
       branch: watch-JENKINS-38381
+libPatches:
+  - groupId: "org.jenkins-ci"
+    artifactId: "task-reactor"
+    source:
+      git: https://github.com/jenkinsci/lib-task-reactor.git
 systemProperties: {
     jenkins.model.Jenkins.slaveAgentPort: "50000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}

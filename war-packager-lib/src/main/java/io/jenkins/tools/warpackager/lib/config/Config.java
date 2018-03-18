@@ -31,6 +31,8 @@ public class Config {
     public DependencyInfo war;
     public Collection<DependencyInfo> plugins;
     @CheckForNull
+    public Collection<DependencyInfo> libPatches;
+    @CheckForNull
     public Map<String, String> systemProperties;
     @CheckForNull
     public Collection<GroovyHookInfo> groovyHooks;
