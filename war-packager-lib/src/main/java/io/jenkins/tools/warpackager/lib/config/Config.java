@@ -29,6 +29,7 @@ public class Config {
     public BuildSettings buildSettings;
     public PackageInfo bundle;
     public DependencyInfo war;
+    @CheckForNull
     public Collection<DependencyInfo> plugins;
     @CheckForNull
     public Collection<DependencyInfo> libPatches;

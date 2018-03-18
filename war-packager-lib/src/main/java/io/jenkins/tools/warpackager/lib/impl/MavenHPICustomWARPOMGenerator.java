@@ -50,10 +50,12 @@ public class MavenHPICustomWARPOMGenerator {
         model.addDependency(dep);
 
         // Plugins
-        for (DependencyInfo plugin : config.plugins) {
-            Dependency pluginDep = plugin.toDependency(versionOverrides);
-            pluginDep.setScope("runtime");
-            model.addDependency(pluginDep);
+        if (config.plugins != null) {
+            for (DependencyInfo plugin : config.plugins) {
+                Dependency pluginDep = plugin.toDependency(versionOverrides);
+                pluginDep.setScope("runtime");
+                model.addDependency(pluginDep);
+            }
         }
 
         // Maven HPI Plugin

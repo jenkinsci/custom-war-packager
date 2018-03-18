@@ -54,8 +54,10 @@ public class Builder {
 
         // Build core and plugins
         buildIfNeeded(config.war);
-        for (DependencyInfo plugin : config.plugins) {
-            buildIfNeeded(plugin);
+        if (config.plugins != null) {
+            for (DependencyInfo plugin : config.plugins) {
+                buildIfNeeded(plugin);
+            }
         }
 
         // Prepare library patches
