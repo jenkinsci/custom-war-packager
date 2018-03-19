@@ -20,10 +20,11 @@ libPatches:
     artifactId: "remoting"
     source:
       git: https://github.com/jenkinsci/remoting.git
-  - groupId: "com.thoughtworks.xstream"
-    artifactId: "xstream"
-    source:
-      git: https://github.com/jenkinsci/xstream.git
+# XStream Repo has corrupted versioning, it cannot be packaged and bundled properly
+#  - groupId: "com.thoughtworks.xstream"
+#    artifactId: "xstream"
+#    source:
+#      git: https://github.com/jenkinsci/xstream.git
   - groupId: "org.kohsuke.stapler"
     artifactId: "stapler"
     source:
@@ -44,16 +45,21 @@ libPatches:
     artifactId: "bytecode-compatibility-transformer"
     source:
       git: https://github.com/jenkinsci/bytecode-compatibility-transformer.git
+  - groupId: "org.kohsuke"
+    artifactId: "asm6"
+    source:
+      version: 6.0_BETA
   # TODO: this one is bad idea, because it may require higher SSHD version (which we do not bump).
   # TODO: dependency resolution in WAR patcher?
   - groupId: "org.jenkins-ci.modules"
     artifactId: "sshd"
     source:
       git: https://github.com/jenkinsci/sshd-module.git
-  - groupId: "org.jenkins-ci.modules"
-    artifactId: "instance-identity"
-    source:
-      git: https://github.com/jenkinsci/instance-identity-module.git
+# TODO: Enable once master branch is fixed
+#  - groupId: "org.jenkins-ci.modules"
+#    artifactId: "instance-identity"
+#    source:
+#      git: https://github.com/jenkinsci/instance-identity-module.git
   - groupId: "org.jenkins-ci.modules"
     artifactId: "slave-installer"
     source:
@@ -62,6 +68,9 @@ libPatches:
     artifactId: "windows-slave-installer"
     source:
       git: https://github.com/jenkinsci/windows-slave-installer-module.git
+libExcludes:
+  - groupId: "org.kohsuke"
+    artifactId: "asm5"
 systemProperties: {
     jenkins.model.Jenkins.slaveAgentPort: "50000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
