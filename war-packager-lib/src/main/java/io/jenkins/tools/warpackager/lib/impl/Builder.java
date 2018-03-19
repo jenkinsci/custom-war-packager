@@ -94,6 +94,7 @@ public class Builder {
                 .removeMetaInf()
                 .addSystemProperties(config.systemProperties)
                 .replaceLibs(versionOverrides)
+                .excludeLibs()
                 .addHooks(hooks);
 
         File warOutputDir = new File(tmpDir, "output");
