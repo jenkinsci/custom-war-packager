@@ -1,0 +1,79 @@
+bundle:
+  groupId: "io.github.oleg-nenashev"
+  artifactId: "mywar"
+  vendor: "Jenkins project"
+  title: "Jenkins WAR - all latest"
+  description: "Just a Jenkins WAR, which includes all latest libs from master branches"
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    git: https://github.com/jenkinsci/jenkins
+# You can add new libraries or replace existing ones
+#TODO: this thing demonstrates that it is a bad idea to include modules in such WAY. BOMs should be used instead
+libPatches:
+  - groupId: "org.jenkins-ci"
+    artifactId: "task-reactor"
+    source:
+      git: https://github.com/jenkinsci/lib-task-reactor.git
+  - groupId: "org.jenkins-ci.main"
+    artifactId: "remoting"
+    source:
+      git: https://github.com/jenkinsci/remoting.git
+# XStream Repo has corrupted versioning, it cannot be packaged and bundled properly
+#  - groupId: "com.thoughtworks.xstream"
+#    artifactId: "xstream"
+#    source:
+#      git: https://github.com/jenkinsci/xstream.git
+  - groupId: "org.kohsuke.stapler"
+    artifactId: "stapler"
+    source:
+      git: https://github.com/stapler/stapler.git
+  - groupId: "org.kohsuke.stapler"
+    artifactId: "stapler-groovy"
+    source:
+      git: https://github.com/stapler/stapler.git
+  - groupId: "org.kohsuke.stapler"
+    artifactId: "stapler-jelly"
+    source:
+      git: https://github.com/stapler/stapler.git
+  - groupId: "org.kohsuke.stapler"
+    artifactId: "stapler-jrebel"
+    source:
+      git: https://github.com/stapler/stapler.git
+  - groupId: "org.jenkins-ci"
+    artifactId: "bytecode-compatibility-transformer"
+    source:
+      git: https://github.com/jenkinsci/bytecode-compatibility-transformer.git
+  - groupId: "org.kohsuke"
+    artifactId: "asm6"
+    source:
+      version: 6.0_BETA
+  # TODO: this one is bad idea, because it may require higher SSHD version (which we do not bump).
+  # TODO: dependency resolution in WAR patcher?
+  - groupId: "org.jenkins-ci.modules"
+    artifactId: "sshd"
+    source:
+      git: https://github.com/jenkinsci/sshd-module.git
+# TODO: Enable once master branch is fixed
+#  - groupId: "org.jenkins-ci.modules"
+#    artifactId: "instance-identity"
+#    source:
+#      git: https://github.com/jenkinsci/instance-identity-module.git
+  - groupId: "org.jenkins-ci.modules"
+    artifactId: "slave-installer"
+    source:
+      git: https://github.com/jenkinsci/slave-installer-module.git
+  - groupId: "org.jenkins-ci.modules"
+    artifactId: "windows-slave-installer"
+    source:
+      git: https://github.com/jenkinsci/windows-slave-installer-module.git
+libExcludes:
+  - groupId: "org.kohsuke"
+    artifactId: "asm5"
+systemProperties: {
+    jenkins.model.Jenkins.slaveAgentPort: "50000",
+    jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
+
+# TODO: Support System Groovy Scripts Bundling
+

@@ -3,9 +3,12 @@ package io.jenkins.tools.warpackager.lib.impl;
 //TODO: This code should finally go to the Standard Maven HPI Plugin
 
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
+import io.jenkins.tools.warpackager.lib.util.MavenHelper;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -29,10 +32,12 @@ import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -85,6 +90,95 @@ public class JenkinsWarPatcher {
             FileUtils.deleteDirectory(p);
         }
         return this;
+    }
+
+    private File getLibsDir() {
+        return new File(dstDir, "WEB-INF/lib");
+    }
+
+    public JenkinsWarPatcher replaceLibs(Map<String, String> versionOverrides) throws IOException, InterruptedException {
+        if (config.libPatches == null) {
+            // nothing to replace
+            return this;
+        }
+
+        for (DependencyInfo lib : config.libPatches) {
+            replaceLib(lib, versionOverrides);
+        }
+
+        return this;
+    }
+
+    public JenkinsWarPatcher excludeLibs() throws IOException, InterruptedException {
+        if (config.libExcludes == null) {
+            // nothing to remove
+            return this;
+        }
+
+        for (DependencyInfo lib : config.libExcludes) {
+            excludeLib(lib);
+        }
+
+        return this;
+    }
+
+    private void replaceLib(DependencyInfo lib, Map<String, String> versionOverrides) throws IOException, InterruptedException {
+
+        File libsDir = getLibsDir();
+        String effectiveVersion = versionOverrides.get(lib.artifactId);
+        if (effectiveVersion == null) {
+            if (!lib.source.isReleasedVersion()) {
+                throw new IOException("Cannot resolve new version for library " + lib);
+            }
+            effectiveVersion = lib.source.version;
+        }
+
+        List<Path> paths = Files.find(libsDir.toPath(), 1, (path, basicFileAttributes) -> {
+            //TODO: this matcher is a bit lame, it may suffer from false positives
+            String fileName = String.valueOf(path.getFileName());
+            if (fileName.matches(lib.artifactId + "-\\d+.*")) {
+                return true;
+            }
+            return false;
+        }).collect(Collectors.toList());
+        if (paths.size() > 1) {
+            throw new IOException("Bug in Jenkins WAR Packager, cannot find unique lib JAR for artifact " + lib.artifactId
+                    + ". Candidates: " + StringUtils.join(paths, ","));
+        } else if (paths.size() == 1) {
+            Path oldFile = paths.get(0);
+            LOGGER.log(Level.INFO, "Replacing the existing library {0} by version {1}. Original File: {2}",
+                    new Object[] {lib.artifactId, effectiveVersion, oldFile.getFileName()});
+            Files.delete(oldFile);
+        } else {
+            LOGGER.log(Level.INFO, "Adding new library {0} with version {1}",
+                    new Object[] {lib.artifactId, effectiveVersion});
+        }
+
+        File newJarFile = new File(libsDir, lib.artifactId + "-" + effectiveVersion + ".jar");
+        MavenHelper.downloadArtifact(dstDir, lib, effectiveVersion, newJarFile);
+    }
+
+    private void excludeLib(DependencyInfo lib) throws IOException, InterruptedException {
+        File libsDir = getLibsDir();
+        List<Path> paths = Files.find(libsDir.toPath(), 1, (path, basicFileAttributes) -> {
+            //TODO: this matcher is a bit lame, it may suffer from false positives
+            String fileName = String.valueOf(path.getFileName());
+            if (fileName.matches(lib.artifactId + "-\\d+.*")) {
+                return true;
+            }
+            return false;
+        }).collect(Collectors.toList());
+        if (paths.size() > 1) {
+            throw new IOException("Bug in Jenkins WAR Packager, cannot find unique lib JAR for artifact " + lib.artifactId
+                    + ". Candidates: " + StringUtils.join(paths, ","));
+        } else if (paths.size() == 1) {
+            Path oldFile = paths.get(0);
+            LOGGER.log(Level.INFO, "Removing library {0}. Original File: {1}",
+                    new Object[] {lib.artifactId, oldFile.getFileName()});
+            Files.delete(oldFile);
+        } else {
+            throw new IOException("Cannot remove library " + lib + ". It is missing in the WAR file");
+        }
     }
 
     public JenkinsWarPatcher addHooks(@Nonnull Map<String, File> hooks) throws IOException {
