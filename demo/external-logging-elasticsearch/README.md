@@ -1,4 +1,4 @@
-Jenkins WAR Packager Demo
+External Task Logging to Elasticsearch Demo
 ===
 
 This demo packages Jenkins WAR for External Task Logging to Elasticsearch with help of Logstash plugin.

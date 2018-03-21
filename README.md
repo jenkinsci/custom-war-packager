@@ -9,9 +9,17 @@ Generally the tool is a wrapper on the top of Maven HPI's plugin
 
 Differences:
 
-* It can build package custom branches with unreleased/unstaged packages
+* It can build package plugins from custom branches with unreleased/unstaged packages
 * It can run as a CLI tool outside Maven
 * It takes YAML specification instead of Maven `pom.xml`
+* It allows patching WAR contents like bundled libraries, system properties
+* It allows embedding [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
+so that the instance can be auto-configured
+
+### Demo
+
+* [Jenkins WAR which bundles master branches for core and some key libraries/modules](./demo/all-latest-core)
+* [External Task Logging to Elasticsearch](./demo/external-logging-elasticsearch)
 
 ### Usage
 
@@ -85,20 +93,25 @@ bundle:
   artifactId: "mywar"
   description: "Just a WAR auto-generation-sample"
 war:
-  groupId: tools
-  artifactId: tools
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
   source:
     version: 2.107
 plugins:
-  - groupId: tools
+  - groupId: "org.jenkins-ci.plugins"
     artifactId: "matrix-project"
     source:
       version: 1.9
-  - groupId: tools
+  - groupId: "org.jenkins-ci.plugins"
     artifactId: "durable-task"
     source:
       git: https://github.com/jglick/durable-task-plugin.git
       branch: watch-JENKINS-38381
+libPatches:
+  - groupId: "org.jenkins-ci.main"
+    artifactId: "remoting"
+    source:
+      git: https://github.com/jenkinsci/remoting.git
 systemProperties: {
      jenkins.model.Jenkins.slaveAgentPort: "50000",
      jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
@@ -111,10 +124,13 @@ groovyHooks:
 
 ### Limitations
 
-Currently the tool is a PoC, some major features are missing:
+Currently the tool is in the alpha state.
+It has some serious limitations:
 
-* No caching of build artifacts, `git` dependencies will be always rebuilt
 * All built artifacts with Git source are being installed to the local repository
   * Versions are unique for every commit, so beware of local repo pollution
-* System properties will work only for a custom ``
-* Error handling and reporting is far from perfect
+* System properties work only for a custom `jenkins.util.SystemProperties` class defined in the core
+  * Use Groovy Hook Scripts if you need to setup other system properties
+* `libPatches` steps bundles only a specified JAR file, but not its dependencies.
+Dependencies need to be explicitly packaged as well if they change compared to the base WAR file.
+  * `libExcludes` can be used to remove dependencies which are not required anymore
