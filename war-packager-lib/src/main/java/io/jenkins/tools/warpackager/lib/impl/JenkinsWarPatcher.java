@@ -123,6 +123,9 @@ public class JenkinsWarPatcher {
     }
 
     private void replaceLib(DependencyInfo lib, Map<String, String> versionOverrides) throws IOException, InterruptedException {
+        if (lib.source == null) {
+            throw new IOException("Source is not defined for " + lib);
+        }
 
         File libsDir = getLibsDir();
         String effectiveVersion = versionOverrides.get(lib.artifactId);

@@ -3,6 +3,7 @@ package io.jenkins.tools.warpackager.lib.config;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.maven.model.Dependency;
 
+import javax.annotation.CheckForNull;
 import java.io.IOException;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import java.util.Map;
 public class DependencyInfo {
     public String groupId;
     public String artifactId;
+    @CheckForNull
     public SourceInfo source;
 
     public boolean isNeedsBuild() {
@@ -36,6 +38,11 @@ public class DependencyInfo {
 
         dep.setVersion(version);
         return dep;
+    }
+
+    @CheckForNull
+    public SourceInfo getSource() {
+        return source;
     }
 
     @Override
