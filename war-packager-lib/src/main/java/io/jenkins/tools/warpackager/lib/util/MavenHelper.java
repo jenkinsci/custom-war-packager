@@ -24,7 +24,6 @@ public class MavenHelper {
 
     public static void downloadArtifact(File buildDir, DependencyInfo dep, String version, File destination)
             throws IOException, InterruptedException {
-        String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
         processFor(buildDir, "mvn", "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
                 "-DgroupId=" + dep.groupId,
                 "-DartifactId=" + dep.artifactId,
