@@ -1,6 +1,6 @@
 bundle:
-  groupId: "io.jenkins.tools.war-packager.demo.external-task-logging"
-  artifactId: "custom-war"
+  groupId: "io.jenkins.tools.war-packager.demo"
+  artifactId: "external-task-logging-logstash"
   vendor: "Jenkins project"
   title: ""
   description: "Jenkins External Task Logging demo for Elasticsearch, packaged as a single WAR file. It automatically configures logging on startup"

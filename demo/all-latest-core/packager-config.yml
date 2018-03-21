@@ -1,6 +1,6 @@
 bundle:
-  groupId: "io.github.oleg-nenashev"
-  artifactId: "mywar"
+  groupId: "io.jenkins.tools.war-packager.demo"
+  artifactId: "jenkins-all-latest"
   vendor: "Jenkins project"
   title: "Jenkins WAR - all latest"
   description: "Just a Jenkins WAR, which includes all latest libs from master branches"
