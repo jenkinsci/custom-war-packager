@@ -3,15 +3,15 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>io.jenkins.tools.war-packager</groupId>
-    <artifactId>war-packager-pom</artifactId>
+    <groupId>io.jenkins.tools.custom-war-packager</groupId>
+    <artifactId>parent-pom</artifactId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>war-packager-maven-plugin</artifactId>
+  <artifactId>custom-war-packager-maven-plugin</artifactId>
   <packaging>maven-plugin</packaging>
 
-  <name>Jenkins WAR Packager Maven Plugin</name>
+  <name>Jenkins Custom WAR Packager Maven Plugin</name>
   <description>Generates a Custom WAR file from the specified YAML configuration file</description>
 
   <dependencies>

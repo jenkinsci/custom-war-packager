@@ -1,4 +1,4 @@
-Jenkins WAR Packager
+Jenkins Custom WAR Packager
 ===
 
 :exclamation: This tool is under development
@@ -29,12 +29,12 @@ The tool offers a CLI interface and a Maven Plugin wrapper.
 
 
 ```shell
-java -jar war-packager-cli.jar -configPath=mywar.yml -version=1.0-SNAPSHOT -tmpDir=tmp
+java -jar custom-war-packager-cli.jar -configPath=mywar.yml -version=1.0-SNAPSHOT -tmpDir=tmp
 ```
 
 After the build the generated WAR file will be put to `tmp/output/${artifactId}.war`.
 
-To run the tool in a demo mode with [this config](./war-packager-cli/src/main/resources/io/jenkins/tools/warpackager/cli/config/sample.yml), just use the following command:
+To run the tool in a demo mode with [this config](./custom-war-packager-cli/src/main/resources/io/jenkins/tools/warpackager/cli/config/sample.yml), just use the following command:
 
 ```shell
 java -jar war-packager-cli.jar -demo
@@ -45,15 +45,15 @@ Invoke the tool without options without options to get a full CLI options list.
 ### Maven
 
 Maven plugin runs the packager and generates the artifact.
-The artifact will be put to "target/war-packager-maven-plugin/output/target/${bundle.artifactId}.war"
+The artifact will be put to "target/custom-war-packager-maven-plugin/output/target/${bundle.artifactId}.war"
 and added to the project artifacts.
 
 ```xml
   <build>
     <plugins>
       <plugin>
-        <groupId>io.jenkins.tools.war-packager</groupId>
-        <artifactId>war-packager-pom</artifactId>
+        <groupId>io.jenkins.tools.custom-war-packager</groupId>
+        <artifactId>custom-war-packager-maven-plugin</artifactId>
         <version>@project.version@</version>
         <executions>
           <execution>
