@@ -52,32 +52,5 @@
       <version>1.9.2</version>
     </dependency>
   </dependencies>
-  
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <!-- version specified in parent pom -->
-        <executions>
-          <execution>
-            <goals>
-              <goal>single</goal>
-            </goals>
-            <phase>package</phase>
-            <configuration>
-              <descriptorRefs>
-                <descriptorRef>jar-with-dependencies</descriptorRef>
-              </descriptorRefs>
-              <archive>
-                <manifest>
-                  <mainClass>io.jenkins.tools.warpackager.cli.Main</mainClass>
-                </manifest>
-              </archive>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
    
 </project>
