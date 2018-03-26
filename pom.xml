@@ -19,6 +19,7 @@
   <name>Jenkins Custom WAR Packager Parent POM</name>
   <description>Parent POM for packaging custom Jenkins WARs</description>
   <packaging>pom</packaging>
+  <url>http://github.com/jenkinsci/custom-war-packager</url>
 
   <modules>
     <module>custom-war-packager-lib</module>
@@ -34,13 +35,12 @@
     </license>
   </licenses>
 
-<!-- TODO: needs to be hosted first
   <scm>
-    <connection>scm:git:ssh://git@github.com/jenkinsci/plugin-compat-tester.git</connection>
-    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/plugin-compat-tester.git</developerConnection>
+    <connection>scm:git:ssh://git@github.com/jenkinsci/custom-war-packager.git</connection>
+    <developerConnection>scm:git:ssh://git@github.com/jenkinsci/custom-war-packager.git</developerConnection>
+    <url>http://github.com/jenkinsci/custom-war-packager</url>
     <tag>HEAD</tag>
   </scm>
--->
 
   <repositories>
     <repository>
