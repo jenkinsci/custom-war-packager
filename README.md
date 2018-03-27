@@ -18,7 +18,8 @@ so that the instance can be auto-configured
 
 ### Demo
 
-* [Jenkins WAR which bundles master branches for core and some key libraries/modules](./demo/all-latest-core)
+* [Jenkins WAR - all latest](./demo/all-latest-core) - bundles master branches for core and some key libraries/modules
+* [Jenkins WAR - all latest with Maven](./demo/all-latest-core-maven) - same as a above, but with Maven
 * [External Task Logging to Elasticsearch](./demo/external-logging-elasticsearch)
 
 ### Usage

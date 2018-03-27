@@ -1,4 +1,4 @@
-Jenkins WAR Packager Demo. All-latest core
+Jenkins WAR Packager Demo. All-latest core (with Maven)
 ===
 
 This demo builds a Jenkins WAR which includes...
@@ -9,6 +9,7 @@ This demo builds a Jenkins WAR which includes...
   * Some agent installer modules have obsolete tooling, they need to be updated before inclusion
 * Latest version of Lib Task Reactor
 
+The demo is similar to [All-latest core](../all-latest-core) demo, but it runs in Maven.
 
 Limitations:
 
@@ -19,6 +20,6 @@ like Extras Executable War cannot be updated right now
 
 ### Usage
 
-To build the demo just run the `sh build.sh` command.
-It will produce a `tmp/output/target/jenkins-all-latest-1.0-SNAPSHOT.war` file.
+To build the demo just run the `mvn clean package` command.
+It will produce a `target/war-packager-maven-plugin/output/target/jenkins-all-latest-1.1-SNAPSHOT.war` file.
 You can run this file as a common Jenkins WAR file.
