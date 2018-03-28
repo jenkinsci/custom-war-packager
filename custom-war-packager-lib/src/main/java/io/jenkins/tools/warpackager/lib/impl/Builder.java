@@ -53,17 +53,17 @@ public class Builder {
         Files.createDirectories(buildRoot.toPath());
 
         // Build core and plugins
-        buildIfNeeded(config.war);
+        buildIfNeeded(config.war, "war");
         if (config.plugins != null) {
             for (DependencyInfo plugin : config.plugins) {
-                buildIfNeeded(plugin);
+                buildIfNeeded(plugin, "hpi");
             }
         }
 
         // Prepare library patches
         if (config.libPatches != null) {
             for(DependencyInfo library : config.libPatches) {
-                buildIfNeeded(library);
+                buildIfNeeded(library, "jar");
             }
         }
 
@@ -135,7 +135,7 @@ public class Builder {
         return componentBuildDir;
     }
 
-    private void buildIfNeeded(DependencyInfo dep) throws IOException, InterruptedException {
+    private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
         //TODO: add Caching support if commit is defined
         if (!dep.isNeedsBuild()) {
             LOGGER.log(Level.INFO, "Component {0}: no build required", dep);
@@ -165,13 +165,13 @@ public class Builder {
             commit = res.split("\\s+")[0];
         }
 
-        //TODO if caching is disabled, aa nice-looking version can be retrieved
+        //TODO if caching is disabled, a nice-looking version can be retrieved
         // We cannot retrieve actual base version here without checkout. 256.0 prevents dependency check failures
         String newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
         versionOverrides.put(dep.artifactId, newVersion);
 
         // TODO: add no-cache option?
-        if (MavenHelper.artifactExists(componentBuildDir, dep, newVersion)) {
+        if (MavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
             LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
                     new Object[] {dep, newVersion});
             return;

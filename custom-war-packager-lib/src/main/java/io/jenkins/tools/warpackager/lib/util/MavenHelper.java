@@ -15,10 +15,13 @@ import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.runFor;
 public class MavenHelper {
 
     private MavenHelper() {}
-
-    public static boolean artifactExists(File buildDir, DependencyInfo dep, String version) throws IOException, InterruptedException {
+    
+    public static boolean artifactExists(File buildDir, DependencyInfo dep, String version, String packaging) throws IOException, InterruptedException {
         String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
-        int res = runFor(buildDir, "mvn", "dependency:get", "-Dartifact=" + gai, "-Dtransitive=false", "-o");
+        int res = runFor(buildDir, "mvn", "dependency:get",
+                "-Dartifact=" + gai,
+                "-Dpackaging=" + packaging,
+                "-Dtransitive=false", "-o");
         return res == 0;
     }
 
