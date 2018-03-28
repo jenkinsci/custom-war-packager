@@ -7,7 +7,7 @@ properties([[$class: 'BuildDiscarderProperty',
 /* These platforms correspond to labels in ci.jenkins.io, see:
  *  https://github.com/jenkins-infra/documentation/blob/master/ci.adoc
  */
-List platforms = ['linux', 'windows']
+List platforms = ['linux']
 Map branches = [:]
 
 for (int i = 0; i < platforms.size(); ++i) {
