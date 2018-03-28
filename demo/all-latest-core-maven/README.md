@@ -21,5 +21,5 @@ like Extras Executable War cannot be updated right now
 ### Usage
 
 To build the demo just run the `mvn clean package` command.
-It will produce a `target/war-packager-maven-plugin/output/target/jenkins-all-latest-1.1-SNAPSHOT.war` file.
+It will produce a `target/custom-war-packager-maven-plugin/output/target/jenkins-all-latest-1.1-SNAPSHOT.war` file.
 You can run this file as a common Jenkins WAR file.

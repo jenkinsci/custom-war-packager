@@ -60,7 +60,7 @@ public class PackageMojo extends AbstractMojo {
             cfg.buildSettings.setTmpDir(new File(tmpDir));
         } else { // Use a Maven temporary dir
             //TODO: use step ID
-            cfg.buildSettings.setTmpDir(new File(project.getBuild().getDirectory(), "war-packager-maven-plugin"));
+            cfg.buildSettings.setTmpDir(new File(project.getBuild().getDirectory(), "custom-war-packager-maven-plugin"));
         }
 
         final Builder bldr = new Builder(cfg);

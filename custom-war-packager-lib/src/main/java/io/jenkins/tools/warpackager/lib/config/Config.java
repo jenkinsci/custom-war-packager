@@ -70,7 +70,7 @@ public class Config {
 
     // TODO: make the destination configurable
     public File getOutputWar() {
-        return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + ".war");
+        return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + "-" + buildSettings.getVersion() + ".war");
     }
 
     @CheckForNull
