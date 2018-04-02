@@ -8,6 +8,14 @@ LABEL Description="This is a Jenkins agent image, which packages tools needed by
 
 RUN apt-get -y update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
 
+# Install Docker Client, we won't start a daemon
+ENV DOCKERVERSION=17.12.0-ce
+RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${DOCKERVERSION}.tgz \
+  && mv docker-${DOCKERVERSION}.tgz docker.tgz \
+  && tar xzvf docker.tgz \
+  && mv docker/docker /usr/local/bin \
+  && rm -r docker docker.tgz
+
 #TODO: Consider moving image to the "jenkins" user instead of root
 RUN mkdir /root/.jenkins
 VOLUME /root/.jenkins
