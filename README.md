@@ -21,6 +21,7 @@ so that the instance can be auto-configured
 * [Jenkins WAR - all latest](./demo/all-latest-core) - bundles master branches for core and some key libraries/modules
 * [Jenkins WAR - all latest with Maven](./demo/all-latest-core-maven) - same as a above, but with Maven
 * [External Task Logging to Elasticsearch](./demo/external-logging-elasticsearch)
+* [Custom WAR Packager CI Demo](https://github.com/oleg-nenashev/jenkins-custom-war-packager-ci-demo) - Standalone demo with an integrated CI flow
 
 ### Usage
 
@@ -83,6 +84,8 @@ Configuration file can be used to configure the downstream builder.
 * Maven 3.5.0 or above
 * Java 8
 * Git (if any Git sources are defined)
+
+Custom WAR Packager offers a [Docker Image](./packaging/docker-builder/README.md) which bundles all the required tools.
 
 #### Configuration file
 
