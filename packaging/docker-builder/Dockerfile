@@ -23,4 +23,5 @@ RUN groupadd -g 10000 jenkins \
   && useradd -c "Jenkins user" -d $HOME -u 10000 -g 10000 -m jenkins
 
 USER jenkins
+VOLUME /var/run/docker.sock
 WORKDIR /home/jenkins
