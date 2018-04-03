@@ -20,7 +20,8 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${
 
 ENV HOME /home/jenkins
 RUN groupadd -g 10000 jenkins \
-  && useradd -c "Jenkins user" -d $HOME -u 10000 -g 10000 -m jenkins
+  && groupadd -g 999 docker-users \
+  && useradd -c "Jenkins user" -d $HOME -u 10000 -g 10000 -G jenkins,docker-users -m jenkins
 
 USER jenkins
 VOLUME /var/run/docker.sock
