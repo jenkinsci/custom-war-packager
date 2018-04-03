@@ -12,6 +12,9 @@ public class CliOptions {
     @Option(name = "-configPath", usage = "Path to the configuration YAML. See the tool's README for format")
     public File configPath;
 
+    @Option(name = "-mvnSettingsFile", usage = "Path to a custom Maven settings file to be used within the build")
+    public File mvnSettingsFile;
+
     @Option(name = "-tmpDir", usage = "Temporary directory for generated files and the output WAR. Defaults to '" + BuildSettings.DEFAULT_TMP_DIR_NAME + "'")
     public File tmpDir;
 
@@ -34,6 +37,11 @@ public class CliOptions {
     @Nonnull
     public String getVersion() {
         return version != null ? version : BuildSettings.DEFAULT_VERSION;
+    }
+
+    @CheckForNull
+    public File getMvnSettingsFile() {
+        return mvnSettingsFile;
     }
 
     public boolean isDemo() {

@@ -46,19 +46,18 @@ import java.util.zip.ZipFile;
  * @author Oleg Nenashev
  * @since TODO
  */
-public class JenkinsWarPatcher {
+public class JenkinsWarPatcher extends PackagerBase {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsWarPatcher.class.getName());
 
-    private final Config config;
     private final File srcWar;
     private final File dstDir;
 
     public JenkinsWarPatcher(@Nonnull Config config, @Nonnull File src, @Nonnull File dstDir) throws IOException {
+        super(config);
         if (src.equals(dstDir)) {
             throw new IOException("Source and destination are the same: " + src);
         }
-        this.config = config;
         this.srcWar = src;
         this.dstDir = dstDir;
         Files.createDirectories(dstDir.toPath());
@@ -158,7 +157,7 @@ public class JenkinsWarPatcher {
         }
 
         File newJarFile = new File(libsDir, lib.artifactId + "-" + effectiveVersion + ".jar");
-        MavenHelper.downloadArtifact(dstDir, lib, effectiveVersion, newJarFile);
+        mavenHelper.downloadArtifact(dstDir, lib, effectiveVersion, newJarFile);
     }
 
     private void excludeLib(DependencyInfo lib) throws IOException, InterruptedException {
