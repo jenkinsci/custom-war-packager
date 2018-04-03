@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
@@ -25,6 +26,7 @@ public class MavenHelper {
         this.cfg = cfg;
     }
 
+    @SuppressFBWarnings(value = "RV_RETURN_VALUE_IGNORED", justification = "Passed parameter is true")
     public void run(File buildDir, String ... args) throws IOException, InterruptedException {
         run(buildDir, true, args);
     }
