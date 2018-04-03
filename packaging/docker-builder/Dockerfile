@@ -6,7 +6,9 @@ MAINTAINER Oleg Nenashev <o.v.nenashev@gmail.com>
 
 LABEL Description="This is a Jenkins agent image, which packages tools needed by Jenkins Custom WAR Packager" Vendor="Jenkins project" Version="0.1"
 
-RUN apt-get -y update && apt-get install -y git && rm -rf /var/lib/apt/lists/*
+RUN apt-get -y update \
+  && apt-get install -y git \
+  && rm -rf /var/lib/apt/lists/*
 
 # Install Docker Client, we won't start a daemon
 ENV DOCKERVERSION=17.12.0-ce
@@ -16,8 +18,9 @@ RUN curl -fsSLO https://download.docker.com/linux/static/stable/x86_64/docker-${
   && mv docker/docker /usr/local/bin \
   && rm -r docker docker.tgz
 
-#TODO: Consider moving image to the "jenkins" user instead of root
-RUN mkdir /root/.jenkins
-VOLUME /root/.jenkins
-VOLUME /root/.m2
-WORKDIR /root
+ENV HOME /home/jenkins
+RUN groupadd -g 10000 jenkins \
+  && useradd -c "Jenkins user" -d $HOME -u 10000 -g 10000 -m jenkins
+
+USER jenkins
+WORKDIR /home/jenkins
