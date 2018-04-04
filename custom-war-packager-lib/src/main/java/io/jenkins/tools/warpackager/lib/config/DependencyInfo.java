@@ -4,6 +4,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.maven.model.Dependency;
 
 import javax.annotation.CheckForNull;
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Map;
 
@@ -17,6 +18,8 @@ public class DependencyInfo {
     public String artifactId;
     @CheckForNull
     public SourceInfo source;
+    @CheckForNull
+    public DependencyBuildSettings build;
 
     public boolean isNeedsBuild() {
         return source != null && !source.isReleasedVersion();
@@ -48,5 +51,10 @@ public class DependencyInfo {
     @Override
     public String toString() {
         return String.format("%s:%s:%s", groupId, artifactId, source);
+    }
+
+    @Nonnull
+    public DependencyBuildSettings getBuildSettings() {
+        return build != null ? build : DependencyBuildSettings.DEFAULT;
     }
 }
