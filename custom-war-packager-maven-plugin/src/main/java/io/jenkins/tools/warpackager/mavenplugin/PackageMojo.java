@@ -70,7 +70,6 @@ public class PackageMojo extends AbstractMojo {
             cfg.buildSettings.setTmpDir(new File(project.getBuild().getDirectory(), "custom-war-packager-maven-plugin"));
         }
 
-
         final Builder bldr = new Builder(cfg);
         try {
             bldr.build();
