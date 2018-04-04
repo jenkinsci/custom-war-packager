@@ -60,7 +60,7 @@ public class MavenHelper {
 
     public void downloadArtifact(File buildDir, DependencyInfo dep, String version, File destination)
             throws IOException, InterruptedException {
-        run(buildDir,"mvn", "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
+        run(buildDir, "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
                 "-DgroupId=" + dep.groupId,
                 "-DartifactId=" + dep.artifactId,
                 "-Dversion=" + version,
