@@ -43,6 +43,7 @@ public class Main {
         // Override Build Settings by CLI arguments
         cfg.buildSettings.setTmpDir(options.getTmpDir());
         cfg.buildSettings.setVersion(options.getVersion());
+        cfg.buildSettings.setMvnSettingsFile(options.getMvnSettingsFile());
 
         final Builder bldr = new Builder(cfg);
         bldr.build();

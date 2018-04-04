@@ -25,19 +25,18 @@ import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.*;
  * @author Oleg Nenashev
  * @since TODO
  */
-public class Builder {
+public class Builder extends PackagerBase {
 
     private static final Logger LOGGER = Logger.getLogger(Builder.class.getName());
 
     private final File buildRoot;
-    private final Config config;
 
     // Context
     private Map<String, String> versionOverrides = new HashMap<>();
 
 
     public Builder(Config config) {
-        this.config = config;
+        super(config);
         this.buildRoot = new File(config.buildSettings.getTmpDir(), "build");
     }
 
@@ -83,7 +82,7 @@ public class Builder {
         gen.writePOM(model, warBuildDir);
 
         // Build WAR using Maven HPI plugin
-        processFor(warBuildDir, "mvn", "clean", "package");
+        mavenHelper.run(warBuildDir, "clean", "package");
 
         // Add System properties
         File srcWar = new File(warBuildDir, "target/" + config.bundle.artifactId + "-prebuild.war");
@@ -101,7 +100,7 @@ public class Builder {
         SimpleManifest manifest = SimpleManifest.parseFile(srcWar);
         MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
-        processFor(warOutputDir, "mvn", "clean", "package");
+        mavenHelper.run(warOutputDir, "clean", "package");
 
         // TODO: Support custom output destinations
         // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
@@ -171,7 +170,7 @@ public class Builder {
         versionOverrides.put(dep.artifactId, newVersion);
 
         // TODO: add no-cache option?
-        if (MavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
+        if (mavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
             LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
                     new Object[] {dep, newVersion});
             return;
@@ -186,12 +185,12 @@ public class Builder {
 
         // Install artifact with default version if required
         if (dep.getBuildSettings().buildOriginalVersion) {
-            processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+            mavenHelper.run(componentBuildDir, "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
         }
 
         // Build artifact with a custom version
         LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
-        processFor(componentBuildDir,"mvn", "versions:set", "-DnewVersion=" + newVersion);
-        processFor(componentBuildDir, "mvn", "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+        mavenHelper.run(componentBuildDir, "versions:set", "-DnewVersion=" + newVersion);
+        mavenHelper.run(componentBuildDir, "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
     }
 }

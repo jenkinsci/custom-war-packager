@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.config;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.File;
 
@@ -17,8 +18,10 @@ public class BuildSettings {
     public static final String DEFAULT_VERSION = "1.0-SNAPSHOT";
 
     private File tmpDir;
-
     private String version;
+    @CheckForNull
+    private File mvnSettingsFile;
+
 
     public void setTmpDir(File tmpDir) {
         this.tmpDir = tmpDir;
@@ -26,6 +29,10 @@ public class BuildSettings {
 
     public void setVersion(String version) {
         this.version = version;
+    }
+
+    public void setMvnSettingsFile(@CheckForNull File mvnSettingsFile) {
+        this.mvnSettingsFile = mvnSettingsFile;
     }
 
     @Nonnull
@@ -38,5 +45,8 @@ public class BuildSettings {
         return version != null ? version : DEFAULT_VERSION;
     }
 
-
+    @CheckForNull
+    public File getMvnSettingsFile() {
+        return mvnSettingsFile;
+    }
 }

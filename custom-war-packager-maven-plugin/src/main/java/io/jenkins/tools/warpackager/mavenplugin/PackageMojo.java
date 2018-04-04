@@ -37,6 +37,9 @@ public class PackageMojo extends AbstractMojo {
     @Parameter
     public @CheckForNull String tmpDir;
 
+    @Parameter
+    public @CheckForNull String mvnSettingsFile;
+
     @Component
     protected MavenProject project;
 
@@ -55,7 +58,11 @@ public class PackageMojo extends AbstractMojo {
         } catch (IOException ex) {
             throw new MojoExecutionException("Cannot load configuration from " + configFilePath, ex);
         }
+
         cfg.buildSettings.setVersion(warVersion);
+        if (mvnSettingsFile != null) {
+            cfg.buildSettings.setMvnSettingsFile(new File(mvnSettingsFile));
+        }
         if (tmpDir != null) {
             cfg.buildSettings.setTmpDir(new File(tmpDir));
         } else { // Use a Maven temporary dir
