@@ -40,6 +40,9 @@ public class PackageMojo extends AbstractMojo {
     @Parameter
     public @CheckForNull String mvnSettingsFile;
 
+    @Parameter
+    public boolean batchMode;
+
     @Component
     protected MavenProject project;
 
@@ -68,6 +71,10 @@ public class PackageMojo extends AbstractMojo {
         } else { // Use a Maven temporary dir
             //TODO: use step ID
             cfg.buildSettings.setTmpDir(new File(project.getBuild().getDirectory(), "custom-war-packager-maven-plugin"));
+        }
+
+        if (batchMode) {
+            cfg.buildSettings.addMavenOption("--batch-mode");
         }
 
         final Builder bldr = new Builder(cfg);

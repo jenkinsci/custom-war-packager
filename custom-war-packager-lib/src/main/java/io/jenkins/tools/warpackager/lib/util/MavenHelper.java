@@ -35,12 +35,15 @@ public class MavenHelper {
     public int run(File buildDir, boolean failOnError, String ... args) throws IOException, InterruptedException {
         ArrayList<String> callArgs = new ArrayList<>();
         callArgs.add("mvn");
-        File settingsFile = cfg.buildSettings != null ? cfg.buildSettings.getMvnSettingsFile() : null;
-        if (settingsFile != null) {
-            callArgs.add("-s");
-            callArgs.add(settingsFile.getAbsolutePath());
+        if (cfg.buildSettings != null) {
+            File settingsFile = cfg.buildSettings.getMvnSettingsFile();
+            if (settingsFile != null) {
+                callArgs.add("-s");
+                callArgs.add(settingsFile.getAbsolutePath());
+            }
+            Collections.addAll(callArgs, args);
+            callArgs.addAll(cfg.buildSettings.getMvnOptions());
         }
-        Collections.addAll(callArgs, args);
 
         if (failOnError) {
             processFor(buildDir, callArgs.toArray(args));

@@ -44,6 +44,9 @@ public class Main {
         cfg.buildSettings.setTmpDir(options.getTmpDir());
         cfg.buildSettings.setVersion(options.getVersion());
         cfg.buildSettings.setMvnSettingsFile(options.getMvnSettingsFile());
+        if (options.batchMode) {
+            cfg.buildSettings.addMavenOption("--batch-mode");
+        }
 
         final Builder bldr = new Builder(cfg);
         bldr.build();
