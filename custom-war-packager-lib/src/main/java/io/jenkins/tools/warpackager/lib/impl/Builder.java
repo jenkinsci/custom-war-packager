@@ -183,9 +183,10 @@ public class Builder extends PackagerBase {
         processFor(componentBuildDir, "git", "checkout", commit);
         //String baseVersion = readFor(componentBuildDir,"mvn", "-q", "org.codehaus.mojo:exec-maven-plugin:1.3.1:exec", "-Dexec.executable=echo", "--non-recursive", "-Dexec.args='${project.version}'");
 
-        // Install artifact with default version
-        // TODO: Make it optional, required for cross-dependencies between objects
-        mavenHelper.run(componentBuildDir, "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+        // Install artifact with default version if required
+        if (dep.getBuildSettings().buildOriginalVersion) {
+            mavenHelper.run(componentBuildDir, "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+        }
 
         // Build artifact with a custom version
         LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});

@@ -32,6 +32,8 @@ plugins:
     source:
       git: https://github.com/jglick/workflow-api-plugin.git
       branch: logs-JENKINS-38381
+    build:
+      buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-step-api"
     source:
@@ -41,16 +43,22 @@ plugins:
     source:
       git: https://github.com/jglick/workflow-support-plugin.git
       branch: logs-JENKINS-38381
+    build:
+      buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-job"
     source:
       git: https://github.com/jglick/workflow-job-plugin.git
       branch: logs-JENKINS-38381
+    build:
+      buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-durable-task-step"
     source:
       git: https://github.com/jglick/workflow-durable-task-step-plugin.git
       branch: watch-JENKINS-38381
+    build:
+      buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "logstash"
     source:
