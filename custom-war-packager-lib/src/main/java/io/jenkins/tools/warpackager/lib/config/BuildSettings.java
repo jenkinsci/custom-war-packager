@@ -3,6 +3,9 @@ package io.jenkins.tools.warpackager.lib.config;
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /**
  * Defines settings for {@link io.jenkins.tools.warpackager.lib.impl.Builder}.
@@ -21,7 +24,8 @@ public class BuildSettings {
     private String version;
     @CheckForNull
     private File mvnSettingsFile;
-
+    @CheckForNull
+    private List<String> mvnOptions;
 
     public void setTmpDir(File tmpDir) {
         this.tmpDir = tmpDir;
@@ -48,5 +52,17 @@ public class BuildSettings {
     @CheckForNull
     public File getMvnSettingsFile() {
         return mvnSettingsFile;
+    }
+
+    public void addMavenOption(@Nonnull String option) {
+        if (mvnOptions == null) {
+            mvnOptions = new ArrayList<>();
+        }
+        mvnOptions.add(option);
+    }
+
+    @Nonnull
+    public List<String> getMvnOptions() {
+        return mvnOptions != null ? Collections.unmodifiableList(mvnOptions) : Collections.emptyList();
     }
 }

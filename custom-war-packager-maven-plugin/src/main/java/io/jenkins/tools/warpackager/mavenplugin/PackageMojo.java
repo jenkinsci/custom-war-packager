@@ -40,6 +40,9 @@ public class PackageMojo extends AbstractMojo {
     @Parameter
     public @CheckForNull String mvnSettingsFile;
 
+    @Parameter
+    public boolean batchMode;
+
     @Component
     protected MavenProject project;
 
@@ -68,6 +71,11 @@ public class PackageMojo extends AbstractMojo {
         } else { // Use a Maven temporary dir
             //TODO: use step ID
             cfg.buildSettings.setTmpDir(new File(project.getBuild().getDirectory(), "custom-war-packager-maven-plugin"));
+        }
+
+        if (batchMode) {
+            cfg.buildSettings.addMavenOption("--batch-mode");
+            cfg.buildSettings.addMavenOption("-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn");
         }
 
         final Builder bldr = new Builder(cfg);

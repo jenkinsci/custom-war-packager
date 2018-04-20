@@ -24,6 +24,9 @@ public class CliOptions {
     @Option(name = "-demo", usage = "Enables demo mode with predefined config file")
     public boolean demo;
 
+    @Option(name = "--batch-mode", usage = "Enables the batch mode for the build")
+    public boolean batchMode;
+
     @CheckForNull
     public File getConfigPath() {
         return configPath;

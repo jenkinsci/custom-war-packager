@@ -44,6 +44,10 @@ public class Main {
         cfg.buildSettings.setTmpDir(options.getTmpDir());
         cfg.buildSettings.setVersion(options.getVersion());
         cfg.buildSettings.setMvnSettingsFile(options.getMvnSettingsFile());
+        if (options.batchMode) {
+            cfg.buildSettings.addMavenOption("--batch-mode");
+            cfg.buildSettings.addMavenOption("-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn");
+        }
 
         final Builder bldr = new Builder(cfg);
         bldr.build();
