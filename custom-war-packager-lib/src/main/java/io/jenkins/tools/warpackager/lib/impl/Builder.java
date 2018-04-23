@@ -12,7 +12,11 @@ import org.codehaus.plexus.util.FileUtils;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.CopyOption;
 import java.nio.file.Files;
+import java.nio.file.Path;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -148,40 +152,48 @@ public class Builder extends PackagerBase {
             throw new IOException("Source is not defined for dependency " + dep);
         }
 
+        final String newVersion;
         switch (dep.source.getType()) {
             case GIT:
                 LOGGER.log(Level.INFO, "Will checkout {0} from git: {1}", new Object[] {dep.artifactId, dep.source});
+
+                String commit = dep.source.commit;
+                final String checkoutId = dep.source.getCheckoutId();
+                if (commit == null) { // we use ls-remote to fetch the commit ID
+                    String res = readFor(componentBuildDir, "git", "ls-remote", dep.source.git, checkoutId != null ? checkoutId : "master");
+                    commit = res.split("\\s+")[0];
+                }
+
+                //TODO if caching is disabled, a nice-looking version can be retrieved
+                // We cannot retrieve actual base version here without checkout. 256.0 prevents dependency check failures
+                newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
+                versionOverrides.put(dep.artifactId, newVersion);
+
+                // TODO: add no-cache option?
+                if (mavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
+                    LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
+                            new Object[] {dep, newVersion});
+                    return;
+                } else {
+                    LOGGER.log(Level.INFO, "Snapshot is missing for {0}: {1}. Will run the build",
+                            new Object[] {dep, newVersion});
+                }
+
+                processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
+                processFor(componentBuildDir, "git", "checkout", commit);
+                break;
+            case FILESYSTEM:
+                assert dep.source.dir != null;
+                LOGGER.log(Level.INFO, "Will checkout {0} from local directory: {1}",
+                        new Object[] {dep.artifactId, dep.source.dir});
+                File sourceDir = new File(dep.source.dir);
+                org.apache.commons.io.FileUtils.copyDirectory(sourceDir, componentBuildDir);
+                newVersion = String.format("256.0-%s-SNAPSHOT", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+                versionOverrides.put(dep.artifactId, newVersion);
                 break;
             default:
                 throw new IOException("Unsupported checkout source: " + dep.source.getType());
         }
-
-        // Git checkout and build
-        String commit = dep.source.commit;
-        final String checkoutId = dep.source.getCheckoutId();
-        if (commit == null) { // we use ls-remote to fetch the commit ID
-            String res = readFor(componentBuildDir, "git", "ls-remote", dep.source.git, checkoutId != null ? checkoutId : "master");
-            commit = res.split("\\s+")[0];
-        }
-
-        //TODO if caching is disabled, a nice-looking version can be retrieved
-        // We cannot retrieve actual base version here without checkout. 256.0 prevents dependency check failures
-        String newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
-        versionOverrides.put(dep.artifactId, newVersion);
-
-        // TODO: add no-cache option?
-        if (mavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
-            LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
-                    new Object[] {dep, newVersion});
-            return;
-        } else {
-            LOGGER.log(Level.INFO, "Snapshot is missing for {0}: {1}. Will run the build",
-                    new Object[] {dep, newVersion});
-        }
-
-        processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
-        processFor(componentBuildDir, "git", "checkout", commit);
-        //String baseVersion = readFor(componentBuildDir,"mvn", "-q", "org.codehaus.mojo:exec-maven-plugin:1.3.1:exec", "-Dexec.executable=echo", "--non-recursive", "-Dexec.args='${project.version}'");
 
         // Install artifact with default version if required
         if (dep.getBuildSettings().buildOriginalVersion) {
