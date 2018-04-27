@@ -223,6 +223,22 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
+    private void copyResource(String path) throws IOException {
+        copyResource(path, path);
+    }
+
+    private void copyResource(String srcPath, String destPath) throws IOException {
+        try (ZipFile zip = new ZipFile(srcWar)) {
+            try(InputStream inputStream = zip.getInputStream(zip.getEntry(srcPath))) {
+                File out = new File(dstDir, destPath);
+                createParentDirIfNotExists(out);
+                try(FileOutputStream ostream = new FileOutputStream(out)) {
+                    IOUtils.copy(inputStream, ostream);
+                }
+            }
+        }
+    }
+
     @Nonnull
     private void writeXMLResource(String path, Document doc) throws IOException {
         File out = new File(dstDir, path);
@@ -249,7 +265,17 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    public JenkinsWarPatcher addSystemProperties(Map<String, String> systemProperties) throws IOException {
+    /**
+     * Adds or modifies system properties in {@code WEB-INF/web.xml}.
+     * @param systemProperties System properties
+     * @return {@code this} instance.
+     * @throws IOException Failed to read or modify the file
+     */
+    public JenkinsWarPatcher addSystemProperties(@CheckForNull Map<String, String> systemProperties) throws IOException {
+        if (systemProperties == null || systemProperties.isEmpty()) {
+            copyResource("WEB-INF/web.xml");
+            return this;
+        }
 
         LOGGER.log(Level.WARNING, "The logic support only System properties using the jenkins.util.SystemProperties engine");
 
@@ -272,18 +298,16 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
 
         // Add non-overridden values
-        if (systemProperties != null) {
-            for (Map.Entry<String, String> entry : systemProperties.entrySet()) {
-                if (overridden.contains(entry.getKey())) {
-                    continue; // Already modified
-                }
-
-                LOGGER.log(Level.INFO, "Adding property {0}", entry.getKey());
-                final Element newParam = doc.createElement("context-param");
-                setByName(newParam, "param-name", entry.getKey());
-                setByName(newParam, "param-value", entry.getValue());
-                doc.getDocumentElement().appendChild(newParam);
+        for (Map.Entry<String, String> entry : systemProperties.entrySet()) {
+            if (overridden.contains(entry.getKey())) {
+                continue; // Already modified
             }
+
+            LOGGER.log(Level.INFO, "Adding property {0}", entry.getKey());
+            final Element newParam = doc.createElement("context-param");
+            setByName(newParam, "param-name", entry.getKey());
+            setByName(newParam, "param-value", entry.getValue());
+            doc.getDocumentElement().appendChild(newParam);
         }
 
         writeXMLResource("WEB-INF/web.xml", doc);
