@@ -97,6 +97,20 @@ public class Config {
         return null;
     }
 
+    @CheckForNull
+    public DependencyInfo findPlugin(@Nonnull String artifactId) {
+        if (plugins == null) {
+            return null;
+        }
+
+        for (DependencyInfo plugin : plugins) {
+            if (artifactId.equals(plugin.artifactId)) {
+                return plugin;
+            }
+        }
+        return null;
+    }
+
     public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
         war = spec.getCore().toWARDependencyInfo();

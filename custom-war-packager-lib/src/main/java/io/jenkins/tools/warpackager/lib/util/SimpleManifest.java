@@ -1,7 +1,7 @@
 /*
  * The MIT License (MIT)
  *
- * Copyright (c) 2016 CloudBees Inc.
+ * Copyright (c) 2016-2018 CloudBees Inc.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,9 @@
  */
 package io.jenkins.tools.warpackager.lib.util;
 
+import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
+
+import javax.annotation.Nonnull;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -100,7 +103,7 @@ public class SimpleManifest {
             throw new FileNotFoundException(file + " is a directory.");
         }
         String lcName = file.getName().toLowerCase();
-        if (lcName.endsWith(".jar") || lcName.endsWith(".war") || lcName.endsWith(".ear")) {
+        if (lcName.endsWith(".jar") || lcName.endsWith(".war") || lcName.endsWith(".ear") || lcName.endsWith(".jpi") || lcName.endsWith(".hpi")) {
             try (ZipFile zip = new ZipFile(file)) {
                 ZipEntry e = zip.getEntry("META-INF/MANIFEST.MF");
                 if (e == null) {
@@ -115,5 +118,16 @@ public class SimpleManifest {
                 return new SimpleManifest(new Manifest(is));
             }
         }
+    }
+
+    public static ComponentReference readPluginManifest(@Nonnull File sourceHPI) throws IOException, InterruptedException {
+        Map<String, String> manifest = SimpleManifest.parseFile(sourceHPI).getMain();
+
+        ComponentReference res = new ComponentReference();
+        res.setGroupId(manifest.get("Group-Id"));
+        res.setArtifactId(manifest.get("Short-Name"));
+        res.setVersion(manifest.get("Plugin-Version").split("\\s+")[0]);
+
+        return res;
     }
 }

@@ -122,6 +122,7 @@ public class Builder extends PackagerBase {
         // Produce BOM
         // TODO: append status to the original BOM?
         BOM bom = new BOMBuilder(config)
+                .withPluginsDir(new File(explodedWar, "WEB-INF/plugins"))
                 .withStatus(versionOverrides)
                 .build();
         bom.write(config.getOutputBOM());

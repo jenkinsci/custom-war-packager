@@ -8,14 +8,19 @@ import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
 import io.jenkins.tools.warpackager.lib.model.bom.Specification;
+import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Builds {@link BOM}.
@@ -26,11 +31,36 @@ public class BOMBuilder {
 
     private final Config config;
 
+    private static final Logger LOGGER = Logger.getLogger(BOMBuilder.class.getName());
+
     @CheckForNull
     private Map<String, String> versionOverrides;
 
+    @CheckForNull
+    private Map<String, ComponentReference> bundledPlugins;
+
     public BOMBuilder(@Nonnull Config config) {
         this.config = config;
+    }
+
+    public BOMBuilder withPluginsDir(File pluginsDir) throws IOException, InterruptedException {
+
+        // Process dependencies
+        if (pluginsDir != null) {
+            LOGGER.log(Level.INFO, "Reading bundled files from {0}", pluginsDir);
+            File[] plugins = pluginsDir.listFiles();
+            if (plugins != null) {
+                bundledPlugins = new HashMap<>();
+                for (File plugin : plugins) {
+                    if (plugin.getAbsolutePath().endsWith(".hpi")) {
+                        final ComponentReference ref = SimpleManifest.readPluginManifest(plugin);
+                        bundledPlugins.put(ref.getArtifactId(), ref);
+                    }
+                }
+            }
+        }
+
+        return this;
     }
 
     public BOMBuilder withStatus(Map<String, String> versionOverrides) {
@@ -38,12 +68,14 @@ public class BOMBuilder {
         return this;
     }
 
-    public BOM build() throws IOException {
+    public BOM build() throws IOException, InterruptedException {
         BOM bom = new BOM();
 
+        LOGGER.log(Level.INFO, "Building BOM");
         bom.setMetadata(buildMetadata());
         bom.setSpec(buildSpec(false));
         if (versionOverrides != null) { // We can produce status
+            LOGGER.log(Level.INFO, "Generating 'status' section of the BOM");
             bom.setStatus(buildSpec(true));
         }
         return bom;
@@ -70,14 +102,40 @@ public class BOMBuilder {
         //TODO(oleg_nenashev): it will produce artifactId and groupId in BOM's [status/core]
         spec.setCore(toComponentReference(config.war, overrideVersions));
 
+        // Plugins
         List<ComponentReference> plugins = new ArrayList<>();
-        if (config.plugins != null) {
+        if (overrideVersions && bundledPlugins != null && !bundledPlugins.isEmpty()){
+            // Writing 'status', put explicit versions for all bundled plugins
+            for (Map.Entry<String, ComponentReference> bundled : bundledPlugins.entrySet()) {
+                ComponentReference ref = bundled.getValue();
+
+                DependencyInfo requiredPlugin = config.findPlugin(ref.getArtifactId());
+                SourceInfo requiredVersionSource = requiredPlugin != null ? requiredPlugin.source : null;
+                String requiredVersion = requiredVersionSource != null ? requiredVersionSource.version : null;
+
+                // TODO: due to whatever reason timestamped Snapshots do not have full version in the manifest
+                // Plugin-Version points to SNAPSHOT. So here we override it
+                if (requiredVersion != null && !requiredVersion.equals(ref.getVersion())) {
+                    LOGGER.log(Level.WARNING, "Plugin {0}: Required version {1} differ from what is in the bundled HPI: {2}. " +
+                            "Assuming that it is a timestamped snapshot, using specification value",
+                            new Object[] {ref.getArtifactId(), requiredVersion, ref.getVersion()});
+                    ComponentReference override = new ComponentReference();
+                    override.setGroupId(ref.getGroupId());
+                    override.setArtifactId(ref.getArtifactId());
+                    override.setVersion(requiredVersion);
+                    ref = override;
+                }
+                plugins.add(ref);
+            }
+        } else if (config.plugins != null) {
+            // We use default resolution
             for (DependencyInfo plugin : config.plugins) {
                 plugins.add(toComponentReference(plugin, overrideVersions));
             }
         }
         spec.setPlugins(plugins);
 
+        // Components - everything else
         //TODO(oleg_nenashev): BOM should support whatever type definition
         List<ComponentReference> components = new ArrayList<>();
         if (config.libPatches != null) {
