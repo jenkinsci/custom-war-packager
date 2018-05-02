@@ -161,10 +161,15 @@ public class Builder extends PackagerBase {
             case GIT:
                 LOGGER.log(Level.INFO, "Will checkout {0} from git: {1}", new Object[] {dep.artifactId, dep.source});
 
+                String gitRemote = dep.source.git;
+                if (gitRemote == null) {
+                    throw new IllegalStateException("Building dependency " + dep + "in Git mode, but Git source is not set" );
+                }
+
                 String commit = dep.source.commit;
                 final String checkoutId = dep.source.getCheckoutId();
                 if (commit == null) { // we use ls-remote to fetch the commit ID
-                    String res = readFor(componentBuildDir, "git", "ls-remote", dep.source.git, checkoutId != null ? checkoutId : "master");
+                    String res = readFor(componentBuildDir, "git", "ls-remote", gitRemote, checkoutId != null ? checkoutId : "master");
                     commit = res.split("\\s+")[0];
                 }
 
@@ -183,7 +188,7 @@ public class Builder extends PackagerBase {
                             new Object[] {dep, newVersion});
                 }
 
-                processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
+                processFor(componentBuildDir, "git", "clone", gitRemote, ".");
                 processFor(componentBuildDir, "git", "checkout", commit);
                 break;
             case FILESYSTEM:

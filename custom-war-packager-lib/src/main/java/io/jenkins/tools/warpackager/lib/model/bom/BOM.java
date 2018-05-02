@@ -3,6 +3,7 @@ package io.jenkins.tools.warpackager.lib.model.bom;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 
 import javax.annotation.CheckForNull;
@@ -20,6 +21,7 @@ import java.io.OutputStream;
  * @author Oleg Nenashev
  * @since TODO
  */
+@SuppressFBWarnings(value = "NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "Fields come from JSON")
 public class BOM {
 
     @CheckForNull

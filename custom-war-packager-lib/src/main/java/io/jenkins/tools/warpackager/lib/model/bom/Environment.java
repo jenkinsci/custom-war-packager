@@ -1,6 +1,7 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -11,6 +12,7 @@ import java.util.List;
  * @author Oleg Nenashev
  * @since TODO
  */
+@SuppressFBWarnings(value = "NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "Fields come from JSON")
 public class Environment {
 
     @Nonnull
