@@ -26,6 +26,10 @@ public class BuildSettings {
     private File mvnSettingsFile;
     @CheckForNull
     private List<String> mvnOptions;
+    @CheckForNull
+    private File bom;
+    @CheckForNull
+    private String environmentName;
 
     public void setTmpDir(File tmpDir) {
         this.tmpDir = tmpDir;
@@ -39,6 +43,14 @@ public class BuildSettings {
         this.mvnSettingsFile = mvnSettingsFile;
     }
 
+    public void setBOM(@CheckForNull File bom) {
+        this.bom = bom;
+    }
+
+    public void setEnvironmentName(@CheckForNull String environmentName) {
+        this.environmentName = environmentName;
+    }
+
     @Nonnull
     public File getTmpDir() {
         return tmpDir != null ? tmpDir : DEFAULT_TMP_DIR;
@@ -47,6 +59,16 @@ public class BuildSettings {
     @Nonnull
     public String getVersion() {
         return version != null ? version : DEFAULT_VERSION;
+    }
+
+    @CheckForNull
+    public File getBOM() {
+        return bom;
+    }
+
+    @CheckForNull
+    public String getEnvironmentName() {
+        return environmentName;
     }
 
     @CheckForNull

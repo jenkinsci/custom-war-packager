@@ -41,6 +41,12 @@ public class PackageMojo extends AbstractMojo {
     public @CheckForNull String mvnSettingsFile;
 
     @Parameter
+    public @CheckForNull String bom;
+
+    @Parameter
+    public @CheckForNull String environment;
+
+    @Parameter
     public boolean batchMode;
 
     @Component
@@ -76,6 +82,12 @@ public class PackageMojo extends AbstractMojo {
         if (batchMode) {
             cfg.buildSettings.addMavenOption("--batch-mode");
             cfg.buildSettings.addMavenOption("-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn");
+        }
+
+        // BOM
+        cfg.buildSettings.setEnvironmentName(environment);
+        if (bom != null) {
+            cfg.buildSettings.setBOM(new File(bom));
         }
 
         final Builder bldr = new Builder(cfg);

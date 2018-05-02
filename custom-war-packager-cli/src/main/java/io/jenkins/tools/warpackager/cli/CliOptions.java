@@ -27,6 +27,12 @@ public class CliOptions {
     @Option(name = "--batch-mode", usage = "Enables the batch mode for the build")
     public boolean batchMode;
 
+    @Option(name = "--bomPath", usage = "Path to the BOM file. If defined, it will override settings in Config YAML")
+    public File bomPath;
+
+    @Option(name = "--environment", usage = "Environment to be used")
+    public String environment;
+
     @CheckForNull
     public File getConfigPath() {
         return configPath;
@@ -45,6 +51,16 @@ public class CliOptions {
     @CheckForNull
     public File getMvnSettingsFile() {
         return mvnSettingsFile;
+    }
+
+    @CheckForNull
+    public File getBOMPath() {
+        return bomPath;
+    }
+
+    @CheckForNull
+    public String getEnvironment() {
+        return environment;
     }
 
     public boolean isDemo() {

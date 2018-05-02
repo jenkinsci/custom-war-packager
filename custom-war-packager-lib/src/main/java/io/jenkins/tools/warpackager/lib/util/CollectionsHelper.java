@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.util;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -16,5 +17,14 @@ public class CollectionsHelper {
             return dest.put(key, value);
         }
         return dest.get(key);
+    }
+
+    @CheckForNull
+    public static <K,V> V getOrFail(@Nonnull Map<K, V> src, @Nonnull K key) throws IOException {
+        V value = src.get(key);
+        if (value == null) {
+            throw new IOException("Cannot mandatory key " + key);
+        }
+        return value;
     }
 }

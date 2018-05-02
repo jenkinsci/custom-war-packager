@@ -44,8 +44,22 @@ public class Specification {
         this.environments = environments;
     }
 
+    @CheckForNull
+    public Environment getEnvironment(@Nonnull String name) {
+        if (environments == null) {
+            return null;
+        }
+
+        for (Environment env : environments) {
+            if (name.equals(env.name)) {
+                return env;
+            }
+        }
+        return null;
+    }
+
     @Nonnull
-    public Reference getCore() {
+    public ComponentReference getCore() {
         return core;
     }
 
@@ -54,12 +68,12 @@ public class Specification {
         return plugins != null ? plugins : Collections.emptyList();
     }
 
-    @CheckForNull
+    @Nonnull
     public List<ComponentReference> getComponents() {
         return components != null ? components : Collections.emptyList();
     }
 
-    @CheckForNull
+    @Nonnull
     public List<Environment> getEnvironments() {
         return environments != null ? environments : Collections.emptyList();
     }

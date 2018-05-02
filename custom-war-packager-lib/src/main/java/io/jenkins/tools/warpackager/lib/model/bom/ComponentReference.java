@@ -1,7 +1,8 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
+import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 
 import javax.annotation.Nonnull;
 
@@ -12,7 +13,7 @@ import javax.annotation.Nonnull;
 @SuppressFBWarnings(value = "NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "Fields come from JSON")
 public class ComponentReference extends Reference {
 
-    //TODO: propoperties are not required for the core
+    //TODO: properties are not required for the core
 
     @Nonnull
   //  @JsonProperty(required = true)
@@ -38,5 +39,37 @@ public class ComponentReference extends Reference {
 
     public void setGroupId(@Nonnull String groupId) {
         this.groupId = groupId;
+    }
+
+    public DependencyInfo toWARDependencyInfo() {
+        DependencyInfo dep = new DependencyInfo();
+        dep.groupId = "org.jenkins-ci.main";
+        dep.artifactId = "jenkins-war";
+
+        dep.source = new SourceInfo();
+        if (version != null) {
+            dep.source.version = version;
+        } else {
+            //TODO(oleg_nenashev): we have to interpolate Git repo now, not defined in BOM
+            dep.source.git = "https://github.com/jenkinsci/" + dep.artifactId + "-plugin.git";
+            dep.source.branch = ref; // It may be actually commit as well, but the CWP's logic will work
+        }
+        return dep;
+    }
+
+    public DependencyInfo toDependencyInfo() {
+        DependencyInfo dep = new DependencyInfo();
+        dep.groupId = groupId;
+        dep.artifactId = artifactId;
+
+        dep.source = new SourceInfo();
+        if (version != null) {
+            dep.source.version = version;
+        } else {
+            //TODO(oleg_nenashev): we have to interpolate Git repo now, not defined in BOM
+            dep.source.git = "https://github.com/jenkinsci/" + dep.artifactId + "-plugin.git";
+            dep.source.branch = ref; // It may be actually commit as well, but the CWP's logic will work
+        }
+        return dep;
     }
 }

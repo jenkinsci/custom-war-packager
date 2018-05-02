@@ -1,0 +1,50 @@
+metadata:
+  # labels and annotations are key: value string attributes
+  labels:
+    name: bom-it
+    groupId: io.github.oleg-nenashev
+    artifactId: mywar
+    version: 1.0
+spec:
+  core:
+    version: 2.118
+  plugins:
+    - groupId: "org.jenkins-ci.plugins.workflow"
+      artifactId: "workflow-api"
+      version: 2.28-20180427.142849-2
+    - groupId: "org.jenkins-ci.plugins"
+      artifactId: "copyartifact"
+      version: 1.40-20180427.143131-1
+    - groupId: "org.jenkins-ci.plugins"
+      artifactId: "structs"
+      version: 1.14
+    - groupId: "org.jenkins-ci.plugins.workflow"
+      artifactId: "workflow-step-api"
+      version: 2.14
+    - groupId: "org.jenkins-ci.plugins.workflow"
+      artifactId: "workflow-job"
+      version: 2.20
+    - groupId: "org.jenkins-ci.plugins.workflow"
+      artifactId: "workflow-basic-steps"
+      version: 2.7
+    - groupId: "org.jenkins-ci.plugins.workflow"
+      artifactId: "workflow-support"
+      version: 2.18
+    - groupId: "org.jenkins-ci.plugins"
+      artifactId: "junit"
+      version: 1.24
+    - groupId: "org.jenkins-ci.plugins"
+      artifactId: "mailer"
+      version: 1.21
+    - groupId: "org.jenkins-ci.plugins"
+      artifactId: "scm-api"
+      version: 2.2.7
+    - groupId: "org.jenkins-ci.plugins"
+      artifactId: "script-security"
+      version: 1.44
+  environments:
+    - name: aws
+      plugins:
+        - groupId: "io.jenkins.plugins"
+          artifactId: "artifact-manager-s3"
+          version: 1.0-alpha-1-20180427.130741-1

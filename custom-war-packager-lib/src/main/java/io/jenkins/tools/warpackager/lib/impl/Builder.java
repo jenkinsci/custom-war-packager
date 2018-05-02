@@ -36,6 +36,8 @@ public class Builder extends PackagerBase {
     // Context
     private Map<String, String> versionOverrides = new HashMap<>();
 
+    private BOM bom = null;
+
 
     public Builder(Config config) {
         super(config);
@@ -52,6 +54,19 @@ public class Builder extends PackagerBase {
             FileUtils.deleteDirectory(tmpDir);
         }
         Files.createDirectories(buildRoot.toPath());
+
+        // Load BOM if needed
+        final File pathToBom = config.buildSettings.getBOM();
+        if (pathToBom != null) {
+            bom = BOM.load(pathToBom);
+            LOGGER.log(Level.INFO, "Overriding settings by BOM file: {0}", pathToBom);
+            config.overrideByBOM(bom, config.buildSettings.getEnvironmentName());
+        }
+
+        // Verify settings
+        if (config.bundle == null) {
+            throw new IOException("Bundle Information must be defined by configuration file or BOM");
+        }
 
         // Build core and plugins
         buildIfNeeded(config.war, "war");
@@ -105,6 +120,7 @@ public class Builder extends PackagerBase {
         mavenHelper.run(warOutputDir, "clean", "package");
 
         // Produce BOM
+        // TODO: append status to the original BOM?
         BOM bom = new BOMBuilder(config)
                 .withStatus(versionOverrides)
                 .build();
