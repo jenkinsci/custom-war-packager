@@ -23,13 +23,12 @@ import java.util.Map;
  * @author Oleg Nenashev
  * @since TODO
  */
-public class MavenHPICustomWARPOMGenerator {
+public class MavenHPICustomWARPOMGenerator extends POMGenerator {
 
-    private final Config config;
     private final String outputFileSuffix;
 
     public MavenHPICustomWARPOMGenerator(Config config, String outputFileSuffix) {
-        this.config = config;
+        super(config);
         this.outputFileSuffix = outputFileSuffix;
     }
 
@@ -77,11 +76,9 @@ public class MavenHPICustomWARPOMGenerator {
                 </executions>
               </plugin>
          */
-        Repository jenkinsRepository = new Repository();
-        jenkinsRepository.setId("repo.jenkins-ci.org");
-        jenkinsRepository.setUrl("https://repo.jenkins-ci.org/public/");
-        model.addPluginRepository(jenkinsRepository);
-        model.addRepository(jenkinsRepository);
+
+        // Maven repositories
+        addRepositories(model);
 
         Plugin mavenHPIPlugin = new Plugin();
         mavenHPIPlugin.setGroupId("org.jenkins-ci.tools");
