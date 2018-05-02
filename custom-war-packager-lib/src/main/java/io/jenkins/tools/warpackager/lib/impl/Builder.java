@@ -4,7 +4,7 @@ import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
-import io.jenkins.tools.warpackager.lib.util.MavenHelper;
+import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
@@ -12,9 +12,7 @@ import org.codehaus.plexus.util.FileUtils;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -105,6 +103,13 @@ public class Builder extends PackagerBase {
         MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
         mavenHelper.run(warOutputDir, "clean", "package");
+
+        // Produce BOM
+        BOM bom = new BOMBuilder(config)
+                .withStatus(versionOverrides)
+                .build();
+        File bomFile = new File(warOutputDir, String.format("%s-%s.bom.yml", config.bundle.artifactId, config.buildSettings.getVersion()));
+        bom.write(bomFile);
 
         // TODO: Support custom output destinations
         // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");

@@ -37,6 +37,8 @@ public class SourceInfo {
         return Type.UNKNOWN;
     }
 
+    //TODO(oleg_nenashev): rename to getRef()
+    @CheckForNull
     public String getCheckoutId() {
         return commit != null ? commit : branch;
     }
