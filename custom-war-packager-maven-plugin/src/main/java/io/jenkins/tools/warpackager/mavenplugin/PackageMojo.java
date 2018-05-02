@@ -86,6 +86,7 @@ public class PackageMojo extends AbstractMojo {
         }
 
         projectHelper.attachArtifact(project, "war", cfg.getOutputWar());
+        projectHelper.attachArtifact(project, "yml", "bom", cfg.getOutputBOM());
     }
 
 }

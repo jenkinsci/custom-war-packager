@@ -73,6 +73,10 @@ public class Config {
         return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + "-" + buildSettings.getVersion() + ".war");
     }
 
+    public File getOutputBOM() {
+        return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + "-" + buildSettings.getVersion() + ".bom.yml");
+    }
+
     @CheckForNull
     public GroovyHookInfo getHookById(@Nonnull String id) {
         if (groovyHooks == null) {

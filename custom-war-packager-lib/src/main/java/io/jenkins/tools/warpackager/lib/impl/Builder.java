@@ -108,8 +108,7 @@ public class Builder extends PackagerBase {
         BOM bom = new BOMBuilder(config)
                 .withStatus(versionOverrides)
                 .build();
-        File bomFile = new File(warOutputDir, String.format("%s-%s.bom.yml", config.bundle.artifactId, config.buildSettings.getVersion()));
-        bom.write(bomFile);
+        bom.write(config.getOutputBOM());
 
         // TODO: Support custom output destinations
         // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
