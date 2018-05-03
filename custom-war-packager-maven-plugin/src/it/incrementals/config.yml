@@ -1,0 +1,15 @@
+bundle:
+  groupId: "io.github.oleg-nenashev"
+  artifactId: "mywar"
+  description: "Test for incrementals"
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    git: https://github.com/jenkinsci/jenkins.git
+    version: 2.118
+plugins:
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "buildtriggerbadge"
+    source:
+      version: 2.10-rc129.5fad9a56d6e9
