@@ -117,7 +117,7 @@ public class Builder extends PackagerBase {
         SimpleManifest manifest = SimpleManifest.parseFile(srcWar);
         MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
-        mavenHelper.run(warOutputDir, "clean", "package");
+        mavenHelper.run(warOutputDir, "clean", "install");
 
         // Produce BOM
         // TODO: append status to the original BOM?

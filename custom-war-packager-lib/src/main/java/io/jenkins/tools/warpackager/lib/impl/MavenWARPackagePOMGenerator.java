@@ -42,6 +42,7 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         model.setArtifactId(config.bundle.artifactId);
         model.setDescription(config.bundle.description);
         model.setVersion(config.buildSettings.getVersion());
+        model.setPackaging("war");
 
         HashMap<String, String> manifestEntries = new HashMap<>(injectedManifestEntries);
         manifestEntries.put("Build-Time", "${maven.build.timestamp}");
@@ -56,7 +57,7 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
               <plugins>
                 <plugin>
                   <artifactId>maven-war-plugin</artifactId>
-                  <version>2.6</version>
+                  <version>3.0.0</version>
                   <goals>
                     <goal>war</goal>
                   </goals>
@@ -93,7 +94,7 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         Plugin mavenHPIPlugin = new Plugin();
         mavenHPIPlugin.setGroupId("org.apache.maven.plugins");
         mavenHPIPlugin.setArtifactId("maven-war-plugin");
-        mavenHPIPlugin.setVersion("2.6"); // TODO: make configurable
+        mavenHPIPlugin.setVersion("3.0.0");
         PluginExecution execution = new PluginExecution();
         execution.setId("package-war");
         execution.addGoal("war");
