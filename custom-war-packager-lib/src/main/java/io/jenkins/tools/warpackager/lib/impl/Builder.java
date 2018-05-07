@@ -4,7 +4,7 @@ import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
-import io.jenkins.tools.warpackager.lib.util.MavenHelper;
+import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
@@ -12,9 +12,7 @@ import org.codehaus.plexus.util.FileUtils;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.CopyOption;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -38,6 +36,8 @@ public class Builder extends PackagerBase {
     // Context
     private Map<String, String> versionOverrides = new HashMap<>();
 
+    private BOM bom = null;
+
 
     public Builder(Config config) {
         super(config);
@@ -54,6 +54,19 @@ public class Builder extends PackagerBase {
             FileUtils.deleteDirectory(tmpDir);
         }
         Files.createDirectories(buildRoot.toPath());
+
+        // Load BOM if needed
+        final File pathToBom = config.buildSettings.getBOM();
+        if (pathToBom != null) {
+            bom = BOM.load(pathToBom);
+            LOGGER.log(Level.INFO, "Overriding settings by BOM file: {0}", pathToBom);
+            config.overrideByBOM(bom, config.buildSettings.getEnvironmentName());
+        }
+
+        // Verify settings
+        if (config.bundle == null) {
+            throw new IOException("Bundle Information must be defined by configuration file or BOM");
+        }
 
         // Build core and plugins
         buildIfNeeded(config.war, "war");
@@ -106,6 +119,14 @@ public class Builder extends PackagerBase {
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
         mavenHelper.run(warOutputDir, "clean", "package");
 
+        // Produce BOM
+        // TODO: append status to the original BOM?
+        BOM bom = new BOMBuilder(config)
+                .withPluginsDir(new File(explodedWar, "WEB-INF/plugins"))
+                .withStatus(versionOverrides)
+                .build();
+        bom.write(config.getOutputBOM());
+
         // TODO: Support custom output destinations
         // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
     }
@@ -157,10 +178,15 @@ public class Builder extends PackagerBase {
             case GIT:
                 LOGGER.log(Level.INFO, "Will checkout {0} from git: {1}", new Object[] {dep.artifactId, dep.source});
 
+                String gitRemote = dep.source.git;
+                if (gitRemote == null) {
+                    throw new IllegalStateException("Building dependency " + dep + "in Git mode, but Git source is not set" );
+                }
+
                 String commit = dep.source.commit;
                 final String checkoutId = dep.source.getCheckoutId();
                 if (commit == null) { // we use ls-remote to fetch the commit ID
-                    String res = readFor(componentBuildDir, "git", "ls-remote", dep.source.git, checkoutId != null ? checkoutId : "master");
+                    String res = readFor(componentBuildDir, "git", "ls-remote", gitRemote, checkoutId != null ? checkoutId : "master");
                     commit = res.split("\\s+")[0];
                 }
 
@@ -179,7 +205,7 @@ public class Builder extends PackagerBase {
                             new Object[] {dep, newVersion});
                 }
 
-                processFor(componentBuildDir, "git", "clone", dep.source.git, ".");
+                processFor(componentBuildDir, "git", "clone", gitRemote, ".");
                 processFor(componentBuildDir, "git", "checkout", commit);
                 break;
             case FILESYSTEM:

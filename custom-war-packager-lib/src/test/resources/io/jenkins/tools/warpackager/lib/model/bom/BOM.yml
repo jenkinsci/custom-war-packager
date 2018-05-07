@@ -1,0 +1,54 @@
+metadata:
+  # labels and annotations are key: value string attributes
+  labels:
+    name: myplugin
+    groupId: TODO_whatisit
+    artifactId: TODO_whatisit
+    version: 1.0
+  annotations:
+    io.jenkins.x: y
+spec:
+  core:
+    # version OR version + ref (version just to keep Maven happy about version order)
+    ref: master
+    version: 1.0
+  components:
+    - groupId: org.acme
+      artifactId: acme-component
+      ref: master
+  plugins:
+    - groupId: org.acme
+      artifactId: acme-plugin
+      ref: master
+      # version: 1.0
+  environments:
+    # environments get added to the other section when enabled
+    - name: aws
+      plugins:
+        - groupId: org.acme
+          artifactId: acme2-plugin
+          ref: master
+          # version: 1.0
+      components:
+        - groupId: org.acme
+          artifactId: acme-component2
+          version: 1.0
+  # other sections can be added and ignored by default
+# the realized BoM after refs are resolved
+status:
+  core:
+    ref: aaabbb
+    # version: 1.0
+  plugins:
+    - groupId: org.acme
+      artifactId: acme-plugin
+      ref: bbbccc
+      # version: 1.0
+  environments:
+    - name: aws
+      plugins:
+        - groupId: org.acme
+          artifactId: acme2-plugin
+          ref: cccddd
+          # version: 1.0
+
