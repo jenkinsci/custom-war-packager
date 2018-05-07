@@ -20,10 +20,10 @@ public class CollectionsHelper {
     }
 
     @CheckForNull
-    public static <K,V> V getOrFail(@Nonnull Map<K, V> src, @Nonnull K key) throws IOException {
+    public static <K,V> V getOrFail(@Nonnull Map<K, V> src, @Nonnull K key, @Nonnull String where) throws IOException {
         V value = src.get(key);
         if (value == null) {
-            throw new IOException("Cannot mandatory key " + key);
+            throw new IOException("Cannot find mandatory key " + key + " in " + where);
         }
         return value;
     }

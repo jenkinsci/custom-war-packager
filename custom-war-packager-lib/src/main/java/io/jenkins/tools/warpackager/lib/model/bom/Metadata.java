@@ -51,8 +51,8 @@ public class Metadata {
         }
 
         PackageInfo pi = new PackageInfo();
-        pi.groupId = getOrFail(labels, "groupId");
-        pi.artifactId = getOrFail(labels, "artifactId");
+        pi.groupId = getOrFail(labels, "groupId", "BOM Metadata labels");
+        pi.artifactId = getOrFail(labels, "artifactId", "BOM Metadata labels");
         pi.vendor = labels.get("vendor");
         pi.description = labels.getOrDefault("description", labels.get("name"));
         pi.title = labels.getOrDefault("title", labels.get("name"));
