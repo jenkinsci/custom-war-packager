@@ -115,10 +115,12 @@ public class BOMBuilder {
 
                 // TODO: due to whatever reason timestamped Snapshots do not have full version in the manifest
                 // Plugin-Version points to SNAPSHOT. So here we override it
-                if (requiredVersion != null && !requiredVersion.equals(ref.getVersion())) {
+                String bundledHPIVersion = ref.getVersion();
+                if (requiredVersion != null && bundledHPIVersion != null &&
+                        !requiredVersion.equals(bundledHPIVersion) && bundledHPIVersion.contains("-SNAPSHOT")) {
                     LOGGER.log(Level.WARNING, "Plugin {0}: Required version {1} differ from what is in the bundled HPI: {2}. " +
                             "Assuming that it is a timestamped snapshot, using specification value",
-                            new Object[] {ref.getArtifactId(), requiredVersion, ref.getVersion()});
+                            new Object[] {ref.getArtifactId(), requiredVersion, bundledHPIVersion});
                     ComponentReference override = new ComponentReference();
                     override.setGroupId(ref.getGroupId());
                     override.setArtifactId(ref.getArtifactId());
