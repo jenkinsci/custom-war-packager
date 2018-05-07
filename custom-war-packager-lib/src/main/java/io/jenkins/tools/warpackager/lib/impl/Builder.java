@@ -117,7 +117,7 @@ public class Builder extends PackagerBase {
         SimpleManifest manifest = SimpleManifest.parseFile(srcWar);
         MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
-        mavenHelper.run(warOutputDir, "clean", "package");
+        mavenHelper.run(warOutputDir, "clean", config.buildSettings.isInstallArtifacts() ? "install" : "package");
 
         // Produce BOM
         // TODO: append status to the original BOM?
@@ -126,6 +126,7 @@ public class Builder extends PackagerBase {
                 .withStatus(versionOverrides)
                 .build();
         bom.write(config.getOutputBOM());
+        // TODO: also install WAR if config.buildSettings.isInstallArtifacts() is set
 
         // TODO: Support custom output destinations
         // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");

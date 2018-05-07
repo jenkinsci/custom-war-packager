@@ -31,6 +31,12 @@ public class BuildSettings {
     @CheckForNull
     private String environmentName;
 
+    /**
+     * If {@code true}, the final artifacts will be installed to the local repo.
+     * It is mainly required for the CLI mode where we may want to install artifacts as well.
+     */
+    private boolean installArtifacts;
+
     public void setTmpDir(File tmpDir) {
         this.tmpDir = tmpDir;
     }
@@ -49,6 +55,10 @@ public class BuildSettings {
 
     public void setEnvironmentName(@CheckForNull String environmentName) {
         this.environmentName = environmentName;
+    }
+
+    public void setInstallArtifacts(boolean installArtifacts) {
+        this.installArtifacts = installArtifacts;
     }
 
     @Nonnull
@@ -74,6 +84,10 @@ public class BuildSettings {
     @CheckForNull
     public File getMvnSettingsFile() {
         return mvnSettingsFile;
+    }
+
+    public boolean isInstallArtifacts() {
+        return installArtifacts;
     }
 
     public void addMavenOption(@Nonnull String option) {

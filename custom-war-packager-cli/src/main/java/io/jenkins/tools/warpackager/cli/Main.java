@@ -46,6 +46,7 @@ public class Main {
         cfg.buildSettings.setMvnSettingsFile(options.getMvnSettingsFile());
         cfg.buildSettings.setBOM(options.getBOMPath());
         cfg.buildSettings.setEnvironmentName(options.getEnvironment());
+        cfg.buildSettings.setInstallArtifacts(options.isInstallArtifacts());
         if (options.batchMode) {
             cfg.buildSettings.addMavenOption("--batch-mode");
             cfg.buildSettings.addMavenOption("-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn");

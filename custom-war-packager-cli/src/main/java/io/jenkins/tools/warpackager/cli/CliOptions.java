@@ -33,6 +33,9 @@ public class CliOptions {
     @Option(name = "--environment", usage = "Environment to be used")
     public String environment;
 
+    @Option(name = "--installArtifacts", usage = "If set, the final artifacts will be automatically installed to the local repository (current version - only WAR)")
+    public boolean installArtifacts;
+
     @CheckForNull
     public File getConfigPath() {
         return configPath;
@@ -65,5 +68,9 @@ public class CliOptions {
 
     public boolean isDemo() {
         return demo;
+    }
+
+    public boolean isInstallArtifacts() {
+        return installArtifacts;
     }
 }
