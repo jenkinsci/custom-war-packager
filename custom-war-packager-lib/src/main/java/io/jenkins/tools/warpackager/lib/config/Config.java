@@ -46,9 +46,27 @@ public class Config {
     @CheckForNull
     public Collection<GroovyHookInfo> groovyHooks;
 
-    private static Config load(@Nonnull InputStream istream) throws IOException {
+    private static Config load(@Nonnull InputStream istream, boolean isEssentialsYML) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-        Config loaded = mapper.readValue(istream, Config.class);
+        final Config loaded;
+        if (isEssentialsYML) {
+            LOGGER.log(Level.INFO, "Loading from the essentials.yml format");
+            EssentialsYMLConfig cfg = mapper.readValue(istream, EssentialsYMLConfig.class);
+            if (cfg.packaging == null) {
+                throw new IOException("essentials.yml does not have the packaging section");
+            }
+            if(cfg.packaging.config != null) {
+                loaded = cfg.packaging.config;
+            } else if (cfg.packaging.configFile != null){
+                LOGGER.log(Level.INFO, "Loading config from external file defined in essentials.yml: {0}",
+                        cfg.packaging.configFile);
+                loaded = loadConfig(new File(cfg.packaging.configFile));
+            } else {
+                throw new IOException("essentials.yml does not have `packaging.config` or `packaging.configFile`");
+            }
+        } else {
+            loaded = mapper.readValue(istream, Config.class);
+        }
         if (loaded.buildSettings == null) {
             loaded.buildSettings = new BuildSettings();
         }
@@ -61,14 +79,22 @@ public class Config {
             if (istream == null) {
                 throw new FileNotFoundException(String.format("Cannot load the demo config: %s/sample.yml", Config.class));
             }
-            return load(istream);
+            return load(istream, false);
         }
     }
 
+    /**
+     * Loads configuration file.
+     * Both standard and {@code essentials.yml} formats are supported.
+     * The format is determined by the name.
+     * @param configPath Path to the configuration file.
+     * @return Loaded configuration
+     * @throws IOException Loading error
+     */
     public static Config loadConfig(@Nonnull File configPath) throws IOException {
         if (configPath.exists() && configPath.isFile()) {
             try (FileInputStream istream = new FileInputStream(configPath)) {
-                return load(istream);
+                return load(istream, "essentials.yml".equals(configPath.getName()));
             }
         }
         throw new FileNotFoundException("Cannot find the configuration file " + configPath);
