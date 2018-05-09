@@ -28,26 +28,29 @@ import static org.apache.maven.plugins.annotations.ResolutionScope.*;
 @Mojo(name="custom-war", defaultPhase = PACKAGE, requiresDependencyResolution = RUNTIME)
 public class PackageMojo extends AbstractMojo {
 
-    @Parameter
+    @Parameter(property = "configFile", required = true)
     public @CheckForNull String configFilePath;
 
-    @Parameter
+    @Parameter(property = "version")
     public @CheckForNull String warVersion;
 
-    @Parameter
+    @Parameter(property = "tmpDir")
     public @CheckForNull String tmpDir;
 
-    @Parameter
+    @Parameter(property = "mvnSettingsFile")
     public @CheckForNull String mvnSettingsFile;
 
-    @Parameter
+    @Parameter(property = "bomFile")
     public @CheckForNull String bom;
 
-    @Parameter
+    @Parameter(property = "environment")
     public @CheckForNull String environment;
 
-    @Parameter
+    @Parameter(property = "batchMode")
     public boolean batchMode;
+
+    @Parameter(property = "installArtifacts")
+    public boolean installArtifacts;
 
     @Component
     protected MavenProject project;
@@ -69,6 +72,7 @@ public class PackageMojo extends AbstractMojo {
         }
 
         cfg.buildSettings.setVersion(warVersion);
+        cfg.buildSettings.setInstallArtifacts(installArtifacts);
         if (mvnSettingsFile != null) {
             cfg.buildSettings.setMvnSettingsFile(new File(mvnSettingsFile));
         }
