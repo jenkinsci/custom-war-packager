@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.mavenplugin;
 
+import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.impl.Builder;
 import org.apache.maven.plugin.AbstractMojo;
@@ -26,27 +27,55 @@ import static org.apache.maven.plugins.annotations.ResolutionScope.RUNTIME;
 @Mojo(name="build", defaultPhase = PACKAGE, requiresProject = false)
 public class BuildMojo extends AbstractMojo {
 
+    /**
+     * Path to the YAML configuration file.
+     * See the format specification in <a href="https://github.com/jenkinsci/custom-war-packager/">Custom WAR Packager documentation</>
+     */
     @Parameter(property = "configFile", required = true)
     public @CheckForNull String configFilePath;
 
-    @Parameter(property = "version")
+    /**
+     * Version of the WAR file to be set.
+     */
+    @Parameter(property = "version", defaultValue = BuildSettings.DEFAULT_VERSION)
     public @CheckForNull String warVersion;
 
-    @Parameter(property = "tmpDir")
+    /**
+     * Temporary directory, which will be used to build subcomponents and to generate outputs.
+     */
+    @Parameter(property = "tmpDir", defaultValue = BuildSettings.DEFAULT_TMP_DIR_NAME)
     public @CheckForNull String tmpDir;
 
+    /**
+     * Optional path to the Maven settings file to be used during the build.
+     */
     @Parameter(property = "mvnSettingsFile")
     public @CheckForNull String mvnSettingsFile;
 
+    //TODO: link the format once it's approved as JEP draft
+    /**
+     * Optional BOM file, which can be used as an input source.
+     */
     @Parameter(property = "bomFile")
     public @CheckForNull String bom;
 
+    /**
+     * Environment, for which the WAR is being generated.
+     * If BOM file is defined, Custom WAR packager will use this environment setting to filter components and plugins.
+     */
     @Parameter(property = "environment")
     public @CheckForNull String environment;
 
+    /**
+     * Enforces Batch mode for underlying Maven commands and sets appropriate flags.
+     * It is recommended to use {@link #mvnSettingsFile} instead to set values.
+     */
     @Parameter(property = "batchMode")
     public boolean batchMode;
 
+    /**
+     * If {@code true}, Custom WAR packager will automatically install the generated artifacts.
+     */
     @Parameter(property = "installArtifacts")
     public boolean installArtifacts;
 
