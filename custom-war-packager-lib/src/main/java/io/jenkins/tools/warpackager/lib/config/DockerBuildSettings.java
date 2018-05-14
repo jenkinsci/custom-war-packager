@@ -18,12 +18,25 @@ public class DockerBuildSettings {
     @CheckForNull
     private String outputDir;
 
+    private boolean build;
+
+    @CheckForNull
+    private String tag;
+
     public void setBase(@CheckForNull String base) {
         this.base = base;
     }
 
     public void setOutputDir(@CheckForNull String outputDir) {
         this.outputDir = outputDir;
+    }
+
+    public void setBuild(boolean build) {
+        this.build = build;
+    }
+
+    public void setTag(@CheckForNull String tag) {
+        this.tag = tag;
     }
 
     @Nonnull
@@ -34,5 +47,14 @@ public class DockerBuildSettings {
     @Nonnull
     public String getOutputDir() {
         return outputDir != null ? outputDir : DEFAULT_OUTPUT_DIR;
+    }
+
+    public boolean isBuild() {
+        return build;
+    }
+
+    @CheckForNull
+    public String getTag() {
+        return tag;
     }
 }

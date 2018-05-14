@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
+import io.jenkins.tools.warpackager.lib.util.SystemCommandHelper;
 import org.apache.commons.io.IOUtils;
 
 import javax.annotation.Nonnull;
@@ -16,8 +17,9 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
+ * Builds Docker images for WAR.
+ * This method implies that the base Docker image is compatible with the standard {@code jenkins/jenkins} image.
  * @author Oleg Nenashev
- * @since TODO
  */
 public class DockerfileBuilder {
 
@@ -65,11 +67,22 @@ public class DockerfileBuilder {
     /**
      * Builds Dockerfile and prepares all resources
      */
-    public void build() throws IOException {
+    public void build() throws IOException, InterruptedException {
+        LOGGER.log(Level.INFO, "Generating Dockerfile");
         String dockerfile = generateDockerfile();
         try(FileOutputStream ostream = new FileOutputStream(new File(outputDir, "Dockerfile"))) {
             IOUtils.write(dockerfile, ostream, "UTF-8");
         }
+
+        if (!dockerSettings.isBuild()) {
+            return;
+        }
+        String tag = dockerSettings.getTag();
+        if (tag == null) {
+            throw new IOException("Cannot build Docker image, tag is not defined");
+        }
+        LOGGER.log(Level.INFO, "Building Docker image {0}", tag);
+        SystemCommandHelper.processFor(outputDir, "docker", "build", "-t", tag, ".");
     }
 
     private String generateDockerfile() {

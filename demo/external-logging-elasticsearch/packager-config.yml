@@ -2,11 +2,13 @@ bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
   artifactId: "external-task-logging-logstash"
   vendor: "Jenkins project"
-  title: ""
+  title: "Jenkins External Task Logging demo for Elasticsearch"
   description: "Jenkins External Task Logging demo for Elasticsearch, packaged as a single WAR file. It automatically configures logging on startup"
 buildSettings:
   docker:
     base: "jenkins/jenkins:2.107.3"
+    tag: "jenkins/demo-external-task-logging-logstash"
+    build: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
