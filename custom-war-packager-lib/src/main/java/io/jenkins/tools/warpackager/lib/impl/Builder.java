@@ -113,7 +113,7 @@ public class Builder extends PackagerBase {
                 .excludeLibs()
                 .addHooks(hooks);
 
-        File warOutputDir = new File(tmpDir, "output");
+        File warOutputDir = config.buildSettings.getOutputDir();
         SimpleManifest manifest = SimpleManifest.parseFile(srcWar);
         MavenWARPackagePOMGenerator finalWar = new MavenWARPackagePOMGenerator(config, explodedWar);
         finalWar.writePOM(finalWar.generatePOM(manifest.getMain()), warOutputDir);
@@ -127,6 +127,14 @@ public class Builder extends PackagerBase {
                 .build();
         bom.write(config.getOutputBOM());
         // TODO: also install WAR if config.buildSettings.isInstallArtifacts() is set
+
+        if (config.buildSettings.getDocker() != null) {
+            LOGGER.log(Level.INFO, "Building Dockerfile");
+            new DockerfileBuilder(config)
+                    .withPlugins(new File(explodedWar, "WEB-INF/plugins"))
+                    .withInitScripts(new File(explodedWar, "WEB-INF"))
+                    .build();
+        }
 
         // TODO: Support custom output destinations
         // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");

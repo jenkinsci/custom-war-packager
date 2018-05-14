@@ -4,6 +4,9 @@ bundle:
   vendor: "Jenkins project"
   title: "Jenkins WAR - all latest"
   description: "Just a Jenkins WAR, which includes all latest libs from master branches"
+buildSettings:
+  docker:
+    base: "jenkins/jenkins:2.107.3"
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"

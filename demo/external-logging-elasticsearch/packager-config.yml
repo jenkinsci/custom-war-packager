@@ -4,11 +4,14 @@ bundle:
   vendor: "Jenkins project"
   title: ""
   description: "Jenkins External Task Logging demo for Elasticsearch, packaged as a single WAR file. It automatically configures logging on startup"
+buildSettings:
+  docker:
+    base: "jenkins/jenkins:2.107.3"
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
-    version: 2.107
+    version: 2.107.3
 plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "structs"
