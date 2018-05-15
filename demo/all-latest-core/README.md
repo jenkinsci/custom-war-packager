@@ -8,7 +8,7 @@ This demo builds a Jenkins WAR which includes...
 * Latest versions of some modules (full list - TODO)
   * Some agent installer modules have obsolete tooling, they need to be updated before inclusion
 * Latest version of Lib Task Reactor
-
+* Docker Packaging for the build
 
 Limitations:
 

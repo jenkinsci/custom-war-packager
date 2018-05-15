@@ -2,11 +2,14 @@ bundle:
   groupId: "io.github.oleg-nenashev"
   artifactId: "mywar"
   description: "Just a WAR auto-generation-sample"
+buildSettings:
+  docker:
+    base: "jenkins/jenkins:2.107.3"
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
-    version: 2.107
+    version: 2.107.3
 plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "matrix-project"

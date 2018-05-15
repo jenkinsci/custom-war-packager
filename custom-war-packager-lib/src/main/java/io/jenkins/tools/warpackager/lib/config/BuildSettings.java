@@ -30,6 +30,8 @@ public class BuildSettings {
     private File bom;
     @CheckForNull
     private String environmentName;
+    @CheckForNull
+    private DockerBuildSettings docker;
 
     /**
      * If {@code true}, the final artifacts will be installed to the local repo.
@@ -67,6 +69,11 @@ public class BuildSettings {
     }
 
     @Nonnull
+    public File getOutputDir() {
+        return new File(getTmpDir(), "output");
+    }
+
+    @Nonnull
     public String getVersion() {
         return version != null ? version : DEFAULT_VERSION;
     }
@@ -100,5 +107,10 @@ public class BuildSettings {
     @Nonnull
     public List<String> getMvnOptions() {
         return mvnOptions != null ? Collections.unmodifiableList(mvnOptions) : Collections.emptyList();
+    }
+
+    @CheckForNull
+    public DockerBuildSettings getDocker() {
+        return docker;
     }
 }
