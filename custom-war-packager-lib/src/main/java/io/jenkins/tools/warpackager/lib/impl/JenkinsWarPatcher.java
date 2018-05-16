@@ -84,11 +84,17 @@ public class JenkinsWarPatcher extends PackagerBase {
     }
 
     public JenkinsWarPatcher removeMetaInf() throws IOException {
-        File p = new File(dstDir, "META-INF");
-        if (p.exists()) {
-            FileUtils.deleteDirectory(p);
-        }
+        deleteMetaINFFiles("MANIFEST.MF", "JENKINS.SF", "JENKINS.RSA");
         return this;
+    }
+
+    private void deleteMetaINFFiles(String ... filenames) throws IOException {
+        for (String filename : filenames) {
+            File p = new File(dstDir, "META-INF/" + filename);
+            if (p.exists() && !p.delete()) {
+                throw new IOException("Failed to delete the metadata file " + p);
+            }
+        }
     }
 
     private File getLibsDir() {
