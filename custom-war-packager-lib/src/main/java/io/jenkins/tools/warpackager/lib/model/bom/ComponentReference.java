@@ -54,6 +54,10 @@ public class ComponentReference extends Reference {
             dep.source.git = "https://github.com/jenkinsci/" + dep.artifactId + "-plugin.git";
             dep.source.branch = ref; // It may be actually commit as well, but the CWP's logic will work
         }
+
+        if (dir != null) {
+            dep.source.dir = dir;
+        }
         return dep;
     }
 
@@ -69,6 +73,10 @@ public class ComponentReference extends Reference {
             //TODO(oleg_nenashev): we have to interpolate Git repo now, not defined in BOM
             dep.source.git = "https://github.com/jenkinsci/" + dep.artifactId + "-plugin.git";
             dep.source.branch = ref; // It may be actually commit as well, but the CWP's logic will work
+        }
+
+        if (dir != null) {
+            dep.source.dir = dir;
         }
         return dep;
     }
