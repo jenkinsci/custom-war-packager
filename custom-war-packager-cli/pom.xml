@@ -5,12 +5,12 @@
   <parent>
     <groupId>io.jenkins.tools.custom-war-packager</groupId>
     <artifactId>parent-pom</artifactId>
-    <version>0.1-alpha-7-SNAPSHOT</version>
+    <version>0.1-alpha-7</version>
   </parent>
 
   <artifactId>custom-war-packager-cli</artifactId>
   <packaging>jar</packaging>
-  <version>0.1-alpha-7-SNAPSHOT</version>
+  <version>0.1-alpha-7</version>
 
   <name>Jenkins Custom WAR Packager CLI</name>
   <description>Generates a Custom WAR file from the specified YAML configuration file</description>
