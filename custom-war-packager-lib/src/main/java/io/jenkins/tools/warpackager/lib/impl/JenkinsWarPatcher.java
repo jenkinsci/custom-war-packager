@@ -4,8 +4,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
-import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
-import io.jenkins.tools.warpackager.lib.util.MavenHelper;
+import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -189,21 +188,21 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    public JenkinsWarPatcher addHooks(@Nonnull Map<String, File> hooks) throws IOException {
-        for (Map.Entry<String, File> hookSrc : hooks.entrySet()) {
-            final String hookId = hookSrc.getKey();
-            GroovyHookInfo hook = config.getHookById(hookId);
-            if (hook == null) {
-                throw new IOException("Cannot find metadata for the hook with ID=" + hookId);
+    public JenkinsWarPatcher addResources(@Nonnull Map<String, File> resources) throws IOException {
+        for (Map.Entry<String, File> hookSrc : resources.entrySet()) {
+            final String resourceId = hookSrc.getKey();
+            WARResourceInfo resource = config.findResourceById(resourceId);
+            if (resource == null) {
+                throw new IOException("Cannot find metadata for the resource with ID=" + resourceId);
             }
-            addHook(hook, hookSrc.getValue());
+            addResource(resource, hookSrc.getValue());
         }
 
         return this;
     }
 
-    public void addHook(@Nonnull GroovyHookInfo hook, File path) throws IOException {
-        File targetDir = new File(dstDir, "WEB-INF/" + hook.type + ".groovy.d");
+    public void addResource(@Nonnull WARResourceInfo resource, File path) throws IOException {
+        File targetDir = new File(dstDir, resource.getDestination());
         if (!targetDir.exists()) {
             Files.createDirectories(targetDir.toPath());
         }

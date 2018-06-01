@@ -1,9 +1,10 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
-import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
+import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
@@ -44,7 +45,22 @@ public class Builder extends PackagerBase {
         this.buildRoot = new File(config.buildSettings.getTmpDir(), "build");
     }
 
+    /**
+     * Performs spot-check of the input configuration.
+     * It does not guarantee that the configuration is fully correct.
+     */
+    public void verifyConfig() throws IOException {
+        if (config.casc != null && !config.casc.isEmpty()) {
+            DependencyInfo dep = config.findPlugin(CasCConfig.CASC_PLUGIN_ARTIFACT_ID);
+            if (dep == null) {
+                throw new IOException("CasC section is declared, but CasC plugin is not declared in the plugins list");
+            }
+        }
+    }
+
     public void build() throws IOException, InterruptedException {
+
+        verifyConfig();
 
         // Cleanup the temporary directory
         final File tmpDir = config.buildSettings.getTmpDir();
@@ -83,12 +99,11 @@ public class Builder extends PackagerBase {
             }
         }
 
-        // Prepare Groovy Hooks
-        Map<String, File> hooks = new HashMap<>();
-        if (config.groovyHooks != null) {
-            for (GroovyHookInfo hook : config.groovyHooks) {
-                hooks.put(hook.id, checkoutIfNeeded(hook.id, hook.source));
-            }
+        // Prepare Resources
+        Map<String, File> warResources = new HashMap<>();
+        for (WARResourceInfo extraWarResource : config.getAllExtraResources()) {
+            warResources.put(extraWarResource.id,
+                    checkoutIfNeeded(extraWarResource.id, extraWarResource.source));
         }
 
         // Generate POM
@@ -111,7 +126,7 @@ public class Builder extends PackagerBase {
                 .addSystemProperties(config.systemProperties)
                 .replaceLibs(versionOverrides)
                 .excludeLibs()
-                .addHooks(hooks);
+                .addResources(warResources);
 
         File warOutputDir = config.buildSettings.getOutputDir();
         SimpleManifest manifest = SimpleManifest.parseFile(srcWar);
