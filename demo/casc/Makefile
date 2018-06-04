@@ -18,7 +18,6 @@ tmp/output/target/${ARTIFACT_ID}-${VERSION}.war:
 
 run: tmp/output/target/${ARTIFACT_ID}-${VERSION}.war
 	JENKINS_HOME=work java \
-	    -Dartifact-manager-s3.enabled=true \
 	    -jar tmp/output/target/${ARTIFACT_ID}-${VERSION}.war \
         --httpPort=8080 --prefix=/jenkins
 
@@ -28,7 +27,7 @@ pct: tmp/output/target/${ARTIFACT_ID}-${VERSION}.war
 	    -v $(shell pwd)/pct_out:/pct/out \
 	    -v $(shell pwd)/pct_tmp:/pct/tmp \
 		-v $(shell pwd)/tmp/output/target/${ARTIFACT_ID}-${VERSION}.war:/pct/jenkins.war:ro \
-		-e ARTIFACT_ID=artifact-manager-s3 \
+		-e ARTIFACT_ID=role-strategy \
 		-e INSTALL_BUNDLED_SNAPSHOTS=true \
 		jenkins/pct \
 		-mavenProperties jenkins-test-harness.version=2.38:jth.jenkins-war.path=/pct/jenkins.war

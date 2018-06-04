@@ -189,13 +189,13 @@ public class JenkinsWarPatcher extends PackagerBase {
     }
 
     public JenkinsWarPatcher addResources(@Nonnull Map<String, File> resources) throws IOException {
-        for (Map.Entry<String, File> hookSrc : resources.entrySet()) {
-            final String resourceId = hookSrc.getKey();
+        for (Map.Entry<String, File> resourceSrc : resources.entrySet()) {
+            final String resourceId = resourceSrc.getKey();
             WARResourceInfo resource = config.findResourceById(resourceId);
             if (resource == null) {
                 throw new IOException("Cannot find metadata for the resource with ID=" + resourceId);
             }
-            addResource(resource, hookSrc.getValue());
+            addResource(resource, resourceSrc.getValue());
         }
 
         return this;
