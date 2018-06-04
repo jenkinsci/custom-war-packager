@@ -11,11 +11,11 @@ public class CasCConfig extends WARResourceInfo {
 
     @Override
     public String getDestination() {
-        return "WEB-INF/casc.yml.d";
+        return "WEB-INF/jenkins.yaml.d";
     }
 
     @Override
     public String getResourceType() {
-        return "casc.yaml";
+        return "jenkins.yaml";
     }
 }
