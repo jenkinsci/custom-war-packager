@@ -1,12 +1,32 @@
 import hudson.security.csrf.DefaultCrumbIssuer
+import hudson.model.*
+import hudson.security.FullControlOnceLoggedInAuthorizationStrategy
+import hudson.security.HudsonPrivateSecurityRealm
 import jenkins.model.Jenkins
 import jenkins.model.JenkinsLocationConfiguration
 import jenkins.CLI
 import jenkins.security.s2m.AdminWhitelistRule
 import org.kohsuke.stapler.StaplerProxy
-//import hudson.tasks.Mailer
+
+//TODO: Migrate to JCasC once it supports disabling via system property
+
+if (!Boolean.getBoolean("io.jenkins.demo.external-task-logging-elk.enabled")) {
+    // Production mode, we do not configure the system
+    return
+}
 
 println("-- System configuration")
+
+println("--- Installing the Security Realm")
+def securityRealm = new HudsonPrivateSecurityRealm(false)
+User user = securityRealm.createAccount("user", "user")
+user.setFullName("User")
+User admin = securityRealm.createAccount("admin", "admin")
+admin.setFullName("Admin")
+Jenkins.instance.setSecurityRealm(securityRealm)
+
+println("---Installing the demo Authorization strategy")
+Jenkins.instance.authorizationStrategy = new FullControlOnceLoggedInAuthorizationStrategy()
 
 println("--- Configuring Remoting (JNLP4 only, no Remoting CLI)")
 CLI.get().enabled = false
@@ -28,4 +48,3 @@ Jenkins.instance.quietPeriod = 0
 println("--- Configuring Email global settings")
 JenkinsLocationConfiguration.get().adminAddress = "admin@non.existent.email"
 // Mailer.descriptor().defaultSuffix = "@non.existent.email"
-

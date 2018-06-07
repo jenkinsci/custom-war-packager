@@ -1,0 +1,26 @@
+version: '3'
+
+services:
+  elk:
+    image: sebp/elk:es241_l240_k461
+    container_name: elk
+    ports:
+      - "5601:5601" # Kibana
+      - "9200:9200" # Elasticsearch
+      - "5044:5044" # Logstash
+    expose:
+      - "5601"
+      - "9200"
+      - "5044"
+  jenkins:
+    image: jenkins/demo-external-task-logging-elk:latest
+    container_name: jenkins
+    links:
+      - elk
+    environment:
+      - JAVA_OPTS=-Dio.jenkins.demo.external-task-logging-elk.enabled=true -Djenkins.install.runSetupWizard=false
+    ports:
+      - "8080:8080"
+    expose:
+      - "8080"
+      # Uncomment if you need agents - "9000:9000"

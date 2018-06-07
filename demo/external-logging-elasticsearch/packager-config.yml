@@ -1,13 +1,13 @@
 bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
-  artifactId: "external-task-logging-logstash"
+  artifactId: "jenkins-external-task-logging-elk-demo"
   vendor: "Jenkins project"
   title: "Jenkins External Task Logging demo for Elasticsearch"
   description: "Jenkins External Task Logging demo for Elasticsearch, packaged as a single WAR file. It automatically configures logging on startup"
 buildSettings:
   docker:
     base: "jenkins/jenkins:2.107.3"
-    tag: "jenkins/demo-external-task-logging-logstash"
+    tag: "jenkins/demo-external-task-logging-elk"
     build: true
 war:
   groupId: "org.jenkins-ci.main"
@@ -70,7 +70,7 @@ plugins:
       git: https://github.com/jglick/logstash-plugin.git
       branch: logs-JENKINS-38381
 systemProperties: {
-    jenkins.model.Jenkins.slaveAgentPort: "50000",
+    jenkins.model.Jenkins.slaveAgentPort: "9000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
 groovyHooks:
   - type: "init"
