@@ -4,6 +4,7 @@ import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
+import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
@@ -18,7 +19,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -146,8 +146,8 @@ public class BOMBuilder {
             }
         }
         if (config.groovyHooks != null) {
-            for (GroovyHookInfo hookInfo : config.groovyHooks) {
-                components.add(toComponentReference(hookInfo, overrideVersions));
+            for (WARResourceInfo extraResource : config.getAllExtraResources()) {
+                components.add(toComponentReference(extraResource, overrideVersions));
             }
         }
         spec.setComponents(components);
@@ -175,10 +175,10 @@ public class BOMBuilder {
         return ref;
     }
 
-    private ComponentReference toComponentReference(GroovyHookInfo hook, boolean overrideVersions) {
+    private ComponentReference toComponentReference(WARResourceInfo hook, boolean overrideVersions) {
         //TODO(oleg_nenashev): no artifact IDs, some hacks here. Maybe groovy hooks should require standard fields
         DependencyInfo mockDependency = new DependencyInfo();
-        mockDependency.groupId = "io.jenkins.tools.warpackager.hooks." + hook.type;
+        mockDependency.groupId = "io.jenkins.tools.warpackager." + hook.getResourceType() + "." + hook.id;
         mockDependency.artifactId = hook.id;
         mockDependency.source = hook.source;
 

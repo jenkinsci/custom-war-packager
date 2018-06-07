@@ -13,14 +13,17 @@ Differences:
 * It can run as a CLI tool outside Maven
 * It takes YAML specification instead of Maven `pom.xml`
 * It allows patching WAR contents like bundled libraries, system properties
-* It allows embedding [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
-so that the instance can be auto-configured
+* It allows self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
+or [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) YAML files
 
 ### Demo
 
 * [Jenkins WAR - all latest](./demo/all-latest-core) - bundles master branches for core and some key libraries/modules
 * [Jenkins WAR - all latest with Maven](./demo/all-latest-core-maven) - same as a above, but with Maven
-* [External Task Logging to Elasticsearch](./demo/external-logging-elasticsearch)
+* [External Task Logging to Elasticsearch](./demo/external-logging-elasticsearch) -
+runs External Logging demo and preconfigures it using System Groovy Hooks
+* [Configuration as Code](./demo/casc) - configuring WAR with 
+[Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) via YAML
 * [Custom WAR Packager CI Demo](https://github.com/oleg-nenashev/jenkins-custom-war-packager-ci-demo) - Standalone demo with an integrated CI flow
 
 ### Usage

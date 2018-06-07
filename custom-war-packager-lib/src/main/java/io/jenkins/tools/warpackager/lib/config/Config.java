@@ -18,6 +18,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -45,6 +46,8 @@ public class Config {
     public Map<String, String> systemProperties;
     @CheckForNull
     public Collection<GroovyHookInfo> groovyHooks;
+    @CheckForNull
+    public Collection<CasCConfig> casc;
 
     private static Config load(@Nonnull InputStream istream, boolean isEssentialsYML) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
@@ -116,6 +119,27 @@ public class Config {
         }
 
         for (GroovyHookInfo hook : groovyHooks) {
+            if (id.equals(hook.id)) {
+                return hook;
+            }
+        }
+        return null;
+    }
+
+    public List<WARResourceInfo> getAllExtraResources() {
+        final List<WARResourceInfo> list = new ArrayList<>();
+        if (groovyHooks != null) {
+            list.addAll(groovyHooks);
+        }
+        if (casc != null) {
+            list.addAll(casc);
+        }
+        return list;
+    }
+
+    @CheckForNull
+    public WARResourceInfo findResourceById(@Nonnull String id) {
+        for (WARResourceInfo hook : getAllExtraResources()) {
             if (id.equals(hook.id)) {
                 return hook;
             }
