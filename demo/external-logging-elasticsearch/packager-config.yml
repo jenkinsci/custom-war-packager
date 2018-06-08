@@ -18,11 +18,11 @@ plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "structs"
     source:
-      version: 1.10
+      version: 1.14
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "scm-api"
     source:
-      version: 2.2.6
+      version: 2.2.7
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-aggregator"
     source:
@@ -42,7 +42,7 @@ plugins:
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-step-api"
     source:
-      version: 2.13
+      version: 2.15
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-support"
     source:
@@ -69,6 +69,27 @@ plugins:
     source:
       git: https://github.com/jglick/logstash-plugin.git
       branch: logs-JENKINS-38381
+  # Security warnings
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "junit"
+    source:
+      version: 1.24
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "mailer"
+    source:
+      version: 1.21
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "git-client"
+    source:
+      version: 2.7.2
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "credentials-binding"
+    source:
+      version: 1.16
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "docker-commons"
+    source:
+      version: 1.13
 systemProperties: {
     jenkins.model.Jenkins.slaveAgentPort: "9000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
