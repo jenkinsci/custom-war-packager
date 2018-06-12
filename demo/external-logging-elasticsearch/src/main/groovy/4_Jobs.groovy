@@ -26,8 +26,9 @@ if(Jenkins.instance.getItem("Demo_agent") == null) {
     WorkflowJob project2 = Jenkins.instance.createProject(WorkflowJob.class, "Demo_agent")
     project2.definition = new CpsFlowDefinition(
         "node('agent') {\n" +
-        "  sh \"Hello, world!\"\n" +
-        "  sh \"ping -c 20 google.com\"\n" +
+        "  sh \"echo Hello, world!\"\n" +
+            // TODO Current demo image does not have ping, ORLY (alpine)
+            //    "  sh \"ping -c 20 google.com\"\n" +
         "}",
         true // Sandbox
     )
