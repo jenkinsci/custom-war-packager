@@ -2,7 +2,7 @@
 .PHONY: all
 
 ARTIFACT_ID = jenkins-external-task-logging-elk-demo
-VERSION = 2.107.3-elk-SNAPSHOT
+VERSION = 2.121.1-elk-SNAPSHOT
 
 all: clean build
 
