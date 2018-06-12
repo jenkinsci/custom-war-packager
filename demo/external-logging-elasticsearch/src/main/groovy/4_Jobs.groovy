@@ -14,7 +14,9 @@ println("-- Creating Jobs")
 if(Jenkins.instance.getItem("Demo_master") == null) {
     WorkflowJob project1 = Jenkins.instance.createProject(WorkflowJob.class, "Demo_master")
     project1.definition = new CpsFlowDefinition(
-        "echo \"ping -c 20 google.com\"",
+        "node('master') {\n" +
+        "  sh \"ping -c 20 google.com\"\n" +
+        "}",
         true // Sandbox
     )
     project1.save()
@@ -23,10 +25,10 @@ if(Jenkins.instance.getItem("Demo_master") == null) {
 if(Jenkins.instance.getItem("Demo_agent") == null) {
     WorkflowJob project2 = Jenkins.instance.createProject(WorkflowJob.class, "Demo_agent")
     project2.definition = new CpsFlowDefinition(
-        "node('agent') {" +
-            "  echo \"Hello, world!\"" +
-            "  sh \"ping -c 20 google.com\"" +
-            "}",
+        "node('agent') {\n" +
+        "  sh \"Hello, world!\"\n" +
+        "  sh \"ping -c 20 google.com\"\n" +
+        "}",
         true // Sandbox
     )
     project2.save()
