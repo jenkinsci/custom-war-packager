@@ -8,6 +8,14 @@ all its upstream dependencies.
 It also bundles auto-configuration System Groovy scripts, so that the WAR file starts
 up with pre-configured Logstash plugin settings and some other configs.
 
+Features of the demo:
+
+* Pipeline jobs logging goes to Elasticsearch
+* When tasks are executed on agents, the logs get posted to Elasticsearch directly
+  without passing though the master and causing scalability issues
+* Pipeline jobs override standard Log actions in the Jenkins core, so the
+  underlying implementation is transparent to users
+
 The demo can be run in Docker Compose,
 ELK stack is provided by the [sebp/elk](https://hub.docker.com/r/sebp/elk/)  image in this case.
 
@@ -28,14 +36,17 @@ many repositories.
 
 ## Running demo
 
-Run `make run`. 
-It will spin up the demo with predefined environment.
-
-1. In order to access the instance, use the "admin/admin" credentials.
-2. Run one of the demo jobs
-3. Browse logs
-  * Classic Log action queries Elasticsearch
-  * There is a _Log (Kibana)_ action in runs, which shows Kibana
+1. Run `make run`. It will spin up the demo with predefined environment.
+2. If you want to run demo jobs on the agent agent, 
+also run `docker-compose up agent` in a separate terminal window
+3. In order to access the instance, use the "admin/admin" credentials.
+4. Run one of the demo jobs.   
+5. Browse logs
+  * Classic Log action queries data from Elasticsearch
+  * There is a _Log (Kibana)_ action in runs, which shows Kibana. 
+  * In order to see Kibana logs, you will need to configure the default index in the 
+    embedded page once Jenkins starts up. Use `logstash/` as a default index and 
+    `@timestamp` as data source
 
 ## Manual run
 
@@ -53,4 +64,4 @@ to start the Docker container to to expose ports
   * `elasticsearch.username` and `elasticsearch.password` - 
 3. Pass through the installation Wizard
 4. Create a Pipeline job with some logging (e.g. `echo` commands), run it
-5. Browse logs
+5. Browse logs (see above)
