@@ -16,13 +16,16 @@ Features of the demo:
 * Pipeline jobs override standard Log actions in the Jenkins core, so the
   underlying implementation is transparent to users
 * Secrets are escaped in stored/displayed logs when running on master and agents.
+* Console annotations work as they work for common Jenkins instances
+* Log blocks are collapsible in the _Console_ screen
+* Origin container ID of every message is visible in Kibana (if you have set that up) via sender field
 
 The demo can be run in Docker Compose,
 ELK stack is provided by the [sebp/elk](https://hub.docker.com/r/sebp/elk/)  image in this case.
 
 ## Prerequisites
 
-* Docker is installed
+* Docker and Docker Compose are installed
 
 ## Building demo
 
