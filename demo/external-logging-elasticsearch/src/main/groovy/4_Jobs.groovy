@@ -34,3 +34,23 @@ if(Jenkins.instance.getItem("Demo_agent") == null) {
     )
     project2.save()
 }
+
+if(Jenkins.instance.getItem("Demo_parallel") == null) {
+    WorkflowJob project3 = Jenkins.instance.createProject(WorkflowJob.class, "Demo_parallel")
+    project3.definition = new CpsFlowDefinition(
+        "parallel local: {\n" +
+        "  node('master') {\n" +
+        "    sh 'for x in 0 1 2 3 4 5 6 7 8 9; do echo \$x; sleep 1; done'\n" +
+        "  }\n" +
+        "}, remote: {\n" +
+        "  node('agent') {\n" +
+        "    withCredentials([string(credentialsId: 'token', variable: 'TOKEN')]) {\n" +
+        "      sh 'echo receiving \$TOKEN'\n" +
+        "      sh 'for x in 0 1 2 3 4 5 6 7 8 9; do echo \$x; sleep 1; done'\n" +
+        "    }\n" +
+        "  }\n" +
+        "}",
+        true // Sandbox
+    )
+    project3.save()
+}

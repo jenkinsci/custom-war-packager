@@ -15,6 +15,7 @@ Features of the demo:
   without passing though the master and causing scalability issues
 * Pipeline jobs override standard Log actions in the Jenkins core, so the
   underlying implementation is transparent to users
+* Secrets are escaped in stored/displayed logs when running on master and agents.
 
 The demo can be run in Docker Compose,
 ELK stack is provided by the [sebp/elk](https://hub.docker.com/r/sebp/elk/)  image in this case.
@@ -37,7 +38,8 @@ many repositories.
 ## Running demo
 
 1. Run `make run`. It will spin up the demo with predefined environment.
-2. If you want to run demo jobs on the agent agent, 
+   Jenkins will be available on the port 8080, credentials: `admin/admin`
+2. If you want to run demo jobs on the agent, 
 also run `docker-compose up agent` in a separate terminal window
 3. In order to access the instance, use the "admin/admin" credentials.
 4. Run one of the demo jobs.   

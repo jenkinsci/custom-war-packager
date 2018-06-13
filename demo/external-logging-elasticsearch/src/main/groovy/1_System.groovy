@@ -2,11 +2,17 @@ import hudson.security.csrf.DefaultCrumbIssuer
 import hudson.model.*
 import hudson.security.FullControlOnceLoggedInAuthorizationStrategy
 import hudson.security.HudsonPrivateSecurityRealm
+import hudson.util.Secret
 import jenkins.model.Jenkins
 import jenkins.model.JenkinsLocationConfiguration
 import jenkins.CLI
 import jenkins.security.s2m.AdminWhitelistRule
 import org.kohsuke.stapler.StaplerProxy
+
+import com.cloudbees.plugins.credentials.CredentialsProvider
+import com.cloudbees.plugins.credentials.CredentialsScope
+import com.cloudbees.plugins.credentials.domains.Domain
+import org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl
 
 //TODO: Migrate to JCasC once it supports disabling via system property
 
@@ -48,3 +54,15 @@ Jenkins.instance.quietPeriod = 0
 println("--- Configuring Email global settings")
 JenkinsLocationConfiguration.get().adminAddress = "admin@non.existent.email"
 // Mailer.descriptor().defaultSuffix = "@non.existent.email"
+
+println("--- Adding test credentials")
+def c = new StringCredentialsImpl(
+    CredentialsScope.GLOBAL,
+    "token",
+    "Test token",
+    Secret.fromString("SECRET_TOKEN_WHICH_SHOULD_NOD_BE_DISPLAYED")
+)
+
+CredentialsProvider.lookupStores(Jenkins.instance).each { it ->
+    it.addCredentials(Domain.global(), c)
+}
