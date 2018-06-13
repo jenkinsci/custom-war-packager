@@ -1,0 +1,34 @@
+version: '3'
+
+services:
+  elk:
+    image: sebp/elk:es241_l240_k461
+    container_name: elk
+    ports:
+      - "5601:5601" # Kibana
+      - "9200:9200" # Elasticsearch
+      - "5044:5044" # Logstash
+    expose:
+      - "5601"
+      - "9200"
+      - "5044"
+  jenkins:
+    image: jenkins/demo-external-task-logging-elk:latest
+    container_name: jenkins
+    links:
+      - elk
+    environment:
+      - JAVA_OPTS=-Dio.jenkins.demo.external-task-logging-elk.enabled=true -Djenkins.install.runSetupWizard=false
+    ports:
+      - "8080:8080"
+      - "9000:9000"
+    expose:
+      - "8080"
+      - "9000"
+  agent:
+    image: cloudbees/jnlp-slave-with-java-build-tools:2.2.0
+    links:
+      - elk
+      - jenkins
+    # TODO there is no -noreconnect yet this does not work when first started; you need to relaunch it; work around with wait-for-it: https://docs.docker.com/compose/startup-order/
+    command: -url http://jenkins:8080/ f9bf0c290371481814f8bc235e3c53736ea9cd9f11b466b76ad794b91cb57a0b -workDir "/home/jenkins" agent

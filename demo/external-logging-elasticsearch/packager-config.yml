@@ -1,28 +1,28 @@
 bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
-  artifactId: "external-task-logging-logstash"
+  artifactId: "jenkins-external-task-logging-elk-demo"
   vendor: "Jenkins project"
   title: "Jenkins External Task Logging demo for Elasticsearch"
   description: "Jenkins External Task Logging demo for Elasticsearch, packaged as a single WAR file. It automatically configures logging on startup"
 buildSettings:
   docker:
-    base: "jenkins/jenkins:2.107.3"
-    tag: "jenkins/demo-external-task-logging-logstash"
+    base: "jenkins/jenkins:2.121.1"
+    tag: "jenkins/demo-external-task-logging-elk"
     build: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
-    version: 2.107.3
+    version: 2.121.1
 plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "structs"
     source:
-      version: 1.10
+      version: 1.14
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "scm-api"
     source:
-      version: 2.2.6
+      version: 2.2.7
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-aggregator"
     source:
@@ -31,46 +31,79 @@ plugins:
     artifactId: "durable-task"
     source:
       git: https://github.com/jglick/durable-task-plugin.git
-      branch: watch-JENKINS-38381
+      # https://github.com/jenkinsci/durable-task-plugin/pull/62
+      # branch: watch-plus-UTF-8-JENKINS-31096
+      commit: e219d474cdd656ae9296314ada48605d3c87ea1c
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-api"
     source:
       git: https://github.com/jglick/workflow-api-plugin.git
-      branch: logs-JENKINS-38381
+      # https://github.com/jenkinsci/workflow-api-plugin/pull/67
+      # branch: logs-JENKINS-38381
+      commit: 834dce0d24cefcd00f70c223d2b438dc3ec986b2
     build:
       buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-step-api"
     source:
-      version: 2.13
+      version: 2.15
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-support"
     source:
       git: https://github.com/jglick/workflow-support-plugin.git
-      branch: logs-JENKINS-38381
+      # https://github.com/jenkinsci/workflow-support-plugin/pull/15
+      # branch: logs-JENKINS-38381
+      commit: cd70bcc4c20940fc8b54e12ded4d781a19ac0485
     build:
       buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-job"
     source:
       git: https://github.com/jglick/workflow-job-plugin.git
-      branch: logs-JENKINS-38381
+      # https://github.com/jenkinsci/workflow-job-plugin/pull/27
+      # branch: logs-JENKINS-38381
+      commit: 18d78f305a4526af9cdf3a7b68eb9caf97c7cfbc
     build:
       buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-durable-task-step"
     source:
       git: https://github.com/jglick/workflow-durable-task-step-plugin.git
-      branch: watch-JENKINS-38381
+      # https://github.com/jenkinsci/workflow-durable-task-step-plugin/pull/65
+      # branch: watch-plus-UTF-8-JENKINS-31096
+      commit: 6c424e059bba90fc94a9c1e87dc9c4a324bfef26
     build:
       buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "logstash"
     source:
       git: https://github.com/jglick/logstash-plugin.git
-      branch: logs-JENKINS-38381
+      # https://github.com/jenkinsci/logstash-plugin/pull/18
+      # branch: logs-JENKINS-38381
+      commit: 3b112333115b6a3ee003a8f03c0f0c907b6c8881
+  # Security warnings
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "junit"
+    source:
+      version: 1.24
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "mailer"
+    source:
+      version: 1.21
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "git-client"
+    source:
+      version: 2.7.2
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "credentials-binding"
+    source:
+      version: 1.16
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "docker-commons"
+    source:
+      version: 1.13
 systemProperties: {
-    jenkins.model.Jenkins.slaveAgentPort: "50000",
+    jenkins.model.Jenkins.slaveAgentPort: "9000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
 groovyHooks:
   - type: "init"
