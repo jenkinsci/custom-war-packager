@@ -37,7 +37,7 @@ The tool offers a CLI interface and a Maven Plugin wrapper.
 java -jar custom-war-packager-cli.jar -configPath=mywar.yml -version=1.0-SNAPSHOT -tmpDir=tmp
 ```
 
-After the build the generated WAR file will be put to `tmp/output/${artifactId}.war`.
+After the build the generated WAR file will be put to `tmp/output/target/${artifactId}.war`.
 
 To run the tool in a demo mode with [this config](./custom-war-packager-cli/src/main/resources/io/jenkins/tools/warpackager/cli/config/sample.yml), just use the following command:
 
