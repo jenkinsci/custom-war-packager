@@ -20,6 +20,12 @@ public class DockerBuildSettings {
 
     private boolean build;
 
+    private boolean push;
+
+    private String registryURL;
+
+    private String credentialsId;
+
     @CheckForNull
     private String tag;
 
@@ -39,6 +45,18 @@ public class DockerBuildSettings {
         this.tag = tag;
     }
 
+    public void setPush(boolean push) {
+        this.push = push;
+    }
+
+    public void setRegistryURL(String registryURL) {
+        this.registryURL = registryURL;
+    }
+
+    public void setCredentialsId(String credentialsId) {
+        this.credentialsId = credentialsId;
+    }
+
     @Nonnull
     public String getBase() {
         return base != null ? base : DEFAULT_BASE;
@@ -51,6 +69,18 @@ public class DockerBuildSettings {
 
     public boolean isBuild() {
         return build;
+    }
+
+    public boolean isPush() {
+        return push;
+    }
+
+    public String getRegistryURL() {
+        return registryURL;
+    }
+
+    public String getCredentialsId() {
+        return credentialsId;
     }
 
     @CheckForNull
