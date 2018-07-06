@@ -8,10 +8,12 @@ import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.FileUtils;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -76,7 +78,21 @@ public class Builder extends PackagerBase {
         if (pathToBom != null) {
             bom = BOM.load(pathToBom);
             LOGGER.log(Level.INFO, "Overriding settings by BOM file: {0}", pathToBom);
-            config.overrideByBOM(bom, config.buildSettings.getEnvironmentName());
+            config.overrideByPOM(bom, config.buildSettings.getEnvironmentName());
+        }
+        final File pathToPom = config.buildSettings.getPOM();
+        if (pathToPom != null) {
+            MavenXpp3Reader rdr = new MavenXpp3Reader();
+            Model model;
+            try(FileInputStream istream = new FileInputStream(pathToPom)) {
+                model = rdr.read(istream);
+            } catch (Exception ex) {
+                throw new IOException("Failed to read POM: " + pathToPom, ex);
+            }
+
+            File downloadDir = new File(tmpDir, "hpiDownloads");
+            Files.createDirectory(downloadDir.toPath());
+            config.overrideByPOM(downloadDir, model);
         }
 
         // Verify settings

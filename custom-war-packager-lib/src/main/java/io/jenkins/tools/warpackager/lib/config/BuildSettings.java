@@ -29,6 +29,8 @@ public class BuildSettings {
     @CheckForNull
     private File bom;
     @CheckForNull
+    private File pom;
+    @CheckForNull
     private String environmentName;
     @CheckForNull
     private DockerBuildSettings docker;
@@ -53,6 +55,10 @@ public class BuildSettings {
 
     public void setBOM(@CheckForNull File bom) {
         this.bom = bom;
+    }
+
+    public void setPOM(@CheckForNull File pom) {
+        this.pom = pom;
     }
 
     public void setEnvironmentName(@CheckForNull String environmentName) {
@@ -81,6 +87,11 @@ public class BuildSettings {
     @CheckForNull
     public File getBOM() {
         return bom;
+    }
+
+    @CheckForNull
+    public File getPOM() {
+        return pom;
     }
 
     @CheckForNull

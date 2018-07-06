@@ -8,6 +8,9 @@ import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.model.bom.Environment;
 import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
 import io.jenkins.tools.warpackager.lib.model.bom.Specification;
+import io.jenkins.tools.warpackager.lib.util.MavenHelper;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -161,7 +164,49 @@ public class Config {
         return null;
     }
 
-    public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
+    //TODO: support appending plugins in POM/BOM
+
+    //TODO: add MANY options to make it configurable
+
+    public void overrideByPOM(File tmpDir, @Nonnull Model pomModel) throws IOException, InterruptedException {
+        MavenHelper helper = new MavenHelper(this);
+        plugins = new ArrayList<>();
+        for (Dependency dep : pomModel.getDependencies()) {
+            processMavenDep(helper, tmpDir, dep);
+        }
+
+        for (Dependency dep : pomModel.getDependencyManagement().getDependencies()) {
+            processMavenDep(helper, tmpDir, dep);
+        }
+    }
+
+    private void processMavenDep(MavenHelper helper, File tmpDir, Dependency dep) throws InterruptedException {
+        // Filter plugins
+        if (dep.isOptional()) {
+            // we accept them for now
+        }
+
+        DependencyInfo res = new DependencyInfo();
+        res.artifactId = dep.getArtifactId();
+        res.groupId = dep.getGroupId();
+        res.source = new SourceInfo();
+        res.source.version = dep.getVersion();
+
+        try {
+            if (!helper.artifactExistsInLocalCache(res, dep.getVersion(), "hpi")
+                    && !helper.artifactExists(tmpDir, res, dep.getVersion(), "hpi")) {
+                helper.downloadArtifact(tmpDir, res, dep.getVersion(), "hpi",
+                        new File(tmpDir, dep.getArtifactId() + ".hpi"));
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO, "Skipping dependency, not an HPI file: " + res);
+            return;
+        }
+
+        plugins.add(res);
+    }
+
+    public void overrideByPOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
         war = spec.getCore().toWARDependencyInfo();
 

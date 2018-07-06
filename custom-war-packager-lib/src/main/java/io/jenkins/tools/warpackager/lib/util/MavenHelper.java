@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.processFor;
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.runFor;
@@ -19,6 +21,8 @@ import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.runFor;
  * @author Oleg Nenashev
  */
 public class MavenHelper {
+
+    private static final Logger LOGGER = Logger.getLogger(MavenHelper.class.getName());
 
     private Config cfg;
 
@@ -52,6 +56,19 @@ public class MavenHelper {
         return runFor(buildDir, callArgs.toArray(args));
     }
 
+    public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
+        String path = String.format("~/.m2/repository/%s/%s/%s/%s-%s.%s",
+                dep.groupId.replaceAll("\\.", "/"),
+                dep.artifactId,
+                version,
+                dep.artifactId,
+                version,
+                packaging);
+        LOGGER.log(Level.INFO, "Checking {0}", path);
+        File expectedFile = new File(path);
+        return expectedFile.exists();
+    }
+
     public boolean artifactExists(File buildDir, DependencyInfo dep, String version, String packaging) throws IOException, InterruptedException {
         String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
         int res = run(buildDir, false,"dependency:get",
@@ -61,13 +78,20 @@ public class MavenHelper {
         return res == 0;
     }
 
-    public void downloadArtifact(File buildDir, DependencyInfo dep, String version, File destination)
+    public void downloadJAR(File buildDir, DependencyInfo dep, String version, File destination)
+            throws IOException, InterruptedException {
+        downloadArtifact(buildDir, dep, version, "jar", destination);
+    }
+
+    public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, File destination)
             throws IOException, InterruptedException {
         run(buildDir, "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
                 "-DgroupId=" + dep.groupId,
                 "-DartifactId=" + dep.artifactId,
                 "-Dversion=" + version,
                 "-DoutputDirectory=" + destination.getParentFile().getAbsolutePath(),
-                "-DoutputFileName=" + destination.getName());
+                "-DoutputFileName=" + destination.getName(),
+                "-Dtype=" + packaging);
     }
+
 }
