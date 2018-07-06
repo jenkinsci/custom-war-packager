@@ -78,7 +78,7 @@ public class Builder extends PackagerBase {
         if (pathToBom != null) {
             bom = BOM.load(pathToBom);
             LOGGER.log(Level.INFO, "Overriding settings by BOM file: {0}", pathToBom);
-            config.overrideByPOM(bom, config.buildSettings.getEnvironmentName());
+            config.overrideByBOM(bom, config.buildSettings.getEnvironmentName());
         }
         final File pathToPom = config.buildSettings.getPOM();
         if (pathToPom != null) {

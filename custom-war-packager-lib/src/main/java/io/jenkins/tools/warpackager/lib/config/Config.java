@@ -206,7 +206,7 @@ public class Config {
         plugins.add(res);
     }
 
-    public void overrideByPOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
+    public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
         war = spec.getCore().toWARDependencyInfo();
 
