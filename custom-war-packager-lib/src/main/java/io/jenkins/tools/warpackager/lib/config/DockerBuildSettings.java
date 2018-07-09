@@ -20,14 +20,13 @@ public class DockerBuildSettings {
 
     private boolean build;
 
-    private boolean push;
-
-    private String registryURL;
-
-    private String credentialsId;
-
     @CheckForNull
     private String tag;
+
+    /**
+     * String custom field to store whatever you want.
+     */
+    private String customSettings;
 
     public void setBase(@CheckForNull String base) {
         this.base = base;
@@ -45,16 +44,8 @@ public class DockerBuildSettings {
         this.tag = tag;
     }
 
-    public void setPush(boolean push) {
-        this.push = push;
-    }
-
-    public void setRegistryURL(String registryURL) {
-        this.registryURL = registryURL;
-    }
-
-    public void setCredentialsId(String credentialsId) {
-        this.credentialsId = credentialsId;
+    public void setCustomSettings(String customSettings) {
+        this.customSettings = customSettings;
     }
 
     @Nonnull
@@ -71,20 +62,12 @@ public class DockerBuildSettings {
         return build;
     }
 
-    public boolean isPush() {
-        return push;
-    }
-
-    public String getRegistryURL() {
-        return registryURL;
-    }
-
-    public String getCredentialsId() {
-        return credentialsId;
-    }
-
     @CheckForNull
     public String getTag() {
         return tag;
+    }
+
+    public String getCustomSettings() {
+        return customSettings;
     }
 }
