@@ -8,10 +8,12 @@ import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.FileUtils;
 
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -77,6 +79,12 @@ public class Builder extends PackagerBase {
             bom = BOM.load(pathToBom);
             LOGGER.log(Level.INFO, "Overriding settings by BOM file: {0}", pathToBom);
             config.overrideByBOM(bom, config.buildSettings.getEnvironmentName());
+        }
+        final File pathToPom = config.buildSettings.getPOM();
+        if (pathToPom != null) {
+            File downloadDir = new File(tmpDir, "hpiDownloads");
+            Files.createDirectory(downloadDir.toPath());
+            config.overrideByPOM(downloadDir, pathToPom);
         }
 
         // Verify settings

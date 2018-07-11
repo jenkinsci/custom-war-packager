@@ -8,9 +8,14 @@ import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.model.bom.Environment;
 import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
 import io.jenkins.tools.warpackager.lib.model.bom.Specification;
+import io.jenkins.tools.warpackager.lib.util.MavenHelper;
+import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -159,6 +164,61 @@ public class Config {
             }
         }
         return null;
+    }
+
+    //TODO: support appending plugins in POM/BOM
+
+    //TODO: add MANY options to make it configurable
+
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH", justification = "plugins is initialized before")
+    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom) throws IOException, InterruptedException {
+        MavenXpp3Reader rdr = new MavenXpp3Reader();
+        Model model;
+        try(FileInputStream istream = new FileInputStream(pom)) {
+            model = rdr.read(istream);
+        } catch (Exception ex) {
+            throw new IOException("Failed to read POM: " + pom, ex);
+        }
+
+        MavenHelper helper = new MavenHelper(this);
+        plugins = new ArrayList<>();
+
+        File destination = new File(tmpDir, "dependencies.txt");
+        if (!destination.exists()) {
+            if(!destination.createNewFile()){
+                throw new IOException("Unable to create dependencies file");
+            }
+        }
+
+        List<DependencyInfo> deps = helper.listDependenciesFromPom(tmpDir, pom, destination);
+
+        for (DependencyInfo dep : deps) {
+            processMavenDep(helper, tmpDir, dep, plugins);
+        }
+
+        // Add the artifact itself, no validation as we asume the pom is from a plugin
+        DependencyInfo res = new DependencyInfo();
+        res.artifactId = model.getArtifactId();
+        res.groupId = model.getGroupId();
+        res.source = new SourceInfo();
+        res.source.version = model.getVersion();
+        plugins.add(res);
+    }
+
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
+    private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException {
+        try {
+            if (!helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi")
+                    && helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
+                helper.downloadArtifact(tmpDir, res, res.getSource().version, "hpi",
+                        new File(tmpDir, res.artifactId + ".hpi"));
+            }
+        } catch (IOException ex) {
+            LOGGER.log(Level.INFO, "Skipping dependency, not an HPI file: " + res);
+            return;
+        }
+
+        plugins.add(res);
     }
 
     public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {

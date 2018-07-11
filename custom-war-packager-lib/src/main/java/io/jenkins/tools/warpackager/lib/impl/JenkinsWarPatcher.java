@@ -162,7 +162,7 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
 
         File newJarFile = new File(libsDir, lib.artifactId + "-" + effectiveVersion + ".jar");
-        mavenHelper.downloadArtifact(dstDir, lib, effectiveVersion, newJarFile);
+        mavenHelper.downloadJAR(dstDir, lib, effectiveVersion, newJarFile);
     }
 
     private void excludeLib(DependencyInfo lib) throws IOException, InterruptedException {
