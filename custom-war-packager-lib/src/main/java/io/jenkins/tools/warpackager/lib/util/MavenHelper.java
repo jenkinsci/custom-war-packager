@@ -92,20 +92,24 @@ public class MavenHelper {
 
     public List<DependencyInfo> listDependenciesFromPom(File buildDir, File pom, File destination) throws IOException, InterruptedException {
         List<DependencyInfo> dependencies = new LinkedList<>();
-        run(buildDir, true, "dependency:list", "-B", "-DoutputFile=" + destination.getAbsolutePath(),  "-DincludeScope=runtime", "-DexcludeClassifiers=tests", "-f", pom.getAbsolutePath(), "-q");
-        try (Stream<String> stream = Files.lines(destination.toPath())) {
-           stream.skip(2).filter(line -> !line.isEmpty()).forEach(line -> {
-               line = line.trim();
-               String[] dependencyData = line.split(":");
-               DependencyInfo dep = new DependencyInfo();
-               dep.groupId = dependencyData[0].trim();
-               dep.artifactId = dependencyData[1].trim();
-               dep.source = new SourceInfo();
-               dep.source.version = dependencyData[3].trim();
-               dependencies.add(dep);
-           });
+        int listed = run(buildDir, true, "dependency:list", "-B", "-DoutputFile=" + destination.getAbsolutePath(),  "-DincludeScope=runtime", "-DexcludeClassifiers=tests", "-f", pom.getAbsolutePath(), "-q");
+        if (listed == 0) {
+            try (Stream<String> stream = Files.lines(destination.toPath())) {
+                stream.skip(2).filter(line -> !line.isEmpty()).forEach(line -> {
+                    line = line.trim();
+                    String[] dependencyData = line.split(":");
+                    DependencyInfo dep = new DependencyInfo();
+                    dep.groupId = dependencyData[0].trim();
+                    dep.artifactId = dependencyData[1].trim();
+                    dep.source = new SourceInfo();
+                    dep.source.version = dependencyData[3].trim();
+                    dependencies.add(dep);
+                });
+            }
+            return dependencies;
+        } else {
+            throw new IOException("Unable to list dependencies for pom file");
         }
-        return dependencies;
     }
 
     public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, File destination)

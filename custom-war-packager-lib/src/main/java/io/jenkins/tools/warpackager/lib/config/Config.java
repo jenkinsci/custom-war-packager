@@ -170,6 +170,7 @@ public class Config {
 
     //TODO: add MANY options to make it configurable
 
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH", justification = "plugins is initialized before")
     public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom) throws IOException, InterruptedException {
         MavenXpp3Reader rdr = new MavenXpp3Reader();
         Model model;
@@ -184,7 +185,9 @@ public class Config {
 
         File destination = new File(tmpDir, "dependencies.txt");
         if (!destination.exists()) {
-            destination.createNewFile();
+            if(!destination.createNewFile()){
+                throw new IOException("Unable to create dependencies file");
+            }
         }
 
         List<DependencyInfo> deps = helper.listDependenciesFromPom(tmpDir, pom, destination);
@@ -202,7 +205,8 @@ public class Config {
         plugins.add(res);
     }
 
-    private void processMavenDep(MavenHelper helper, File tmpDir, @Nullable DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException {
+    @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
+    private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException {
         try {
             if (!helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi")
                     && helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
