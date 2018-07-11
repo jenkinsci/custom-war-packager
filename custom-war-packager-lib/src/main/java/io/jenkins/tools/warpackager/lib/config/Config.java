@@ -11,9 +11,11 @@ import io.jenkins.tools.warpackager.lib.model.bom.Specification;
 import io.jenkins.tools.warpackager.lib.util.MavenHelper;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -168,35 +170,44 @@ public class Config {
 
     //TODO: add MANY options to make it configurable
 
-    public void overrideByPOM(File tmpDir, @Nonnull Model pomModel) throws IOException, InterruptedException {
+    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom) throws IOException, InterruptedException {
+        MavenXpp3Reader rdr = new MavenXpp3Reader();
+        Model model;
+        try(FileInputStream istream = new FileInputStream(pom)) {
+            model = rdr.read(istream);
+        } catch (Exception ex) {
+            throw new IOException("Failed to read POM: " + pom, ex);
+        }
+
         MavenHelper helper = new MavenHelper(this);
         plugins = new ArrayList<>();
-        for (Dependency dep : pomModel.getDependencies()) {
-            processMavenDep(helper, tmpDir, dep);
+
+        File destination = new File(tmpDir, "dependencies.txt");
+        if (!destination.exists()) {
+            destination.createNewFile();
         }
 
-        for (Dependency dep : pomModel.getDependencyManagement().getDependencies()) {
-            processMavenDep(helper, tmpDir, dep);
+        List<DependencyInfo> deps = helper.listDependenciesFromPom(tmpDir, pom, destination);
+
+        for (DependencyInfo dep : deps) {
+            processMavenDep(helper, tmpDir, dep, plugins);
         }
+
+        // Add the artifact itself, no validation as we asume the pom is from a plugin
+        DependencyInfo res = new DependencyInfo();
+        res.artifactId = model.getArtifactId();
+        res.groupId = model.getGroupId();
+        res.source = new SourceInfo();
+        res.source.version = model.getVersion();
+        plugins.add(res);
     }
 
-    private void processMavenDep(MavenHelper helper, File tmpDir, Dependency dep) throws InterruptedException {
-        // Filter plugins
-        if (dep.isOptional()) {
-            // we accept them for now
-        }
-
-        DependencyInfo res = new DependencyInfo();
-        res.artifactId = dep.getArtifactId();
-        res.groupId = dep.getGroupId();
-        res.source = new SourceInfo();
-        res.source.version = dep.getVersion();
-
+    private void processMavenDep(MavenHelper helper, File tmpDir, @Nullable DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException {
         try {
-            if (!helper.artifactExistsInLocalCache(res, dep.getVersion(), "hpi")
-                    && !helper.artifactExists(tmpDir, res, dep.getVersion(), "hpi")) {
-                helper.downloadArtifact(tmpDir, res, dep.getVersion(), "hpi",
-                        new File(tmpDir, dep.getArtifactId() + ".hpi"));
+            if (!helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi")
+                    && helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
+                helper.downloadArtifact(tmpDir, res, res.getSource().version, "hpi",
+                        new File(tmpDir, res.artifactId + ".hpi"));
             }
         } catch (IOException ex) {
             LOGGER.log(Level.INFO, "Skipping dependency, not an HPI file: " + res);

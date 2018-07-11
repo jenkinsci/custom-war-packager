@@ -82,17 +82,9 @@ public class Builder extends PackagerBase {
         }
         final File pathToPom = config.buildSettings.getPOM();
         if (pathToPom != null) {
-            MavenXpp3Reader rdr = new MavenXpp3Reader();
-            Model model;
-            try(FileInputStream istream = new FileInputStream(pathToPom)) {
-                model = rdr.read(istream);
-            } catch (Exception ex) {
-                throw new IOException("Failed to read POM: " + pathToPom, ex);
-            }
-
             File downloadDir = new File(tmpDir, "hpiDownloads");
             Files.createDirectory(downloadDir.toPath());
-            config.overrideByPOM(downloadDir, model);
+            config.overrideByPOM(downloadDir, pathToPom);
         }
 
         // Verify settings

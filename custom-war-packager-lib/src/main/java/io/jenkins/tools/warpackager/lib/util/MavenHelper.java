@@ -4,15 +4,22 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
+import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 
 import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.processFor;
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.runFor;
@@ -74,13 +81,31 @@ public class MavenHelper {
         int res = run(buildDir, false,"dependency:get",
                 "-Dartifact=" + gai,
                 "-Dpackaging=" + packaging,
-                "-Dtransitive=false", "-o");
+                "-Dtransitive=false", "-q", "-B");
         return res == 0;
     }
 
     public void downloadJAR(File buildDir, DependencyInfo dep, String version, File destination)
             throws IOException, InterruptedException {
         downloadArtifact(buildDir, dep, version, "jar", destination);
+    }
+
+    public List<DependencyInfo> listDependenciesFromPom(File buildDir, File pom, File destination) throws IOException, InterruptedException {
+        List<DependencyInfo> dependencies = new LinkedList<>();
+        run(buildDir, true, "dependency:list", "-B", "-DoutputFile=" + destination.getAbsolutePath(),  "-DincludeScope=runtime", "-DexcludeClassifiers=tests", "-f", pom.getAbsolutePath(), "-q");
+        try (Stream<String> stream = Files.lines(destination.toPath())) {
+           stream.skip(2).filter(line -> !line.isEmpty()).forEach(line -> {
+               line = line.trim();
+               String[] dependencyData = line.split(":");
+               DependencyInfo dep = new DependencyInfo();
+               dep.groupId = dependencyData[0].trim();
+               dep.artifactId = dependencyData[1].trim();
+               dep.source = new SourceInfo();
+               dep.source.version = dependencyData[3].trim();
+               dependencies.add(dep);
+           });
+        }
+        return dependencies;
     }
 
     public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, File destination)
@@ -91,7 +116,8 @@ public class MavenHelper {
                 "-Dversion=" + version,
                 "-DoutputDirectory=" + destination.getParentFile().getAbsolutePath(),
                 "-DoutputFileName=" + destination.getName(),
-                "-Dtype=" + packaging);
+                "-Dtype=" + packaging,
+                "-q");
     }
 
 }
