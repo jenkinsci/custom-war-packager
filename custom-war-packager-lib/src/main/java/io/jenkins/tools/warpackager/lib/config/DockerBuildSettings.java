@@ -23,6 +23,11 @@ public class DockerBuildSettings {
     @CheckForNull
     private String tag;
 
+    /**
+     * String custom field to store whatever you want.
+     */
+    private String customSettings;
+
     public void setBase(@CheckForNull String base) {
         this.base = base;
     }
@@ -37,6 +42,10 @@ public class DockerBuildSettings {
 
     public void setTag(@CheckForNull String tag) {
         this.tag = tag;
+    }
+
+    public void setCustomSettings(String customSettings) {
+        this.customSettings = customSettings;
     }
 
     @Nonnull
@@ -56,5 +65,9 @@ public class DockerBuildSettings {
     @CheckForNull
     public String getTag() {
         return tag;
+    }
+
+    public String getCustomSettings() {
+        return customSettings;
     }
 }
