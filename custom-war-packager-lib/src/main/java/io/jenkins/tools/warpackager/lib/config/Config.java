@@ -206,19 +206,12 @@ public class Config {
     }
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
-    private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException {
-        try {
-            if (!helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi")
-                    && helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
-                helper.downloadArtifact(tmpDir, res, res.getSource().version, "hpi",
-                        new File(tmpDir, res.artifactId + ".hpi"));
-            }
-        } catch (IOException ex) {
+    private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
+        if (helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi") || helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
+            plugins.add(res);
+        } else {
             LOGGER.log(Level.INFO, "Skipping dependency, not an HPI file: " + res);
-            return;
         }
-
-        plugins.add(res);
     }
 
     public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
