@@ -15,13 +15,15 @@ Differences:
 * It allows patching WAR contents like bundled libraries, system properties
 * It allows self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
 or [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) YAML files
+* It can prepare Dockerfiles and build Docker images
 
 ### Demo
 
 * [Jenkins WAR - all latest](./demo/all-latest-core) - bundles master branches for core and some key libraries/modules
 * [Jenkins WAR - all latest with Maven](./demo/all-latest-core-maven) - same as a above, but with Maven
 * [External Task Logging to Elasticsearch](./demo/external-logging-elasticsearch) -
-runs External Logging demo and preconfigures it using System Groovy Hooks
+runs External Logging demo and preconfigures it using System Groovy Hooks.
+The demo is packaged with Docker, and it provides a ready-to-fly Docker Compose package.
 * [Configuration as Code](./demo/casc) - configuring WAR with 
 [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) via YAML
 * [Custom WAR Packager CI Demo](https://github.com/oleg-nenashev/jenkins-custom-war-packager-ci-demo) - Standalone demo with an integrated CI flow
@@ -99,6 +101,12 @@ bundle:
   groupId: "io.github.oleg-nenashev"
   artifactId: "mywar"
   description: "Just a WAR auto-generation-sample"
+  vendor: "Jenkins project"
+buildSettings:
+  docker:
+    base: "jenkins/jenkins:2.121.1"
+    tag: "jenkins/demo-external-task-logging-elk"
+    build: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
@@ -114,6 +122,15 @@ plugins:
     source:
       git: https://github.com/jglick/durable-task-plugin.git
       branch: watch-JENKINS-38381
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-durable-task-step"
+    source:
+      git: https://github.com/jglick/workflow-durable-task-step-plugin.git
+      commit: 6c424e059bba90fc94a9c1e87dc9c4a324bfef26
+  - groupId: "io.jenkins"
+    artifactId: "configuration-as-code"
+    source:
+      version: 0.11-alpha-rc373.933033f6b51e
 libPatches:
   - groupId: "org.jenkins-ci.main"
     artifactId: "remoting"
@@ -127,7 +144,61 @@ groovyHooks:
     id: "initScripts"
     source: 
       dir: scripts
+casc:
+  - id: "jcasc-config"
+    source:
+      dir: jenkins.yml
 ```
+
+There are more options available.
+See the linked demos for examples.
+
+#### BOM support
+
+The plugin supports Bill of Materials (BOM) as an input.
+This format is described in [JEP-309](https://github.com/jenkinsci/jep/tree/master/jep/309).
+
+If BOM is defined, Custom WAR Packager will load plugin and component dependencies
+from there.
+
+```yaml
+bundle:
+  groupId: "io.jenkins.tools.war-packager.demo"
+  artifactId: "pom-input-demo"
+buildSettings:
+  bom: bom.yml
+  environment: aws
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.121.1
+```
+
+An example of such configuration is available
+[here](https://github.com/jenkinsci/artifact-manager-s3-plugin/pull/20).
+
+#### Plugins from POM
+
+In order to simplify packaging for development versions,
+it is possible to link Custom War Packager to the POM file
+so that it takes plugins to be bundled from there:
+
+```yaml
+bundle:
+  groupId: "io.jenkins.tools.war-packager.demo"
+  artifactId: "pom-input-demo"
+buildSettings:
+  pom: pom.xml
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.121.1
+```
+
+If such option is set, all dependencies will be added, including test ones.
+Example is available [here](./demo/artifact-manager-s3-pom).
 
 ### Limitations
 
