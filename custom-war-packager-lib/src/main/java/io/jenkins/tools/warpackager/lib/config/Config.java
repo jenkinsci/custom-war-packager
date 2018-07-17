@@ -207,7 +207,6 @@ public class Config {
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
     private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
-        boolean shouldAdd = false;
         if (helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi") || helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
             plugins.add(res);
         } else {
