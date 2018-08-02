@@ -2,26 +2,29 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.LibraryInfo;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
-import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 import org.codehaus.plexus.util.FileUtils;
 
 import javax.annotation.Nonnull;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Stream;
 
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.*;
 
@@ -38,6 +41,9 @@ public class Builder extends PackagerBase {
 
     // Context
     private Map<String, String> versionOverrides = new HashMap<>();
+
+    // Core libraries
+    private List<String> propertyOverrides = new LinkedList<>();
 
     private BOM bom = null;
 
@@ -93,6 +99,14 @@ public class Builder extends PackagerBase {
         }
 
         // Build core and plugins
+
+        // Start with libraries if needed
+        if (config.war.libraries != null) {
+            for (LibraryInfo ci : config.war.libraries) {
+                buildIfNeeded(ci.source, "jar");
+                propertyOverrides.add("-D" + ci.getProperty() + "=" + versionOverrides.get(ci.getSource().artifactId));
+            }
+        }
         buildIfNeeded(config.war, "war");
         if (config.plugins != null) {
             for (DependencyInfo plugin : config.plugins) {
@@ -192,6 +206,8 @@ public class Builder extends PackagerBase {
     }
 
     private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
+
+        String properties;
         //TODO: add Caching support if commit is defined
         if (!dep.isNeedsBuild()) {
             LOGGER.log(Level.INFO, "Component {0}: no build required", dep);
@@ -254,13 +270,19 @@ public class Builder extends PackagerBase {
         }
 
         // Install artifact with default version if required
+        String[] args = {"clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true"};
+        String[] combined = args;
+        if(!propertyOverrides.isEmpty()) {
+            combined = Stream.concat(Arrays.stream(args), propertyOverrides.stream())
+                    .toArray(String[]::new);
+        }
         if (dep.getBuildSettings().buildOriginalVersion) {
-            mavenHelper.run(componentBuildDir, "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+            mavenHelper.run(componentBuildDir, combined);
         }
 
         // Build artifact with a custom version
         LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
         mavenHelper.run(componentBuildDir, "versions:set", "-DnewVersion=" + newVersion);
-        mavenHelper.run(componentBuildDir, "clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true");
+        mavenHelper.run(componentBuildDir, combined);
     }
 }

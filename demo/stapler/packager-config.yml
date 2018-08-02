@@ -1,0 +1,18 @@
+bundle:
+  groupId: "io.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  vendor: "Jenkins project"
+  title: "Jenkins WAR - Stapler Integration Tests"
+  description: "Bundles stapler "
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    git: "https://github.com/jenkinsci/jenkins"
+  libraries:
+  - property: "stapler.version"
+    source:
+      groupId: "org.kohsuke.stapler"
+      artifactId: "stapler"
+      source:
+        git: "https://github.com/stapler/stapler.git"

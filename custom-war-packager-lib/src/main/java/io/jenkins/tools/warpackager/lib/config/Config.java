@@ -40,7 +40,7 @@ public class Config {
     public BuildSettings buildSettings;
     public PackageInfo bundle;
     // Nonnull after the build starts
-    public DependencyInfo war;
+    public WarInfo war;
     @CheckForNull
     public Collection<DependencyInfo> plugins;
     @CheckForNull

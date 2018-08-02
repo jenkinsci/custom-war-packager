@@ -3,6 +3,7 @@ package io.jenkins.tools.warpackager.lib.model.bom;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
+import io.jenkins.tools.warpackager.lib.config.WarInfo;
 
 import javax.annotation.Nonnull;
 
@@ -41,8 +42,8 @@ public class ComponentReference extends Reference {
         this.groupId = groupId;
     }
 
-    public DependencyInfo toWARDependencyInfo() {
-        DependencyInfo dep = new DependencyInfo();
+    public WarInfo toWARDependencyInfo() {
+        WarInfo dep = new WarInfo();
         dep.groupId = "org.jenkins-ci.main";
         dep.artifactId = "jenkins-war";
 
