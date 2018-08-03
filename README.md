@@ -26,6 +26,7 @@ runs External Logging demo and preconfigures it using System Groovy Hooks.
 The demo is packaged with Docker, and it provides a ready-to-fly Docker Compose package.
 * [Configuration as Code](./demo/casc) - configuring WAR with 
 [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) via YAML
+* [Core components build](./demo/stapler) - demonstrates how to modify core components (libraries, modules)
 * [Custom WAR Packager CI Demo](https://github.com/oleg-nenashev/jenkins-custom-war-packager-ci-demo) - Standalone demo with an integrated CI flow
 
 ### Usage

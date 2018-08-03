@@ -1,6 +1,14 @@
 Changelog
 ====
 
+### 1.1
+
+Release date: Aug 03, 2018
+
+* [JENKINS-51302](https://issues.jenkins-ci.org/browse/JENKINS-51302) -
+Add support to core libraries that need a rebuild of war file for proper classloading in tests.
+  * [Demo for Stapler](./demo/stapler)
+
 ### 1.0
 
 Release date: Jul 17, 2018

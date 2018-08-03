@@ -12,6 +12,8 @@ war:
   artifactId: "jenkins-war"
   source:
     git: https://github.com/jenkinsci/jenkins
+#TODO: replace by core components line in (/demo/stapler)
+# https://issues.jenkins-ci.org/browse/JENKINS-52880
 # You can add new libraries or replace existing ones
 #TODO: this thing demonstrates that it is a bad idea to include modules in such WAY. BOMs should be used instead
 libPatches:
