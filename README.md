@@ -161,19 +161,19 @@ This format is described in [JEP-309](https://github.com/jenkinsci/jep/tree/mast
 
 If BOM is defined, Custom WAR Packager will load plugin and component dependencies
 from there.
+The example below takes the input from BOM and produces custom WAR and Docker packages.
 
 ```yaml
 bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
-  artifactId: "pom-input-demo"
+  artifactId: "bom-demo"
 buildSettings:
   bom: bom.yml
   environment: aws
-war:
-  groupId: "org.jenkins-ci.main"
-  artifactId: "jenkins-war"
-  source:
-    version: 2.121.1
+  docker:
+    base: "jenkins/jenkins:2.121.2"
+    tag: "jenkins/cwp-bom-demo"
+    build: true
 ```
 
 An example of such configuration is available
