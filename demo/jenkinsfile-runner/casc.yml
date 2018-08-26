@@ -1,0 +1,4 @@
+jenkins:
+  systemMessage: "Custom War Packager - Demo of Jenkinsfile Runner"
+#TODO(oleg_nenashev): Configure something meaningful here
+# Demo Pipeline should use some bits of system configuration (like credentials)

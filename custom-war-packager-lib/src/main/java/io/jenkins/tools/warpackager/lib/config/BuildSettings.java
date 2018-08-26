@@ -34,6 +34,8 @@ public class BuildSettings {
     private String environmentName;
     @CheckForNull
     private DockerBuildSettings docker;
+    @CheckForNull
+    private JenkinsfileRunnerSettings jenkinsfileRunner;
 
     /**
      * If {@code true}, the final artifacts will be installed to the local repo.
@@ -123,5 +125,10 @@ public class BuildSettings {
     @CheckForNull
     public DockerBuildSettings getDocker() {
         return docker;
+    }
+
+    @CheckForNull
+    public JenkinsfileRunnerSettings getJenkinsfileRunner() {
+        return jenkinsfileRunner;
     }
 }

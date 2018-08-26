@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
+import io.jenkins.tools.warpackager.lib.util.DockerfileBuilder;
 import io.jenkins.tools.warpackager.lib.util.SystemCommandHelper;
 import org.apache.commons.io.IOUtils;
 
@@ -21,24 +22,17 @@ import java.util.logging.Logger;
  * This method implies that the base Docker image is compatible with the standard {@code jenkins/jenkins} image.
  * @author Oleg Nenashev
  */
-public class DockerfileBuilder {
+public class JenkinsDockerfileBuilder extends DockerfileBuilder {
 
-    private final Config config;
-    private final DockerBuildSettings dockerSettings;
-    private final File outputDir;
+    private static final Logger LOGGER = Logger.getLogger(JenkinsDockerfileBuilder.class.getName());
 
-    private static final Logger LOGGER = Logger.getLogger(DockerfileBuilder.class.getName());
-
-    public DockerfileBuilder(@Nonnull Config config) throws IOException {
-        this.config = config;
-        this.dockerSettings = config.buildSettings.getDocker();
-        if (dockerSettings == null) {
-            throw new IOException("Docker settings are not defined");
-        }
-        this.outputDir = config.buildSettings.getOutputDir();
+    public JenkinsDockerfileBuilder(@Nonnull Config config) throws IOException {
+        super(config,
+              config.buildSettings.getDocker(),
+              config.buildSettings.getOutputDir());
     }
 
-    public DockerfileBuilder withPlugins(@Nonnull File pluginsDir) {
+    public JenkinsDockerfileBuilder withPlugins(@Nonnull File pluginsDir) {
         if (!pluginsDir.exists()) {
             LOGGER.log(Level.INFO, "No plugins to include");
             return this;
@@ -48,7 +42,7 @@ public class DockerfileBuilder {
         return this;
     }
 
-    public DockerfileBuilder withInitScripts(@Nonnull File rootDir) {
+    public JenkinsDockerfileBuilder withInitScripts(@Nonnull File rootDir) {
         final File[] files = rootDir.listFiles();
         if (files == null || files.length == 0) {
             return this; // never happens anyway
@@ -64,28 +58,7 @@ public class DockerfileBuilder {
         return this;
     }
 
-    /**
-     * Builds Dockerfile and prepares all resources
-     */
-    public void build() throws IOException, InterruptedException {
-        LOGGER.log(Level.INFO, "Generating Dockerfile");
-        String dockerfile = generateDockerfile();
-        try(FileOutputStream ostream = new FileOutputStream(new File(outputDir, "Dockerfile"))) {
-            IOUtils.write(dockerfile, ostream, "UTF-8");
-        }
-
-        if (!dockerSettings.isBuild()) {
-            return;
-        }
-        String tag = dockerSettings.getTag();
-        if (tag == null) {
-            throw new IOException("Cannot build Docker image, tag is not defined");
-        }
-        LOGGER.log(Level.INFO, "Building Docker image {0}", tag);
-        SystemCommandHelper.processFor(outputDir, "docker", "build", "-t", tag, ".");
-    }
-
-    private String generateDockerfile() {
+    protected String generateDockerfile() {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         final PrintStream ps;
         try {
