@@ -243,11 +243,15 @@ public class Builder extends PackagerBase {
                 newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
                 versionOverrides.put(dep.artifactId, newVersion);
 
-                // TODO: add no-cache option?
                 if (mavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
-                    LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
-                            new Object[] {dep, newVersion});
-                    return;
+                    if (dep.build.noCache) {
+                        LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}, but caching is disabled. Will run the build",
+                                new Object[]{dep, newVersion});
+                    } else {
+                        LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
+                                new Object[]{dep, newVersion});
+                        return;
+                    }
                 } else {
                     LOGGER.log(Level.INFO, "Snapshot is missing for {0}: {1}. Will run the build",
                             new Object[] {dep, newVersion});
