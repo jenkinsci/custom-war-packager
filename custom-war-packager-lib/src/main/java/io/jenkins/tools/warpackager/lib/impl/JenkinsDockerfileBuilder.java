@@ -26,10 +26,12 @@ public class JenkinsDockerfileBuilder extends DockerfileBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsDockerfileBuilder.class.getName());
 
-    public JenkinsDockerfileBuilder(@Nonnull Config config) throws IOException {
+    public JenkinsDockerfileBuilder(@Nonnull Config config,
+                                    @Nonnull DockerBuildSettings docker,
+                                    @Nonnull File outputDir) throws IOException {
         super(config,
-              config.buildSettings.getDocker(),
-              config.buildSettings.getOutputDir());
+              docker,
+              outputDir);
     }
 
     public JenkinsDockerfileBuilder withPlugins(@Nonnull File pluginsDir) {

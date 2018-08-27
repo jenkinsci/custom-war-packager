@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
 import io.jenkins.tools.warpackager.lib.config.JenkinsfileRunnerSettings;
 import io.jenkins.tools.warpackager.lib.config.LibraryInfo;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
@@ -168,9 +169,10 @@ public class Builder extends PackagerBase {
         // TODO: also install WAR if config.buildSettings.isInstallArtifacts() is set
 
         // Build Docker if needed
-        if (config.buildSettings.getDocker() != null) {
+        DockerBuildSettings dockerBuild = config.buildSettings.getDocker();
+        if (dockerBuild != null) {
             LOGGER.log(Level.INFO, "Building Dockerfile");
-            new JenkinsDockerfileBuilder(config)
+            new JenkinsDockerfileBuilder(config, dockerBuild, config.buildSettings.getOutputDir())
                     .withPlugins(new File(explodedWar, "WEB-INF/plugins"))
                     .withInitScripts(new File(explodedWar, "WEB-INF"))
                     .build();
@@ -179,14 +181,14 @@ public class Builder extends PackagerBase {
         // Build Jenkinsfile Runner if needed
         JenkinsfileRunnerSettings jenkinsfileRunner = config.buildSettings.getJenkinsfileRunner();
         if (jenkinsfileRunner != null) {
-            if (!jenkinsfileRunner.source.isNeedsBuild()) {
+            if (!jenkinsfileRunner.getSource().isNeedsBuild()) {
                 throw new IOException("Jenkinsfile Runner always requires build");
             }
-            buildIfNeeded(jenkinsfileRunner.source, "jar");
+            buildIfNeeded(jenkinsfileRunner.getSource(), "jar");
             File outputDir = config.buildSettings.getOutputDir();
 
             org.apache.commons.io.FileUtils.copyDirectory(
-                    new File(buildRoot, jenkinsfileRunner.source.artifactId + "/app/target/appassembler"),
+                    new File(buildRoot, jenkinsfileRunner.getSource().artifactId + "/app/target/appassembler"),
                     new File(outputDir, "jenkinsfileRunner"));
 
             // TODO: replace directory copy once Jenkinsfile Runner creates an archive for Jenkinsfile runner
@@ -195,12 +197,13 @@ public class Builder extends PackagerBase {
             //mavenHelper.downloadArtifact(outputDir, jenkinsfileRunner.source,
              //       version, "jar-with-dependencies", jenkinsfileBuilderJar);
 
-            if (jenkinsfileRunner.docker != null) {
+            DockerBuildSettings jenkinsfileRunnerDocker = jenkinsfileRunner.getDocker();
+            if (jenkinsfileRunnerDocker != null) {
                 if (config.buildSettings.getDocker() != null) {
                     //TODO: should be fixed later
                     throw new IOException("Currently it is not possible to build Docker and Jenkinsfile Runner Docker at the same time");
                 }
-                new JenkinsfileRunnerDockerBuilder(config, jenkinsfileRunner.docker, outputDir)
+                new JenkinsfileRunnerDockerBuilder(config, jenkinsfileRunnerDocker, outputDir)
                         .withPlugins(new File(explodedWar, "WEB-INF/plugins"))
                         .withVersionOverrides(versionOverrides)
                         .build();
@@ -284,7 +287,7 @@ public class Builder extends PackagerBase {
                 versionOverrides.put(dep.artifactId, newVersion);
 
                 if (mavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
-                    if (dep.build.noCache) {
+                    if (dep.build != null && dep.build.noCache) {
                         LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}, but caching is disabled. Will run the build",
                                 new Object[]{dep, newVersion});
                     } else {
