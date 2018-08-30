@@ -83,6 +83,11 @@ systemProperties: {
     jenkins.model.Jenkins.slaveAgentPort: "50000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
 casc:
-  - id: "initScripts"
+  - id: "jcasc"
     source:
       dir: casc.yml
+groovyHooks:
+  - type: "init"
+    id: "initScripts"
+    source:
+      dir: init.groovy

@@ -184,7 +184,15 @@ public class Builder extends PackagerBase {
             if (!jenkinsfileRunner.getSource().isNeedsBuild()) {
                 throw new IOException("Jenkinsfile Runner always requires build");
             }
-            buildIfNeeded(jenkinsfileRunner.getSource(), "jar");
+            if (!config.war.artifactId.equals("jenkins-war")) {
+                throw new IOException("Jenkinsfile Runner packager can package only 'jenkins-war' so far");
+            }
+
+            String jenkinsVersion = ComponentReference.resolveFrom(config.war, true, versionOverrides).getVersion();
+            buildIfNeeded(jenkinsfileRunner.getSource(), "jar",
+                    Arrays.asList(
+                            "-Djenkins.version=" + jenkinsVersion
+                            /*, "-Djenkins.testharness.version=2.38"*/));
             File outputDir = config.buildSettings.getOutputDir();
 
             org.apache.commons.io.FileUtils.copyDirectory(

@@ -84,10 +84,12 @@ public class ComponentReference extends Reference {
         return dep;
     }
 
+    @Nonnull
     public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep) {
         return resolveFrom(dep, false, null);
     }
 
+    @Nonnull
     public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep, boolean overrideVersions,
                                                   @CheckForNull Map<String, String> versionOverrides) {
         ComponentReference ref = new ComponentReference();

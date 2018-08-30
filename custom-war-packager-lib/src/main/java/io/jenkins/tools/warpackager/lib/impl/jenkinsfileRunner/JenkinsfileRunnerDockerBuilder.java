@@ -72,9 +72,19 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
         ps.println("COPY jenkinsfileRunner /app");
         //TODO(oleg_nenashev): Plugins dir is empty to prevent the logic from crashing, plugins are actually bundled inside WAR
         ps.println("RUN chmod +x /app/bin/jenkinsfile-runner && mkdir -p /usr/share/jenkins/ref/plugins");
+
+        //TODO: we can copy it from exploded WAR instead
         if (pluginsDir != null) {
             ps.println("COPY plugins /usr/share/jenkins/ref/plugins");
         }
+
+        if (config.groovyHooks != null) {
+            ps.println("RUN cp -R /app/jenkins/WEB-INF/*.groovy.d /usr/share/jenkins/ref/");
+        }
+        if (config.casc != null) {
+            ps.println("ENV CASC_JENKINS_CONFIG=/app/jenkins/WEB-INF/jenkins.yaml.d");
+        }
+        // ps.println("ENV JAVA_OPTS='-Djth.jenkins-war.path=/usr/share/jenkins/jenkins.war'");
 
         ps.println();
         ps.println("ENTRYPOINT [\"/app/bin/jenkinsfile-runner\", \\\n" +
