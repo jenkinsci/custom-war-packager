@@ -100,7 +100,7 @@ public class BOMBuilder {
     private Specification buildSpec(boolean overrideVersions) {
         Specification spec = new Specification();
         //TODO(oleg_nenashev): it will produce artifactId and groupId in BOM's [status/core]
-        spec.setCore(toComponentReference(config.war, overrideVersions));
+        spec.setCore(ComponentReference.resolveFrom(config.war, overrideVersions, versionOverrides));
 
         // Plugins
         List<ComponentReference> plugins = new ArrayList<>();
@@ -132,7 +132,7 @@ public class BOMBuilder {
         } else if (config.plugins != null) {
             // We use default resolution
             for (DependencyInfo plugin : config.plugins) {
-                plugins.add(toComponentReference(plugin, overrideVersions));
+                plugins.add(ComponentReference.resolveFrom(plugin, overrideVersions, versionOverrides));
             }
         }
         spec.setPlugins(plugins);
@@ -142,7 +142,7 @@ public class BOMBuilder {
         List<ComponentReference> components = new ArrayList<>();
         if (config.libPatches != null) {
             for (DependencyInfo dep : config.libPatches) {
-                components.add(toComponentReference(dep, overrideVersions));
+                components.add(ComponentReference.resolveFrom(dep, overrideVersions, versionOverrides));
             }
         }
         if (config.groovyHooks != null) {
@@ -155,26 +155,6 @@ public class BOMBuilder {
         return spec;
     }
 
-    private ComponentReference toComponentReference(DependencyInfo dep, boolean overrideVersions) {
-        ComponentReference ref = new ComponentReference();
-        ref.setGroupId(dep.groupId);
-        ref.setArtifactId(dep.artifactId);
-        //TODO(oleg_nenashev): BOM says "the realized BoM after refs are resolved" when versions are resolved
-        if (dep.source == null) {
-            throw new IllegalStateException("Source is not defined for dependency " + dep);
-        }
-
-        // Not putting ref then
-        ref.setRef(dep.source.getCheckoutId());
-        String effectiveVersion = dep.source.version;
-        if (overrideVersions && versionOverrides != null && versionOverrides.containsKey(dep.artifactId)) {
-            effectiveVersion = versionOverrides.get(dep.artifactId);
-        }
-        ref.setVersion(effectiveVersion);
-
-        return ref;
-    }
-
     private ComponentReference toComponentReference(WARResourceInfo hook, boolean overrideVersions) {
         //TODO(oleg_nenashev): no artifact IDs, some hacks here. Maybe groovy hooks should require standard fields
         DependencyInfo mockDependency = new DependencyInfo();
@@ -182,7 +162,7 @@ public class BOMBuilder {
         mockDependency.artifactId = hook.id;
         mockDependency.source = hook.source;
 
-        ComponentReference ref = toComponentReference(mockDependency, overrideVersions);
+        ComponentReference ref = ComponentReference.resolveFrom(mockDependency, overrideVersions, versionOverrides);
         //TODO(oleg_nenashev): we cannot produce version
         if (overrideVersions && ref.getVersion() == null) {
             ref.setVersion("unknown");

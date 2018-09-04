@@ -2,15 +2,20 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
+import io.jenkins.tools.warpackager.lib.config.JenkinsfileRunnerSettings;
 import io.jenkins.tools.warpackager.lib.config.LibraryInfo;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
+import io.jenkins.tools.warpackager.lib.impl.jenkinsfileRunner.JenkinsfileRunnerDockerBuilder;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
+import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
@@ -41,9 +46,6 @@ public class Builder extends PackagerBase {
 
     // Context
     private Map<String, String> versionOverrides = new HashMap<>();
-
-    // Core libraries
-    private List<String> propertyOverrides = new LinkedList<>();
 
     private BOM bom = null;
 
@@ -101,13 +103,14 @@ public class Builder extends PackagerBase {
         // Build core and plugins
 
         // Start with libraries if needed
+        List<String> coreComponentVersionOverrides = new LinkedList<>();
         if (config.war.libraries != null) {
             for (LibraryInfo ci : config.war.libraries) {
                 buildIfNeeded(ci.source, "jar");
-                propertyOverrides.add("-D" + ci.getProperty() + "=" + versionOverrides.get(ci.getSource().artifactId));
+                coreComponentVersionOverrides.add("-D" + ci.getProperty() + "=" + versionOverrides.get(ci.getSource().artifactId));
             }
         }
-        buildIfNeeded(config.war, "war");
+        buildIfNeeded(config.war, "war", coreComponentVersionOverrides);
         if (config.plugins != null) {
             for (DependencyInfo plugin : config.plugins) {
                 buildIfNeeded(plugin, "hpi");
@@ -165,12 +168,54 @@ public class Builder extends PackagerBase {
         bom.write(config.getOutputBOM());
         // TODO: also install WAR if config.buildSettings.isInstallArtifacts() is set
 
-        if (config.buildSettings.getDocker() != null) {
+        // Build Docker if needed
+        DockerBuildSettings dockerBuild = config.buildSettings.getDocker();
+        if (dockerBuild != null) {
             LOGGER.log(Level.INFO, "Building Dockerfile");
-            new DockerfileBuilder(config)
+            new JenkinsDockerfileBuilder(config, dockerBuild, config.buildSettings.getOutputDir())
                     .withPlugins(new File(explodedWar, "WEB-INF/plugins"))
                     .withInitScripts(new File(explodedWar, "WEB-INF"))
                     .build();
+        }
+
+        // Build Jenkinsfile Runner if needed
+        JenkinsfileRunnerSettings jenkinsfileRunner = config.buildSettings.getJenkinsfileRunner();
+        if (jenkinsfileRunner != null) {
+            if (!jenkinsfileRunner.getSource().isNeedsBuild()) {
+                throw new IOException("Jenkinsfile Runner always requires build");
+            }
+            if (!config.war.artifactId.equals("jenkins-war")) {
+                throw new IOException("Jenkinsfile Runner packager can package only 'jenkins-war' so far");
+            }
+
+            String jenkinsVersion = ComponentReference.resolveFrom(config.war, true, versionOverrides).getVersion();
+            buildIfNeeded(jenkinsfileRunner.getSource(), "jar",
+                    Arrays.asList(
+                            "-Djenkins.version=" + jenkinsVersion
+                            /*, "-Djenkins.testharness.version=2.38"*/));
+            File outputDir = config.buildSettings.getOutputDir();
+
+            org.apache.commons.io.FileUtils.copyDirectory(
+                    new File(buildRoot, jenkinsfileRunner.getSource().artifactId + "/app/target/appassembler"),
+                    new File(outputDir, "jenkinsfileRunner"));
+
+            // TODO: replace directory copy once Jenkinsfile Runner creates an archive for Jenkinsfile runner
+            //File jenkinsfileBuilderJar = new File(outputDir, "jenkinsfile-runner.jar");
+            //String version = ComponentReference.resolveFrom(jenkinsfileRunner.source, true, versionOverrides).getVersion();
+            //mavenHelper.downloadArtifact(outputDir, jenkinsfileRunner.source,
+             //       version, "jar-with-dependencies", jenkinsfileBuilderJar);
+
+            DockerBuildSettings jenkinsfileRunnerDocker = jenkinsfileRunner.getDocker();
+            if (jenkinsfileRunnerDocker != null) {
+                if (config.buildSettings.getDocker() != null) {
+                    //TODO: should be fixed later
+                    throw new IOException("Currently it is not possible to build Docker and Jenkinsfile Runner Docker at the same time");
+                }
+                new JenkinsfileRunnerDockerBuilder(config, jenkinsfileRunnerDocker, outputDir)
+                        .withPlugins(new File(explodedWar, "WEB-INF/plugins"))
+                        .withVersionOverrides(versionOverrides)
+                        .build();
+            }
         }
 
         // TODO: Support custom output destinations
@@ -206,6 +251,12 @@ public class Builder extends PackagerBase {
     }
 
     private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
+        buildIfNeeded(dep, packaging,null);
+    }
+
+    private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging,
+                               @CheckForNull List<String> extraMavenArgs)
+            throws IOException, InterruptedException {
 
         String properties;
         //TODO: add Caching support if commit is defined
@@ -243,11 +294,15 @@ public class Builder extends PackagerBase {
                 newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
                 versionOverrides.put(dep.artifactId, newVersion);
 
-                // TODO: add no-cache option?
                 if (mavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
-                    LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
-                            new Object[] {dep, newVersion});
-                    return;
+                    if (dep.build != null && dep.build.noCache) {
+                        LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}, but caching is disabled. Will run the build",
+                                new Object[]{dep, newVersion});
+                    } else {
+                        LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
+                                new Object[]{dep, newVersion});
+                        return;
+                    }
                 } else {
                     LOGGER.log(Level.INFO, "Snapshot is missing for {0}: {1}. Will run the build",
                             new Object[] {dep, newVersion});
@@ -272,8 +327,8 @@ public class Builder extends PackagerBase {
         // Install artifact with default version if required
         String[] args = {"clean", "install", "-DskipTests", "-Dfindbugs.skip=true", "-Denforcer.skip=true"};
         String[] combined = args;
-        if(!propertyOverrides.isEmpty()) {
-            combined = Stream.concat(Arrays.stream(args), propertyOverrides.stream())
+        if(extraMavenArgs!= null && !extraMavenArgs.isEmpty()) {
+            combined = Stream.concat(Arrays.stream(args), extraMavenArgs.stream())
                     .toArray(String[]::new);
         }
         if (dep.getBuildSettings().buildOriginalVersion) {

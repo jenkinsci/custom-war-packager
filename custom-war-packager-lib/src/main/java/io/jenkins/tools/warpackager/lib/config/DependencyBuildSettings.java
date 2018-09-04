@@ -12,4 +12,6 @@ public class DependencyBuildSettings {
     public static final DependencyBuildSettings DEFAULT = new DependencyBuildSettings();
 
     public boolean buildOriginalVersion;
+
+    public boolean noCache;
 }
