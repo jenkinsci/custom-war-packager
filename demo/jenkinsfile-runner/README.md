@@ -17,3 +17,7 @@ Once the Docker image is built, the demo Jenkinsfile Runner can be started simpl
 docker run --rm -v $PWD/Jenkinsfile:/workspace/Jenkinsfile jenkins-experimental/cwp-jenkinsfile-runner-demo
 ``` 
 
+or in Kubernetes
+
+    kubectl create configmap jenkinsfile --from-file=Jenkinsfile
+    kubectl create -f kubernetes.yaml

@@ -1,0 +1,19 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jenkinsfile-runner
+spec:
+  template:
+    spec:
+      containers:
+      - name: jenkinsfile-runner
+        image: jenkins-experimental/cwp-jenkinsfile-runner-demo
+        volumeMounts:
+        - name: jenkinsfile
+          mountPath: /workspace
+      volumes:
+        - name: jenkinsfile
+          configMap:
+            name: jenkinsfile
+      restartPolicy: Never
+  backoffLimit: 1
