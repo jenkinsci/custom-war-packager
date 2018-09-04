@@ -3,7 +3,7 @@ Jenkins Custom WAR Packager
 
 :exclamation: This tool is under development
 
-A small packaging tool, which bundles custom Jenkins WAR files using the YAML specification.
+A packaging tool, which bundles custom Jenkins WAR files using the YAML specification.
 Generally the tool is a wrapper on the top of Maven HPI's plugin 
 [Custom WAR Mojo](https://jenkinsci.github.io/maven-hpi-plugin/custom-war-mojo.html).
 
@@ -16,6 +16,7 @@ Differences:
 * It allows self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
 or [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) YAML files
 * It can prepare Dockerfiles and build Docker images
+* Experimental: Support of building Jenkinsfile Runner images (see the changelog)
 
 ### Demo
 
@@ -28,6 +29,7 @@ The demo is packaged with Docker, and it provides a ready-to-fly Docker Compose 
 [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) via YAML
 * [Core components build](./demo/stapler) - demonstrates how to modify core components (libraries, modules)
 * [Custom WAR Packager CI Demo](https://github.com/oleg-nenashev/jenkins-custom-war-packager-ci-demo) - Standalone demo with an integrated CI flow
+* [Jenkinsfile Runner](./demo/jenkinsfile-runner) - Packaging of Docker image for Jenkinsfile Runner
 
 ### Usage
 

@@ -1,6 +1,16 @@
 Changelog
 ====
 
+### 1.2
+
+Release date: Sep 04, 2018
+
+* **EXPERIMENTAL**: Support of building Jenkinsfile Runner binaries and Docker images
+  * The feature is based on [kohsuke/jenkinsfile-runner](https://github.com/kohsuke/jenkinsfile-runner),
+    but it will be updated to use the upstream [jenkinsci/jenkinsfile-runner](https://github.com/jenkinsci/jenkinsfile-runner)
+  * There may be incompatible changes
+  * [Demo](./demo/jenkinsfile-runner)
+
 ### 1.1
 
 Release date: Aug 03, 2018
