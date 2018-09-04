@@ -7,7 +7,7 @@ spec:
     spec:
       containers:
       - name: jenkinsfile-runner
-        image: jenkins-experimantal/cwp-jenkinsfile-runner-demo
+        image: jenkins-experimental/cwp-jenkinsfile-runner-demo
         volumeMounts:
         - name: jenkinsfile
           mountPath: /workspace
