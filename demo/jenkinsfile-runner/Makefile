@@ -3,18 +3,22 @@
 
 ARTIFACT_ID = jenkinsfile-runner-demo
 VERSION = 256.0-test
+CWP_VERSION = 1.2
 
 all: clean build
 
 clean:
 	rm -rf tmp
 
-build: tmp/output/target/${ARTIFACT_ID}-${VERSION}.war
+.build/cwp-cli-${CWP_VERSION}.jar:
+	rm -rf .build
+	mkdir -p .build
+	wget -O .build/cwp-cli-${CWP_VERSION}.jar https://repo.jenkins-ci.org/releases/io/jenkins/tools/custom-war-packager/custom-war-packager-cli/${CWP_VERSION}/custom-war-packager-cli-${CWP_VERSION}-jar-with-dependencies.jar
 
-tmp/output/target/${ARTIFACT_ID}-${VERSION}.war:
-	java \
-	    -jar $(shell ls ../../custom-war-packager-cli/target/custom-war-packager-cli-*-jar-with-dependencies.jar) \
-	    -configPath packager-config.yml -version ${VERSION}
+build: .build/cwp-cli-${CWP_VERSION}.jar
+	java -jar .build/cwp-cli-${CWP_VERSION}.jar \
+	     -configPath packager-config.yml -version ${VERSION}
 
-run: tmp/output/target/${ARTIFACT_ID}-${VERSION}.war
-	docker run --rm -v $PWD/Jenkinsfile:/workspace/Jenkinsfile jenkins-experimental/cwp-jenkinsfile-runner-demo
+run:
+	docker run --rm -v $(shell pwd)/demo/Jenkinsfile:/workspace/Jenkinsfile \
+	    jenkins-experimental/cwp-jenkinsfile-runner-demo
