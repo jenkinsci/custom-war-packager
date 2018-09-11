@@ -6,19 +6,19 @@ bundle:
   description: "Configuration-as-Code demo, produced by Custom WAR Packager"
 buildSettings:
   docker:
-    base: "jenkins/jenkins:2.107.3"
-  #  tag: "jenkins/custom-war-packager-casc-demo"
-  #  build: true
+    base: "jenkins/jenkins:2.121.3"
+    tag: "jenkins-experimental/custom-war-packager-casc-demo"
+    build: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
-    version: 2.107.3
+    version: 2.121.3
 plugins:
   - groupId: "io.jenkins"
     artifactId: "configuration-as-code"
     source:
-      version: 0.8-alpha-SNAPSHOT
+      version: 1.0-rc3
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "role-strategy"
     source:
@@ -26,7 +26,7 @@ plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "matrix-auth"
     source:
-      version: "2.2"
+      version: "2.3"
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "cloudbees-folder"
     source:
@@ -35,6 +35,6 @@ systemProperties: {
     jenkins.model.Jenkins.slaveAgentPort: "50000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
 casc:
-  - id: "initScripts"
+  - id: "casc"
     source:
       dir: casc.yml
