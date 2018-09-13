@@ -12,7 +12,7 @@ jenkins:
   # Ownership-based Security configuration sample.
   # It requires RoleStrategy and Ownership plugins to be installed.
   authorizationStrategy:
-    roleStrategy:
+    roleBased:
       roles:
         global:
           - name: "admin"
@@ -37,7 +37,6 @@ jenkins:
               - "Job/Configure"
               - "Job/Build"
               - "Job/Delete"
-              - "Run/Delete"
             assignments:
               - "authenticated"
           - name: "@CoOwnerNoSid"

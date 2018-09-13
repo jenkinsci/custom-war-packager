@@ -18,7 +18,11 @@ plugins:
   - groupId: "io.jenkins"
     artifactId: "configuration-as-code"
     source:
-      version: 1.0-rc3
+      version: 1.0
+  - groupId: "io.jenkins.configuration-as-code"
+    artifactId: "configuration-as-code-support"
+    source:
+      version: 1.0
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "role-strategy"
     source:
