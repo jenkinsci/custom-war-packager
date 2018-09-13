@@ -78,7 +78,7 @@ plugins:
   - groupId: "io.jenkins"
     artifactId: "configuration-as-code"
     source:
-      version: "1.0"
+      version: "1.0-rc2"
 systemProperties: {
     jenkins.model.Jenkins.slaveAgentPort: "50000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
