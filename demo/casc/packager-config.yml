@@ -6,23 +6,23 @@ bundle:
   description: "Configuration-as-Code demo, produced by Custom WAR Packager"
 buildSettings:
   docker:
-    base: "jenkins/jenkins:2.121.3"
+    base: "jenkins/jenkins:2.138.2"
     tag: "jenkins-experimental/custom-war-packager-casc-demo"
     build: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
-    version: 2.121.3
+    version: 2.138.2
 plugins:
   - groupId: "io.jenkins"
     artifactId: "configuration-as-code"
     source:
-      version: 1.0
+      version: 1.1
   - groupId: "io.jenkins.configuration-as-code"
     artifactId: "configuration-as-code-support"
     source:
-      version: 1.0
+      version: 1.1
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "role-strategy"
     source:
@@ -34,10 +34,11 @@ plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "cloudbees-folder"
     source:
-      version: "6.4"
-systemProperties: {
-    jenkins.model.Jenkins.slaveAgentPort: "50000",
-    jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
+      version: "6.6"
+systemProperties:
+  jenkins.install.runSetupWizard: "false"
+  jenkins.model.Jenkins.slaveAgentPort: "50000"
+  jenkins.model.Jenkins.slaveAgentPortEnforce: "true"
 casc:
   - id: "casc"
     source:

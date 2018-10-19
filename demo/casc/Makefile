@@ -17,9 +17,9 @@ tmp/output/target/${ARTIFACT_ID}-${VERSION}.war:
 	    -configPath packager-config.yml -version ${VERSION}
 
 run: tmp/output/target/${ARTIFACT_ID}-${VERSION}.war
-	JENKINS_HOME=work java \
-	    -jar tmp/output/target/${ARTIFACT_ID}-${VERSION}.war \
-        --httpPort=8080 --prefix=/jenkins
+	docker run --rm \
+	    -p 8080:8080 \
+	    jenkins-experimental/custom-war-packager-casc-demo
 
 pct: tmp/output/target/${ARTIFACT_ID}-${VERSION}.war
 	docker run --rm \

@@ -1,5 +1,13 @@
 jenkins:
   systemMessage: "Custom War Packager - Demo of Configuration-as-Code plugin"
+
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  agentProtocols:
+    - "JNLP4-connect"
+    - "Ping"
+
   securityRealm:
     local:
       allowsSignup: false
