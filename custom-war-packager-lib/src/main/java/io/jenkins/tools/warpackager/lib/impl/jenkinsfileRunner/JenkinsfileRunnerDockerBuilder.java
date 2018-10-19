@@ -81,9 +81,11 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
         if (config.groovyHooks != null) {
             ps.println("RUN cp -R /app/jenkins/WEB-INF/*.groovy.d /usr/share/jenkins/ref/");
         }
-        if (config.casc != null) {
-            ps.println("ENV CASC_JENKINS_CONFIG=/app/jenkins/WEB-INF/jenkins.yaml.d");
-        }
+        //TODO: No longer needed in 1.0+ (JENKINS-54151)
+        //if (config.casc != null) {
+        //    ps.println("ENV CASC_JENKINS_CONFIG=/app/jenkins/WEB-INF/jenkins.yaml.d");
+        //}
+
         // ps.println("ENV JAVA_OPTS='-Djth.jenkins-war.path=/usr/share/jenkins/jenkins.war'");
 
         ps.println();
