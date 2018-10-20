@@ -1,22 +1,12 @@
 Jenkins Custom WAR Packager
 ===
 
-:exclamation: This tool is under development
-
-A packaging tool, which bundles custom Jenkins WAR files using the YAML specification.
-Generally the tool is a wrapper on the top of Maven HPI's plugin 
-[Custom WAR Mojo](https://jenkinsci.github.io/maven-hpi-plugin/custom-war-mojo.html).
-
-Differences:
-
-* It can build package plugins from custom branches with unreleased/unstaged packages
-* It can run as a CLI tool outside Maven
-* It takes YAML specification instead of Maven `pom.xml`
-* It allows patching WAR contents like bundled libraries, system properties
-* It allows self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
+Custom WAR Packager (CWP) allows building ready-to-fly Jenkins packages using a YAML specification.
+The tool can produce Docker images, WAR files, and [Jenkinsfile Runner](https://github.com/jenkinsci/jenkinsfile-runner) docker images (aka single-shot Jenkins masters).
+These bundles may include Jenkins core, plugins,extra libraries, and self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
 or [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) YAML files
-* It can prepare Dockerfiles and build Docker images
-* Experimental: Support of building Jenkinsfile Runner images (see the changelog)
+
+See [this blogpost](https://jenkins.io/blog/2018/10/16/custom-war-packager/) for more information.
 
 ### Demo
 
@@ -35,7 +25,7 @@ The demo is packaged with Docker, and it provides a ready-to-fly Docker Compose 
 
 The tool offers a CLI interface and a Maven Plugin wrapper.
 
-### CLI
+#### CLI
 
 
 ```shell
@@ -52,7 +42,7 @@ java -jar war-packager-cli.jar -demo
 
 Invoke the tool without options without options to get a full CLI options list.
 
-### Maven
+#### Maven
 
 Maven plugin runs the packager and generates the artifact.
 The artifact will be put to "target/custom-war-packager-maven-plugin/output/target/${bundle.artifactId}.war"
@@ -202,6 +192,13 @@ war:
 
 If such option is set, all dependencies will be added, including test ones.
 Example is available [here](./demo/artifact-manager-s3-pom).
+
+### Advanced features
+
+Features:
+
+* Rebuilding Jenkins core with custom dependencies (e.g. Remoting or Stapler)
+* Adding extra libraries to the Jenkins core so that they can be used in extensions
 
 ### Limitations
 
