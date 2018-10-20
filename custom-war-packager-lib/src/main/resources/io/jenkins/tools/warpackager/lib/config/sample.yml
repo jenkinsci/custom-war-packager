@@ -17,8 +17,7 @@ plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "durable-task"
     source:
-      git: https://github.com/jglick/durable-task-plugin.git
-      branch: watch-JENKINS-38381
+      version: 1.26
 libPatches:
   - groupId: "org.jenkins-ci"
     artifactId: "task-reactor"
@@ -28,5 +27,4 @@ systemProperties: {
     jenkins.model.Jenkins.slaveAgentPort: "50000",
     jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
 
-# TODO: Support System Groovy Scripts Bundling
 
