@@ -1,6 +1,16 @@
 Changelog
 ====
 
+### 1.3
+
+Release date: coming soon
+
+* [JENKINS-54151](https://issues.jenkins-ci.org/browse/JENKINS-54151) - 
+  Fix compatibility with JCasC Plugin 1.0 and above in 
+  the Jenkinsfile Runner mode
+* Pre-release versions of Jenkins Configuration as Code Plugin
+  are no longer supported
+
 ### 1.2
 
 Release date: Sep 04, 2018

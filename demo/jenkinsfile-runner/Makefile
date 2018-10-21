@@ -3,7 +3,7 @@
 
 ARTIFACT_ID = jenkinsfile-runner-demo
 VERSION = 256.0-test
-CWP_VERSION = 1.2
+CWP_VERSION = 1.3
 
 all: clean build
 

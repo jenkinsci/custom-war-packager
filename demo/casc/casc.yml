@@ -1,5 +1,13 @@
 jenkins:
   systemMessage: "Custom War Packager - Demo of Configuration-as-Code plugin"
+
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  agentProtocols:
+    - "JNLP4-connect"
+    - "Ping"
+
   securityRealm:
     local:
       allowsSignup: false
@@ -12,7 +20,7 @@ jenkins:
   # Ownership-based Security configuration sample.
   # It requires RoleStrategy and Ownership plugins to be installed.
   authorizationStrategy:
-    roleStrategy:
+    roleBased:
       roles:
         global:
           - name: "admin"
@@ -37,7 +45,6 @@ jenkins:
               - "Job/Configure"
               - "Job/Build"
               - "Job/Delete"
-              - "Run/Delete"
             assignments:
               - "authenticated"
           - name: "@CoOwnerNoSid"
