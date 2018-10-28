@@ -50,27 +50,21 @@ plugins:
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-support"
     source:
-      git: https://github.com/jglick/workflow-support-plugin.git
-      # https://github.com/jenkinsci/workflow-support-plugin/pull/15
-      # branch: logs-JENKINS-38381
+      git: https://github.com/jenkinsci/workflow-support-plugin.git
       commit: cd70bcc4c20940fc8b54e12ded4d781a19ac0485
     build:
       buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-job"
     source:
-      git: https://github.com/jglick/workflow-job-plugin.git
-      # https://github.com/jenkinsci/workflow-job-plugin/pull/27
-      # branch: logs-JENKINS-38381
+      git: https://github.com/jenkinsci/workflow-job-plugin.git
       commit: 18d78f305a4526af9cdf3a7b68eb9caf97c7cfbc
     build:
       buildOriginalVersion: true
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-durable-task-step"
     source:
-      git: https://github.com/jglick/workflow-durable-task-step-plugin.git
-      # https://github.com/jenkinsci/workflow-durable-task-step-plugin/pull/65
-      # branch: watch-plus-UTF-8-JENKINS-31096
+      git: https://github.com/jenkinsci/workflow-durable-task-step-plugin.git
       commit: 6c424e059bba90fc94a9c1e87dc9c4a324bfef26
     build:
       buildOriginalVersion: true
