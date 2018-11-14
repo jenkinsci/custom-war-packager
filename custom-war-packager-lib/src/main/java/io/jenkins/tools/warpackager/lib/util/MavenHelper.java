@@ -65,17 +65,21 @@ public class MavenHelper {
 
     public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
         final String folder = "repository";
-        String path = String.format("~/.m2/%s/%s/%s/%s/%s-%s.%s",
-                folder,
-                dep.groupId.replaceAll("\\.", "/"),
-                dep.artifactId,
-                version,
-                dep.artifactId,
-                version,
-                packaging);
+        String path = getDependencyPath(folder, dep, version, packaging);
         LOGGER.log(Level.INFO, "Checking {0}", path);
         File expectedFile = new File(path);
         return expectedFile.exists();
+    }
+
+    private static String getDependencyPath(final String folder, final DependencyInfo dep, final String version, final String packaging) {
+        return String.format("~/.m2/%s/%s/%s/%s/%s-%s.%s",
+                    folder,
+                    dep.groupId.replaceAll("\\.", "/"),
+                    dep.artifactId,
+                    version,
+                    dep.artifactId,
+                    version,
+                    packaging);
     }
 
     public boolean artifactExists(File buildDir, DependencyInfo dep, String version, String packaging) throws IOException, InterruptedException {
