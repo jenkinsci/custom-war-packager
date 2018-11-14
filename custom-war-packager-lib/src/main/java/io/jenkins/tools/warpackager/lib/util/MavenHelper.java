@@ -64,7 +64,9 @@ public class MavenHelper {
     }
 
     public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
-        String path = String.format("~/.m2/repository/%s/%s/%s/%s-%s.%s",
+        final String folder = "repository";
+        String path = String.format("~/.m2/%s/%s/%s/%s/%s-%s.%s",
+                folder,
                 dep.groupId.replaceAll("\\.", "/"),
                 dep.artifactId,
                 version,
