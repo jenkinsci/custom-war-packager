@@ -82,7 +82,8 @@ public class MavenHelper {
                 "-Dartifact=" + gai,
                 "-Dpackaging=" + packaging,
                 "-Dtransitive=false", "-q", "-B");
-        return res == 0;
+        final boolean found = res == 0;
+        return found;
     }
 
     public void downloadJAR(File buildDir, DependencyInfo dep, String version, File destination)
