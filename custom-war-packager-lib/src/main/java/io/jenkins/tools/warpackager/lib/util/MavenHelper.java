@@ -29,6 +29,9 @@ import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.runFor;
  */
 public class MavenHelper {
 
+    private static final String USER_HOME_PROPERTY = System.getProperty("user.home");
+    private static final String USER_HOME =
+            USER_HOME_PROPERTY != null && !USER_HOME_PROPERTY.isEmpty() ? USER_HOME_PROPERTY : "~";
     private static final Logger LOGGER = Logger.getLogger(MavenHelper.class.getName());
 
     private Config cfg;
@@ -66,13 +69,14 @@ public class MavenHelper {
     public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
         final String folder = "repository";
         String path = getDependencyPath(folder, dep, version, packaging);
-        LOGGER.log(Level.INFO, "Checking {0}", path);
         File expectedFile = new File(path);
+        LOGGER.log(Level.INFO, "Checking {0}", expectedFile.getAbsolutePath());
         return expectedFile.exists();
     }
 
     private static String getDependencyPath(final String folder, final DependencyInfo dep, final String version, final String packaging) {
-        return String.format("~/.m2/%s/%s/%s/%s/%s-%s.%s",
+        return String.format("%s/.m2/%s/%s/%s/%s/%s-%s.%s",
+                    USER_HOME,
                     folder,
                     dep.groupId.replaceAll("\\.", "/"),
                     dep.artifactId,
