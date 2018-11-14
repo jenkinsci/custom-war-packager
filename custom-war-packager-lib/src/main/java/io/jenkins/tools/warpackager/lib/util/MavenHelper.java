@@ -87,12 +87,27 @@ public class MavenHelper {
     }
 
     public boolean artifactExists(File buildDir, DependencyInfo dep, String version, String packaging) throws IOException, InterruptedException {
+        final String path = getDependencyPath("cwp_non_hpi_cache", dep, version, packaging);
+        final boolean isHpi = "hpi".equals(packaging);
+        final File folder = new File(path);
         String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
+        if (isHpi && folder.isDirectory()) {
+            final String msg = "Dependency {0} was found in the non-HPI cache.  " +
+                    "Delete {1} to attempt another resolution attempt.";
+            LOGGER.log(Level.INFO, msg, new Object[]{gai, path});
+            return false;
+        }
         int res = run(buildDir, false,"dependency:get",
                 "-Dartifact=" + gai,
                 "-Dpackaging=" + packaging,
                 "-Dtransitive=false", "-q", "-B");
         final boolean found = res == 0;
+        if (isHpi && !found) {
+            final String msg = "Could not download {0}, assuming it is not an HPI and creating {1} to remember the assumption.";
+            LOGGER.log(Level.INFO, msg, new Object[]{gai, path});
+            //noinspection ResultOfMethodCallIgnored
+            folder.mkdirs();
+        }
         return found;
     }
 
