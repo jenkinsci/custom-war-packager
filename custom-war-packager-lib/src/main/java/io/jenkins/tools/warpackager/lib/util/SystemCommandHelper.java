@@ -15,8 +15,12 @@ public class SystemCommandHelper {
 
     private SystemCommandHelper() {}
 
+    private static ProcessBuilder createProcessBuilder(final String[] args) {
+        return new ProcessBuilder(args);
+    }
+
     public static void processFor(File buildDir, String ... args) throws IOException, InterruptedException {
-        ProcessBuilder bldr = new ProcessBuilder(args).inheritIO();
+        ProcessBuilder bldr = createProcessBuilder(args).inheritIO();
         int res = runFor(buildDir, args);
         if (res != 0) {
             throw new IOException("Command failed with exit code " + res + ": " + StringUtils.join(bldr.command(), ' '));
@@ -24,13 +28,13 @@ public class SystemCommandHelper {
     }
 
     public static int runFor(File buildDir, String ... args) throws IOException, InterruptedException {
-        ProcessBuilder bldr = new ProcessBuilder(args).inheritIO();
+        ProcessBuilder bldr = createProcessBuilder(args).inheritIO();
         bldr.directory(buildDir);
         return bldr.start().waitFor();
     }
 
     public static String readFor(File buildDir, String ... args) throws IOException, InterruptedException {
-        ProcessBuilder bldr = new ProcessBuilder(args);
+        ProcessBuilder bldr = createProcessBuilder(args);
         bldr.directory(buildDir);
         Process proc = bldr.start();
         int res = proc.waitFor();
