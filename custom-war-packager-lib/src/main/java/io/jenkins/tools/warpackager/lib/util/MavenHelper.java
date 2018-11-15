@@ -105,8 +105,10 @@ public class MavenHelper {
         if (isHpi && !found) {
             final String msg = "Could not download {0}, assuming it is not an HPI and creating {1} to remember the assumption.";
             LOGGER.log(Level.INFO, msg, new Object[]{gai, path});
-            //noinspection ResultOfMethodCallIgnored
-            folder.mkdirs();
+            final boolean dirsCreated = folder.mkdirs();
+            if (!dirsCreated) {
+                LOGGER.log(Level.WARNING, "Unable to create the {0} folder.", folder.getAbsolutePath());
+            }
         }
         return found;
     }
