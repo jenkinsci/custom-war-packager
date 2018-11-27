@@ -1,0 +1,13 @@
+bundle:
+  groupId: "io.github.oleg-nenashev"
+  artifactId: "mywar"
+  description: "Just a WAR auto-generation-sample"
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.107
+casc:
+  - id: "casc"
+    source:
+      dir: casc.yml
