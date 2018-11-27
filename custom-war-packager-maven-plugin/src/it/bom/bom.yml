@@ -47,4 +47,4 @@ spec:
       plugins:
         - groupId: "io.jenkins.plugins"
           artifactId: "artifact-manager-s3"
-          version: 1.0-alpha-1-20180427.130741-1
+          version: 1.0

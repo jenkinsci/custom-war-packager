@@ -7,13 +7,3 @@ war:
   artifactId: "jenkins-war"
   source:
     version: 2.107
-plugins:
-  - groupId: "org.jenkins-ci.plugins"
-    artifactId: "matrix-project"
-    source:
-      version: 1.9
-  - groupId: "org.jenkins-ci.plugins"
-    artifactId: "durable-task"
-    source:
-      git: https://github.com/jglick/durable-task-plugin.git
-      branch: watch-JENKINS-38381
