@@ -29,7 +29,7 @@ public class BuildMojo extends AbstractMojo {
 
     /**
      * Path to the YAML configuration file.
-     * See the format specification in <a href="https://github.com/jenkinsci/custom-war-packager/">Custom WAR Packager documentation</>
+     * See the format specification in the Custom WAR Packager documentation on GitHub.
      */
     @Parameter(property = "configFile", required = true)
     public @CheckForNull String configFilePath;
