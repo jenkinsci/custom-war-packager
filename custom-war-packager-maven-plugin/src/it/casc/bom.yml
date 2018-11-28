@@ -1,0 +1,15 @@
+metadata:
+  # labels and annotations are key: value string attributes
+  labels:
+    name: bom-it
+    groupId: io.github.oleg-nenashev
+    artifactId: mywar
+    version: 1.0
+spec:
+  core:
+    version: 2.138.3
+  plugins:
+    # reproduces JENKINS-54340
+    - groupId: "io.jenkins"
+      artifactId: "configuration-as-code"
+      version: 1.3

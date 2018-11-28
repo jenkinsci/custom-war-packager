@@ -18,5 +18,5 @@ plugins:
   - groupId: "org.jenkins-ci.plugins"
     artifactId: "durable-task"
     source:
-      git: https://github.com/jglick/durable-task-plugin.git
-      branch: watch-JENKINS-38381
+      git: https://github.com/jenkinsci/durable-task-plugin.git
+      commit: d6258dd63384de5ec261e7374028fd6f4a106dd0

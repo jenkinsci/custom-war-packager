@@ -70,8 +70,6 @@ public class Builder extends PackagerBase {
 
     public void build() throws IOException, InterruptedException {
 
-        verifyConfig();
-
         // Cleanup the temporary directory
         final File tmpDir = config.buildSettings.getTmpDir();
 
@@ -88,12 +86,15 @@ public class Builder extends PackagerBase {
             LOGGER.log(Level.INFO, "Overriding settings by BOM file: {0}", pathToBom);
             config.overrideByBOM(bom, config.buildSettings.getEnvironmentName());
         }
+        // Load POM if needed
         final File pathToPom = config.buildSettings.getPOM();
         if (pathToPom != null) {
             File downloadDir = new File(tmpDir, "hpiDownloads");
             Files.createDirectory(downloadDir.toPath());
             config.overrideByPOM(downloadDir, pathToPom);
         }
+
+        verifyConfig();
 
         // Verify settings
         if (config.bundle == null) {

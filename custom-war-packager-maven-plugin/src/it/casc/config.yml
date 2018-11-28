@@ -7,3 +7,7 @@ war:
   artifactId: "jenkins-war"
   source:
     version: 2.107
+casc:
+  - id: "casc"
+    source:
+      dir: casc.yml
