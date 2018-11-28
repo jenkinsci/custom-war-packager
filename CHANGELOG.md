@@ -1,9 +1,26 @@
 Changelog
 ====
 
+### 1.4
+
+Release date: Nov 28, 2018
+
+* [#45](https://github.com/jenkinsci/custom-war-packager/pull/45) - 
+Introduce an official Docker image for Custom WAR Packager
+  * https://hub.docker.com/r/jenkins/custom-war-packager
+* [#49](https://github.com/jenkinsci/custom-war-packager/issues/49) -
+Custom WAR Packager did not work correctly on Windows
+* [JENKINS-54340](https://issues.jenkins-ci.org/browse/JENKINS-54340), [#54](https://github.com/jenkinsci/custom-war-packager/pull/54) -
+Custom WAR Packager was throwing error for `casc` sections 
+when JCasC plugin was defined in BOM or pom.xml input
+* [#55](https://github.com/jenkinsci/custom-war-packager/pull/55) -
+Maven Plugin was not published for `1.3` due to the Javadoc issue
+* [#47](https://github.com/jenkinsci/custom-war-packager/pull/47) -
+Fix the External build logging demo after changes in upstream dependencies
+
 ### 1.3
 
-Release date: coming soon
+Release date: Oct 21, 2018
 
 * [JENKINS-54151](https://issues.jenkins-ci.org/browse/JENKINS-54151) - 
   Fix compatibility with JCasC Plugin 1.0 and above in 
