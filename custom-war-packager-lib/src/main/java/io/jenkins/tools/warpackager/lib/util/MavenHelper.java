@@ -32,6 +32,7 @@ public class MavenHelper {
     private static final Logger LOGGER = Logger.getLogger(MavenHelper.class.getName());
 
     private Config cfg;
+    private static final String mvnCommand = MavenHelper.getOsSpecificMavenCommand();
 
     public MavenHelper(Config cfg) {
         this.cfg = cfg;
@@ -45,7 +46,9 @@ public class MavenHelper {
     @CheckReturnValue
     public int run(File buildDir, boolean failOnError, String ... args) throws IOException, InterruptedException {
         ArrayList<String> callArgs = new ArrayList<>();
-        callArgs.add("mvn");
+
+        callArgs.add(MavenHelper.mvnCommand);
+
         if (cfg.buildSettings != null) {
             File settingsFile = cfg.buildSettings.getMvnSettingsFile();
             if (settingsFile != null) {
@@ -61,6 +64,17 @@ public class MavenHelper {
             return 0;
         }
         return runFor(buildDir, callArgs.toArray(args));
+    }
+
+    private static String getOsSpecificMavenCommand() {
+        String mvnCmd = "mvn";
+
+        String osName = System.getProperty("os.name");
+        if(osName != null && osName.toLowerCase().contains("windows")) {
+            mvnCmd = "mvn.cmd";
+        }
+
+        return mvnCmd;
     }
 
     public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
