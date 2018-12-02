@@ -3,10 +3,10 @@ Jenkins Custom WAR Packager
 
 Custom WAR Packager (CWP) allows building ready-to-fly Jenkins packages using a YAML specification.
 The tool can produce Docker images, WAR files, and [Jenkinsfile Runner](https://github.com/jenkinsci/jenkinsfile-runner) docker images (aka single-shot Jenkins masters).
-These bundles may include Jenkins core, plugins,extra libraries, and self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
-or [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) YAML files
+These bundles may include Jenkins core, plugins, extra libraries, and self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
+or [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-code-plugin) YAML files.
 
-See [this blogpost](https://jenkins.io/blog/2018/10/16/custom-war-packager/) for more information.
+See [this blog post](https://jenkins.io/blog/2018/10/16/custom-war-packager/) for more information.
 
 ### Demo
 
@@ -34,13 +34,13 @@ java -jar custom-war-packager-cli.jar -configPath=mywar.yml -version=1.0-SNAPSHO
 
 After the build the generated WAR file will be put to `tmp/output/target/${artifactId}.war`.
 
-To run the tool in a demo mode with [this config](./custom-war-packager-cli/src/main/resources/io/jenkins/tools/warpackager/cli/config/sample.yml), just use the following command:
+To run the tool in a demo mode with [this config](./custom-war-packager-cli/src/main/resources/io/jenkins/tools/warpackager/cli/config/sample.yml), use the following command:
 
 ```shell
 java -jar war-packager-cli.jar -demo
 ```
 
-Invoke the tool without options without options to get a full CLI options list.
+Invoke the tool without options to get a full CLI options list.
 
 #### Maven
 
@@ -148,8 +148,8 @@ See the linked demos for examples.
 
 #### BOM support
 
-The plugin supports Bill of Materials (BOM) as an input.
-This format is described in [JEP-309](https://github.com/jenkinsci/jep/tree/master/jep/309).
+The plugin supports Bill of Materials (BOM), described in
+[JEP-309](https://github.com/jenkinsci/jep/tree/master/jep/309), as an input.
 
 If BOM is defined, Custom WAR Packager will load plugin and component dependencies
 from there.
@@ -197,18 +197,18 @@ Example is available [here](./demo/artifact-manager-s3-pom).
 
 Features:
 
-* Rebuilding Jenkins core with custom dependencies (e.g. Remoting or Stapler)
+* Rebuilding Jenkins core with custom dependencies (e.g., Remoting or Stapler)
 * Adding extra libraries to the Jenkins core so that they can be used in extensions
 
 ### Limitations
 
-Currently the tool is in the alpha state.
+Currently, the tool is in the alpha state.
 It has some serious limitations:
 
 * All built artifacts with Git source are being installed to the local repository
   * Versions are unique for every commit, so beware of local repo pollution
 * System properties work only for a custom `jenkins.util.SystemProperties` class defined in the core
-  * Use Groovy Hook Scripts if you need to setup other system properties
-* `libPatches` steps bundles only a specified JAR file, but not its dependencies.
-Dependencies need to be explicitly packaged as well if they change compared to the base WAR file.
+  * Use Groovy Hook Scripts if you need to set up other system properties
+* `libPatches` steps bundles only a specified JAR file, but not its dependencies
+Dependencies need to be explicitly packaged as well if they change compared to the base WAR file
   * `libExcludes` can be used to remove dependencies which are not required anymore
