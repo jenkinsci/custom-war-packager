@@ -30,6 +30,7 @@ public class BuildSettings {
     private File bom;
     @CheckForNull
     private File pom;
+    private boolean isPluginPom = true;
     @CheckForNull
     private String environmentName;
     @CheckForNull
@@ -63,6 +64,10 @@ public class BuildSettings {
         this.pom = pom;
     }
 
+    public void setPluginPom(boolean isPluginPom) {
+        this.isPluginPom = isPluginPom;
+    }
+
     public void setEnvironmentName(@CheckForNull String environmentName) {
         this.environmentName = environmentName;
     }
@@ -94,6 +99,10 @@ public class BuildSettings {
     @CheckForNull
     public File getPOM() {
         return pom;
+    }
+
+    public boolean isPluginPom() {
+        return isPluginPom;
     }
 
     @CheckForNull

@@ -171,7 +171,7 @@ public class Config {
     //TODO: add MANY options to make it configurable
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH", justification = "plugins is initialized before")
-    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom) throws IOException, InterruptedException {
+    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom, final boolean isPluginPom) throws IOException, InterruptedException {
         MavenXpp3Reader rdr = new MavenXpp3Reader();
         Model model;
         try(FileInputStream istream = new FileInputStream(pom)) {
@@ -196,13 +196,15 @@ public class Config {
             processMavenDep(helper, tmpDir, dep, plugins);
         }
 
-        // Add the artifact itself, no validation as we asume the pom is from a plugin
-        DependencyInfo res = new DependencyInfo();
-        res.artifactId = model.getArtifactId();
-        res.groupId = model.getGroupId();
-        res.source = new SourceInfo();
-        res.source.version = model.getVersion();
-        plugins.add(res);
+        if (isPluginPom) {
+            // Add the artifact itself, no validation as we assume the pom is from a plugin
+            DependencyInfo res = new DependencyInfo();
+            res.artifactId = model.getArtifactId();
+            res.groupId = model.getGroupId();
+            res.source = new SourceInfo();
+            res.source.version = model.getVersion();
+            plugins.add(res);
+        }
     }
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
