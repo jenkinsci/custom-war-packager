@@ -29,6 +29,9 @@ import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.runFor;
  */
 public class MavenHelper {
 
+    private static final String USER_HOME_PROPERTY = System.getProperty("user.home");
+    private static final String USER_HOME =
+            USER_HOME_PROPERTY != null && !USER_HOME_PROPERTY.isEmpty() ? USER_HOME_PROPERTY : "~";
     private static final Logger LOGGER = Logger.getLogger(MavenHelper.class.getName());
 
     private Config cfg;
@@ -78,25 +81,50 @@ public class MavenHelper {
     }
 
     public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
-        String path = String.format("~/.m2/repository/%s/%s/%s/%s-%s.%s",
-                dep.groupId.replaceAll("\\.", "/"),
-                dep.artifactId,
-                version,
-                dep.artifactId,
-                version,
-                packaging);
-        LOGGER.log(Level.INFO, "Checking {0}", path);
+        final String folder = "repository";
+        String path = getDependencyPath(folder, dep, version, packaging);
         File expectedFile = new File(path);
+        LOGGER.log(Level.INFO, "Checking {0}", expectedFile.getAbsolutePath());
         return expectedFile.exists();
     }
 
+    private static String getDependencyPath(final String folder, final DependencyInfo dep, final String version, final String packaging) {
+        return String.format("%s/.m2/%s/%s/%s/%s/%s-%s.%s",
+                    USER_HOME,
+                    folder,
+                    dep.groupId.replaceAll("\\.", "/"),
+                    dep.artifactId,
+                    version,
+                    dep.artifactId,
+                    version,
+                    packaging);
+    }
+
     public boolean artifactExists(File buildDir, DependencyInfo dep, String version, String packaging) throws IOException, InterruptedException {
+        final String path = getDependencyPath("cwp_non_hpi_cache", dep, version, packaging);
+        final boolean isHpi = "hpi".equals(packaging);
+        final File folder = new File(path);
         String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
+        if (isHpi && folder.isDirectory()) {
+            final String msg = "Dependency {0} was found in the non-HPI cache.  " +
+                    "Delete {1} to attempt another resolution attempt.";
+            LOGGER.log(Level.INFO, msg, new Object[]{gai, path});
+            return false;
+        }
         int res = run(buildDir, false,"dependency:get",
                 "-Dartifact=" + gai,
                 "-Dpackaging=" + packaging,
                 "-Dtransitive=false", "-q", "-B");
-        return res == 0;
+        final boolean found = res == 0;
+        if (isHpi && !found) {
+            final String msg = "Could not download {0}, assuming it is not an HPI and creating {1} to remember the assumption.";
+            LOGGER.log(Level.INFO, msg, new Object[]{gai, path});
+            final boolean dirsCreated = folder.mkdirs();
+            if (!dirsCreated) {
+                LOGGER.log(Level.WARNING, "Unable to create the {0} folder.", folder.getAbsolutePath());
+            }
+        }
+        return found;
     }
 
     public void downloadJAR(File buildDir, DependencyInfo dep, String version, File destination)
