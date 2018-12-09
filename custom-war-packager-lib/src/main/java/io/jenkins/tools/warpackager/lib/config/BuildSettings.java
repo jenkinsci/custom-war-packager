@@ -30,7 +30,7 @@ public class BuildSettings {
     private File bom;
     @CheckForNull
     private File pom;
-    private boolean isPluginPom = true;
+    private boolean pomIgnoreRoot;
     @CheckForNull
     private String environmentName;
     @CheckForNull
@@ -64,8 +64,8 @@ public class BuildSettings {
         this.pom = pom;
     }
 
-    public void setPluginPom(boolean isPluginPom) {
-        this.isPluginPom = isPluginPom;
+    public void setPomIgnoreRoot(boolean pomIgnoreRoot) {
+        this.pomIgnoreRoot = pomIgnoreRoot;
     }
 
     public void setEnvironmentName(@CheckForNull String environmentName) {
@@ -101,8 +101,8 @@ public class BuildSettings {
         return pom;
     }
 
-    public boolean isPluginPom() {
-        return isPluginPom;
+    public boolean isPomIgnoreRoot() {
+        return pomIgnoreRoot;
     }
 
     @CheckForNull
