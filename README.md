@@ -175,7 +175,10 @@ An example of such configuration is available
 
 In order to simplify packaging for development versions,
 it is possible to link Custom War Packager to the POM file
-so that it takes plugins to be bundled from there:
+so that it takes plugins to be bundled from there.
+
+If the `pom` option is set, all dependencies will be added, including test ones.
+The current parent will be also bundled unless the `pomIgnoreRoot` flag is set.
 
 ```yaml
 bundle:
@@ -183,6 +186,7 @@ bundle:
   artifactId: "pom-input-demo"
 buildSettings:
   pom: pom.xml
+  pomIgnoreRoot: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
@@ -190,7 +194,6 @@ war:
     version: 2.121.1
 ```
 
-If such option is set, all dependencies will be added, including test ones.
 Example is available [here](./demo/artifact-manager-s3-pom).
 
 ### Advanced features

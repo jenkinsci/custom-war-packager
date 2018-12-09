@@ -91,7 +91,7 @@ public class Builder extends PackagerBase {
         if (pathToPom != null) {
             File downloadDir = new File(tmpDir, "hpiDownloads");
             Files.createDirectory(downloadDir.toPath());
-            config.overrideByPOM(downloadDir, pathToPom, config.buildSettings.isPluginPom());
+            config.overrideByPOM(downloadDir, pathToPom, config.buildSettings.isPomIgnoreRoot());
         }
 
         verifyConfig();
