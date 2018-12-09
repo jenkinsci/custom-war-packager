@@ -1,6 +1,9 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
+
+import java.nio.charset.StandardCharsets;
+
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Repository;
 
@@ -31,5 +34,9 @@ public class POMGenerator {
         incrementals.setUrl("https://repo.jenkins-ci.org/incrementals/");
         target.addPluginRepository(incrementals);
         target.addRepository(incrementals);
+    }
+    
+    protected void addUTF8SourceEncodingProperty(Model target) {
+        target.addProperty("project.build.sourceEncoding", StandardCharsets.UTF_8.toString());
     }
 }

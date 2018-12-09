@@ -42,6 +42,8 @@ public class MavenHPICustomWARPOMGenerator extends POMGenerator {
         }
         model.setVersion(config.buildSettings.getVersion());
 
+        addUTF8SourceEncodingProperty(model);
+        
         // WAR Dependency
         Dependency dep = config.war.toDependency(versionOverrides);
         dep.setScope("test");

@@ -44,6 +44,8 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         model.setVersion(config.buildSettings.getVersion());
         model.setPackaging("war");
 
+        addUTF8SourceEncodingProperty(model);
+
         HashMap<String, String> manifestEntries = new HashMap<>(injectedManifestEntries);
         manifestEntries.put("Build-Time", "${maven.build.timestamp}");
         manifestEntries.put("Built-By", "${user.name}");
