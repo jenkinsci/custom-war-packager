@@ -7,10 +7,9 @@ Release date: Dec 10, 2018
 
 * [#52](https://github.com/jenkinsci/custom-war-packager/pull/52),
   [#62](https://github.com/jenkinsci/custom-war-packager/pull/62)- 
-  Introduce a new `pomIgnoreRoot` option which allows skipping the root artifact
-  when using `pom.xml` as a plugin list input
+  Add a new `pomIgnoreRoot` option which skips the root artifact when using `pom.xml` as a plugin list
 * [#51](https://github.com/jenkinsci/custom-war-packager/pull/51) -
-  Performance: Cache non-Plugin dependencies when using `pom.xml` as a plugin list input.
+  Performance: Cache non-Plugin dependencies when using `pom.xml` as a plugin list
 * [#57](https://github.com/jenkinsci/custom-war-packager/issues/57) -
   Fix encoding warning from Maven Resources Plugin when building packages
 
