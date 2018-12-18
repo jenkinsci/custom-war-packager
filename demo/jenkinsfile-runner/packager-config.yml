@@ -7,7 +7,7 @@ bundle:
 buildSettings:
   jenkinsfileRunner:
     source:
-      groupId: "io.jenkins"
+      groupId: "io.jenkins.jenkinsfile-runner"
       artifactId: "jenkinsfile-runner"
       build:
         # Jenkinsfile Runner produces appassembler directory which is not a maven artifact
