@@ -259,7 +259,6 @@ public class Builder extends PackagerBase {
                                @CheckForNull List<String> extraMavenArgs)
             throws IOException, InterruptedException {
 
-        String properties;
         //TODO: add Caching support if commit is defined
         if (!dep.isNeedsBuild()) {
             LOGGER.log(Level.INFO, "Component {0}: no build required", dep);
