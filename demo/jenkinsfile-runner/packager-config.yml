@@ -7,10 +7,15 @@ bundle:
 buildSettings:
   jenkinsfileRunner:
     source:
-      groupId: "io.jenkins.jenkinsfile-runner"
+      groupId: "io.jenkins"
       artifactId: "jenkinsfile-runner"
+      build:
+        # Jenkinsfile Runner produces appassembler directory which is not a maven artifact
+        #TODO: replace once Jenkinsfile Runner archives runner & CWP is updated
+        noCache: true
       source:
-        version: 1.0-beta-4
+        git: https://github.com/jenkinsci/jenkinsfile-runner.git
+        commit: 8ff9b1e9a097e629c5fbffca9a3d69750097ecc4
     docker:
       base: "jenkins/jenkins:2.138.2"
       tag: "jenkins-experimental/cwp-jenkinsfile-runner-demo"
