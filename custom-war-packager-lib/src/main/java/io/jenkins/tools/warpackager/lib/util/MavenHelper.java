@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -156,14 +157,28 @@ public class MavenHelper {
 
     public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, File destination)
             throws IOException, InterruptedException {
-        run(buildDir, "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
-                "-DgroupId=" + dep.groupId,
-                "-DartifactId=" + dep.artifactId,
-                "-Dversion=" + version,
-                "-DoutputDirectory=" + destination.getParentFile().getAbsolutePath(),
-                "-DoutputFileName=" + destination.getName(),
-                "-Dtype=" + packaging,
-                "-q");
+        downloadArtifact(buildDir, dep, version, packaging, null, destination);
+    }
+
+    public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, String classifier, File destination)
+            throws IOException, InterruptedException {
+        List<String> args = new LinkedList<>();
+
+        args.add("com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact");
+        args.add("-DgroupId=" + dep.groupId);
+        args.add("-DartifactId=" + dep.artifactId);
+        args.add("-Dversion=" + version);
+        args.add("-DoutputDirectory=" + destination.getParentFile().getAbsolutePath());
+        args.add("-DoutputFileName=" + destination.getName());
+        args.add("-Dtype=" + packaging);
+
+        if (classifier != null) {
+            args.add("-Dclassifier=" + classifier);
+        }
+
+        args.add("-q");
+
+        run(buildDir, args.toArray(new String[0]));
     }
 
 }

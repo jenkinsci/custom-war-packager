@@ -2,22 +2,25 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
 import io.jenkins.tools.warpackager.lib.config.JenkinsfileRunnerSettings;
 import io.jenkins.tools.warpackager.lib.config.LibraryInfo;
-import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.impl.jenkinsfileRunner.JenkinsfileRunnerDockerBuilder;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
@@ -30,8 +33,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
-import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.*;
+import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.processFor;
+import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.readFor;
 
 /**
  * Builds WAR according to the specified config.
@@ -182,23 +188,27 @@ public class Builder extends PackagerBase {
         // Build Jenkinsfile Runner if needed
         JenkinsfileRunnerSettings jenkinsfileRunner = config.buildSettings.getJenkinsfileRunner();
         if (jenkinsfileRunner != null) {
-            if (!jenkinsfileRunner.getSource().isNeedsBuild()) {
-                throw new IOException("Jenkinsfile Runner always requires build");
-            }
             if (!config.war.artifactId.equals("jenkins-war")) {
                 throw new IOException("Jenkinsfile Runner packager can package only 'jenkins-war' so far");
             }
 
-            String jenkinsVersion = ComponentReference.resolveFrom(config.war, true, versionOverrides).getVersion();
-            buildIfNeeded(jenkinsfileRunner.getSource(), "jar",
-                    Arrays.asList(
-                            "-Djenkins.version=" + jenkinsVersion
-                            /*, "-Djenkins.testharness.version=2.38"*/));
             File outputDir = config.buildSettings.getOutputDir();
 
-            org.apache.commons.io.FileUtils.copyDirectory(
-                    new File(buildRoot, jenkinsfileRunner.getSource().artifactId + "/app/target/appassembler"),
-                    new File(outputDir, "jenkinsfileRunner"));
+            if (jenkinsfileRunner.getSource().isNeedsBuild()) {
+                String jenkinsVersion = ComponentReference.resolveFrom(config.war, true, versionOverrides).getVersion();
+                buildIfNeeded(jenkinsfileRunner.getSource(), "jar",
+                        Arrays.asList(
+                                "-Djenkins.version=" + jenkinsVersion
+                                /*, "-Djenkins.testharness.version=2.38"*/));
+
+                org.apache.commons.io.FileUtils.copyDirectory(
+                        new File(buildRoot, jenkinsfileRunner.getSource().artifactId + "/app/target/appassembler"),
+                        new File(outputDir, "jenkinsfileRunner"));
+            } else {
+                File jfrZip = new File(buildRoot, "jfrApp.zip");
+                mavenHelper.downloadArtifact(buildRoot, jenkinsfileRunner.getSource(), jenkinsfileRunner.getSource().getSource().version, "zip", "app", jfrZip);
+                unzip(jfrZip, new File(outputDir, "jenkinsfileRunner"));
+            }
 
             // TODO: replace directory copy once Jenkinsfile Runner creates an archive for Jenkinsfile runner
             //File jenkinsfileBuilderJar = new File(outputDir, "jenkinsfile-runner.jar");
@@ -259,7 +269,6 @@ public class Builder extends PackagerBase {
                                @CheckForNull List<String> extraMavenArgs)
             throws IOException, InterruptedException {
 
-        String properties;
         //TODO: add Caching support if commit is defined
         if (!dep.isNeedsBuild()) {
             LOGGER.log(Level.INFO, "Component {0}: no build required", dep);
@@ -340,5 +349,44 @@ public class Builder extends PackagerBase {
         LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
         mavenHelper.run(componentBuildDir, "versions:set", "-DnewVersion=" + newVersion);
         mavenHelper.run(componentBuildDir, combined);
+    }
+
+    private static void unzip(File zipFile, File destDir) throws IOException {
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
+            ZipEntry zipEntry = zis.getNextEntry();
+            while (zipEntry != null) {
+                File newFile = newFile(destDir, zipEntry);
+
+                if (zipEntry.isDirectory()) {
+                    if (!newFile.isDirectory() && !newFile.mkdirs()) {
+                        throw new IOException("failed to create directory " + newFile);
+                    }
+                } else {
+                    if (!destDir.isDirectory() && !destDir.mkdirs()) {
+                        throw new IOException("failed to create directory " + destDir);
+                    }
+
+                    try (FileOutputStream fos = new FileOutputStream(newFile)) {
+                        IOUtils.copy(zis, fos);
+                    }
+                }
+
+                zipEntry = zis.getNextEntry();
+            }
+            zis.closeEntry();
+        }
+    }
+
+    private static File newFile(File destinationDir, ZipEntry zipEntry) throws IOException {
+        File destFile = new File(destinationDir, zipEntry.getName());
+
+        String destDirPath = destinationDir.getCanonicalPath();
+        String destFilePath = destFile.getCanonicalPath();
+
+        if (!destFilePath.startsWith(destDirPath + File.separator)) {
+            throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
+        }
+
+        return destFile;
     }
 }

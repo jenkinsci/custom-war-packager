@@ -2,3 +2,6 @@
 *.iml
 target
 cwp-cli-1.2.jar
+demo/jenkinsfile-runner/.build
+demo/jenkinsfile-runner/tmp
+tmp
