@@ -193,21 +193,26 @@ public class Builder extends PackagerBase {
             }
 
             File outputDir = config.buildSettings.getOutputDir();
+            File jfrDir = new File(outputDir, "jenkinsfileRunner");
 
             if (jenkinsfileRunner.getSource().isNeedsBuild()) {
                 String jenkinsVersion = ComponentReference.resolveFrom(config.war, true, versionOverrides).getVersion();
                 buildIfNeeded(jenkinsfileRunner.getSource(), "jar",
                         Arrays.asList(
-                                "-Djenkins.version=" + jenkinsVersion
-                                /*, "-Djenkins.testharness.version=2.38"*/));
+                                "-Djenkins.version=" + jenkinsVersion));
 
                 org.apache.commons.io.FileUtils.copyDirectory(
                         new File(buildRoot, jenkinsfileRunner.getSource().artifactId + "/app/target/appassembler"),
-                        new File(outputDir, "jenkinsfileRunner"));
+                        jfrDir);
             } else {
-                File jfrZip = new File(buildRoot, "jfrApp.zip");
-                mavenHelper.downloadArtifact(buildRoot, jenkinsfileRunner.getSource(), jenkinsfileRunner.getSource().getSource().version, "zip", "app", jfrZip);
-                unzip(jfrZip, new File(outputDir, "jenkinsfileRunner"));
+                SourceInfo source = jenkinsfileRunner.getSource().getSource();
+                if (source != null) {
+                    File jfrZip = new File(buildRoot, "jfrApp.zip");
+                    mavenHelper.downloadArtifact(buildRoot, jenkinsfileRunner.getSource(), source.version, "zip", "app", jfrZip);
+                    unzip(jfrZip, jfrDir);
+                } else {
+                    throw new IOException("Source for jenkinsfile runner not specified");
+                }
             }
 
             // TODO: replace directory copy once Jenkinsfile Runner creates an archive for Jenkinsfile runner
