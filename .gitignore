@@ -2,6 +2,7 @@
 *.iml
 target
 cwp-cli-1.2.jar
+custom-war-packager-cli/tmp
 demo/jenkinsfile-runner/.build
 demo/jenkinsfile-runner/tmp
 tmp
