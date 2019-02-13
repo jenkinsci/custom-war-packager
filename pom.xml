@@ -25,7 +25,7 @@
     <module>custom-war-packager-lib</module>
     <module>custom-war-packager-cli</module>
     <module>custom-war-packager-maven-plugin</module>
-    <module>tests</module>
+    <module>jenkinsfile-runner-tests</module>
   </modules>
 
   <licenses>

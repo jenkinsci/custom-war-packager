@@ -7,8 +7,8 @@
     <version>1.6-SNAPSHOT</version>
   </parent>
 
-  <artifactId>custom-war-packager-tests</artifactId>
-  <name>Jenkins Custom WAR Packager tests</name>
+  <artifactId>jenkinsfile-runner-tests</artifactId>
+  <name>Integration tests for Custom war Packager and Jenkinsfile Runner</name>
 
   <profiles>
     <profile>

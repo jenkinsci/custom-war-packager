@@ -1,4 +1,4 @@
-# Custom WAR Packager Tests
+# Integration tests for Custom WAR Packager and Jenkinsfile Runner
 
 ## Running the tests on macOS
 The version of shUnit2 we are using does not work with the default bash shell on macOS.  In order to get the tests to run, we recommend upgrading your bash shell to a more modern version by following the instructions below.
