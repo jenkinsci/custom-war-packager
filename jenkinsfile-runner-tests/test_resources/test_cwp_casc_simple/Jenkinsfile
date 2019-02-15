@@ -1,0 +1,15 @@
+pipeline {
+    agent any
+    stages {
+        stage('Get System Message') {
+            steps {
+                script {
+                    def instance = Jenkins.get()
+                    def systemMesssage = instance.getSystemMessage()
+                    echo "Message: ${systemMesssage}"
+                }
+            }
+        }
+    }
+}
+

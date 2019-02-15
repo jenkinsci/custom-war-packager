@@ -1,0 +1,28 @@
+pipeline {
+    agent any
+    tools {
+        maven 'maven'
+    }
+    stages {
+        stage('install maven') {
+            steps {
+            //
+            // FIXME see if we can updated casc.yml to install maven for us.
+            //
+            sh '''
+                mkdir /var/jenkins_home/tools
+                cd /var/jenkins_home/tools
+                rm -rf apache-maven-3.3.3-bin*
+                wget --no-verbose https://archive.apache.org/dist/maven/maven-3/3.3.3/binaries/apache-maven-3.3.3-bin.tar.gz
+                tar -xzf apache-maven-3.3.3-bin.tar.gz
+            '''
+            }
+
+        }
+        stage('build') {
+            steps {
+                sh 'mvn --version'
+            }
+        }
+    }
+}

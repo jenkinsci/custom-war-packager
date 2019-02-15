@@ -1,0 +1,9 @@
+@Library('awesome-lib@master') _
+
+stage('Simple library test') {
+    node {
+        def trusted = infra.isTrusted()
+        def onJenkinsInfra = infra.isRunningOnJenkinsInfra()
+        echo "TRUSTED? " + trusted + " On Jenkins Infra? " + onJenkinsInfra
+    }
+}

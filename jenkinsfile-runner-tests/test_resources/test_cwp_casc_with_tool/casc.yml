@@ -1,0 +1,11 @@
+jenkins:
+  systemMessage: "Jenkins for CWP CasC With Tool test\n\n"
+  numExecutors: 5
+  scmCheckoutRetryCount: 2
+  mode: NORMAL
+
+tool:
+  maven:
+    installations:
+      - name: maven
+        home: /var/jenkins_home/tools/apache-maven-3.3.3

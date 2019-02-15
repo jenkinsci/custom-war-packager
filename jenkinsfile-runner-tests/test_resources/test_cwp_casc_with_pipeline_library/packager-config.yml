@@ -1,0 +1,105 @@
+bundle:
+  groupId: "io.jenkins.tools.custom-war-packager.demo"
+  artifactId: "jenkinsfile-runner"
+  vendor: "Jenkins project"
+  title: "Jenkinsfile Runner demo"
+  description: "Jenkinsfile Runner Docker Image, produced by Custom WAR Packager"
+buildSettings:
+  jenkinsfileRunner:
+    source:
+      groupId: "io.jenkins"
+      artifactId: "jenkinsfile-runner"
+      build:
+        noCache: true
+      source:
+        git: https://github.com/jenkinsci/jenkinsfile-runner.git
+        branch: parent-1.0-beta-4
+    docker:
+      base: "jenkins/jenkins:2.150.3"
+      tag: "jenkins-experimental/jenkinsfile-runner-demo"
+      build: false
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: "2.150.3"
+plugins:
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-job"
+    source:
+      version: "2.31"
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-cps"
+    source:
+      version: "2.63"
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-cps-global-lib"
+    source:
+      version: "2.13"
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-api"
+    source:
+      version: "2.33"
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-step-api"
+    source:
+      version: "2.19"
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-support"
+    source:
+      version: "3.2"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "pipeline-utility-steps"
+    source:
+      version: "2.2.0"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "cloudbees-folder"
+    source:
+      version: "6.4"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "credentials"
+    source:
+      version: "2.1.18"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "structs"
+    source:
+      version: "1.17"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "scm-api"
+    source:
+      version: "2.3.0"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "ssh-credentials"
+    source:
+      version: "1.14"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "credentials-binding"
+    source:
+      version: "1.16"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "permissive-script-security"
+    source:
+      version: "0.3"
+  - groupId: "org.jenkins-ci.plugins"
+    artifactId: "git"
+    source:
+      version: "3.0.0"
+  - groupId: "org.jenkins-ci.plugins.workflow"
+    artifactId: "workflow-aggregator"
+    source:
+      version: "2.5"
+  - groupId: "io.jenkins"
+    artifactId: "configuration-as-code"
+    source:
+      version: "1.5"
+  - groupId: "io.jenkins.configuration-as-code"
+    artifactId: "configuration-as-code-support"
+    source:
+      version: "1.5"
+systemProperties: {
+    jenkins.model.Jenkins.slaveAgentPort: "50000",
+    jenkins.model.Jenkins.slaveAgentPortEnforce: "true"}
+casc:
+  - id: "casc"
+    source:
+      dir: ./test_resources/test_cwp_casc_with_pipeline_library/casc.yml

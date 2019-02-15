@@ -1,0 +1,19 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code Plugin\n\n"
+  numExecutors: 5
+  scmCheckoutRetryCount: 2
+  mode: NORMAL
+
+unclassified:
+  globalLibraries:
+    libraries:
+      - name: "awesome-lib"
+        retriever:
+          legacySCM:
+            scm:
+              git:
+                branches:
+                  - name: "*/master"
+                doGenerateSubmoduleConfigurations: false
+                userRemoteConfigs:
+                  - url: "https://github.com/jenkins-infra/pipeline-library.git"
