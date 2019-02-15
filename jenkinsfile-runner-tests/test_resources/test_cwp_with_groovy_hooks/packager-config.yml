@@ -15,14 +15,14 @@ buildSettings:
         git: https://github.com/jenkinsci/jenkinsfile-runner.git
         branch: parent-1.0-beta-4
     docker:
-      base: "jenkins/jenkins:2.138.2"
+      base: "jenkins/jenkins:2.150.3"
       tag: "jenkins-experimental/jenkinsfile-runner-demo"
       build: false
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
-    version: "2.138.2"
+    version: "2.150.3"
 
 # TODO I don't think we need all of the plugins here; see the ones that were addded for the pipeline library test
 plugins:
@@ -105,4 +105,4 @@ groovyHooks:
   - type: "init"
     id: "initScripts"
     source:
-      dir: init.groovy
+      dir: ./test_resources/test_cwp_with_groovy_hooks/init.groovy
