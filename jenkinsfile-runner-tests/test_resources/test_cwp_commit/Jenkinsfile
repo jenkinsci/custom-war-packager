@@ -1,0 +1,6 @@
+stage('Get class') {
+    node {
+        Jenkins.instance.pluginManager.uberClassLoader.loadClass('com.cloudbees.jenkins.support.util.WordReplacer')
+        echo Jenkins.instance.pluginManager.getPlugin('support-core').versionNumber.toString()
+    }
+}

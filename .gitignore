@@ -6,3 +6,5 @@ custom-war-packager-cli/tmp
 demo/jenkinsfile-runner/.build
 demo/jenkinsfile-runner/tmp
 tmp
+jenkinsfile-runner-tests/.testing
+*.log
