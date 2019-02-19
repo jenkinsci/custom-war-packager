@@ -87,8 +87,8 @@ test_cwp_jfr() {
 # Build a JFR image using a commit for a plugin and validates the built and installed version matches that commit.
 #
 test_cwp_commit() {
-  #jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_cwp_commit/packager-config.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
-  #execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
+  jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_cwp_commit/packager-config.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
+  execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
 
   run_jfr_docker_image_with_jfr_options "$jenkinsfile_runner_tag" "$current_directory/test_resources/test_cwp_commit/Jenkinsfile" "--no-sandbox"
   jenkinsfile_execution_should_succeed "$?"
