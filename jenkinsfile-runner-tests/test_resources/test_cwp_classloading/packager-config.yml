@@ -13,7 +13,7 @@ buildSettings:
         noCache: true
       source:
         git: https://github.com/jenkinsci/jenkinsfile-runner.git
-        branch: 1.0-beta-6
+        branch: 1.0-beta-7
     docker:
       base: "jenkins/jenkins:2.156"
       build: false
