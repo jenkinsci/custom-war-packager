@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.JenkinsfileRunnerSettings;
 import io.jenkins.tools.warpackager.lib.impl.Builder;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
@@ -52,7 +53,26 @@ public class Main {
             cfg.buildSettings.addMavenOption("-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn");
         }
 
+        JenkinsfileRunnerSettings jfrSettings = cfg.buildSettings.getJenkinsfileRunner();
+        if (options.runWorkspace() != null) {
+            checkJfrSettingsAvailable(jfrSettings, "--runWorkspace");
+
+            jfrSettings.setRunWorkspace(options.runWorkspace());
+        }
+
+        if (options.isNoSandbox()) {
+            checkJfrSettingsAvailable(jfrSettings, "--no-sandbox");
+
+            jfrSettings.setNoSandbox(options.isNoSandbox());
+        }
+
         final Builder bldr = new Builder(cfg);
         bldr.build();
+    }
+
+    private static void checkJfrSettingsAvailable(JenkinsfileRunnerSettings jfrSettings, String parameter) {
+        if (jfrSettings == null || jfrSettings.getDocker() == null) {
+            throw new IllegalArgumentException(String.format("The parameter '%s' needs the Jenkinsfile Runner Docker configuration to be specified", parameter));
+        }
     }
 }

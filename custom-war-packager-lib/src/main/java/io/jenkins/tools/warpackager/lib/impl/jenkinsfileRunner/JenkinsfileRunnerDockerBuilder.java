@@ -27,6 +27,12 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
     @CheckForNull
     private File pluginsDir;
 
+    @CheckForNull
+    private String runWorkspace;
+
+    @CheckForNull
+    private boolean noSandbox;
+
     public JenkinsfileRunnerDockerBuilder(@Nonnull Config config,
                                           @Nonnull DockerBuildSettings dockerBuildSettings,
                                           @Nonnull File targetDir) throws IOException {
@@ -40,6 +46,16 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
 
     public JenkinsfileRunnerDockerBuilder withVersionOverrides(Map<String, String> versionOverrides) {
         this.versionOverrides = versionOverrides;
+        return this;
+    }
+
+    public JenkinsfileRunnerDockerBuilder withRunWorkspace(String runWorkspace) {
+        this.runWorkspace = runWorkspace;
+        return this;
+    }
+
+    public JenkinsfileRunnerDockerBuilder withNoSandbox(boolean noSandbox) {
+        this.noSandbox = noSandbox;
         return this;
     }
 
@@ -81,20 +97,30 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
         if (config.groovyHooks != null) {
             ps.println("RUN cp -R /app/jenkins/WEB-INF/*.groovy.d /usr/share/jenkins/ref/");
         }
-        //TODO: No longer needed in 1.0+ (JENKINS-54151)
-        //if (config.casc != null) {
-        //    ps.println("ENV CASC_JENKINS_CONFIG=/app/jenkins/WEB-INF/jenkins.yaml.d");
-        //}
-
-        // ps.println("ENV JAVA_OPTS='-Djth.jenkins-war.path=/usr/share/jenkins/jenkins.war'");
 
         ps.println();
-        ps.println("ENTRYPOINT [\"/app/bin/jenkinsfile-runner\", \\\n" +
+
+        final StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("ENTRYPOINT [\"/app/bin/jenkinsfile-runner\",\\\n" +
                 "            \"-w\", \"/app/jenkins\",\\\n" +
                 "            \"-p\", \"/usr/share/jenkins/ref/plugins\",\\\n" +
                 //TODO(oleg_nenashev): There is a glitch in the stock Dockerfile in the repo,
                 // it should point to Jenkinsfile to prevent using / as a Filesystem SCM root
-                "            \"-f\", \"/workspace/Jenkinsfile\"]");
+                "            \"-f\", \"/workspace/Jenkinsfile\"");
+
+        if (runWorkspace != null) {
+            stringBuilder.append(",\\\n            \"--runWorkspace\", \"");
+            stringBuilder.append(runWorkspace);
+            stringBuilder.append("\"");
+        }
+
+        if (noSandbox) {
+            stringBuilder.append(",\\\n            \"--no-sandbox\"");
+        }
+
+        stringBuilder.append("]");
+
+        ps.println(stringBuilder.toString());
 
         String dockerfile = new String(baos.toByteArray(), StandardCharsets.UTF_8);
         return dockerfile;

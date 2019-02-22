@@ -20,12 +20,25 @@ public class JenkinsfileRunnerSettings {
     @CheckForNull
     private DockerBuildSettings docker;
 
+    @CheckForNull
+    private String runWorkspace;
+
+    private boolean noSandbox;
+
+    public void setSource(@Nonnull DependencyInfo source) {
+        this.source = source;
+    }
+
     public void setDocker(@CheckForNull DockerBuildSettings docker) {
         this.docker = docker;
     }
 
-    public void setSource(@Nonnull DependencyInfo source) {
-        this.source = source;
+    public void setRunWorkspace(@CheckForNull String runWorkspace) {
+        this.runWorkspace= runWorkspace;
+    }
+
+    public void setNoSandbox(boolean noSandbox) {
+        this.noSandbox = noSandbox;
     }
 
     @Nonnull
@@ -36,5 +49,14 @@ public class JenkinsfileRunnerSettings {
     @CheckForNull
     public DockerBuildSettings getDocker() {
         return docker;
+    }
+
+    @CheckForNull
+    public String getRunWorkspace() {
+        return runWorkspace;
+    }
+
+    public boolean isNoSandbox() {
+        return noSandbox;
     }
 }

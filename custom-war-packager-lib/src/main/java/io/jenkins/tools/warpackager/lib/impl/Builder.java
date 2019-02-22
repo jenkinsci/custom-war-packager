@@ -215,6 +215,8 @@ public class Builder extends PackagerBase {
                 new JenkinsfileRunnerDockerBuilder(config, jenkinsfileRunnerDocker, outputDir)
                         .withPlugins(new File(explodedWar, "WEB-INF/plugins"))
                         .withVersionOverrides(versionOverrides)
+                        .withRunWorkspace(jenkinsfileRunner.getRunWorkspace())
+                        .withNoSandbox(jenkinsfileRunner.isNoSandbox())
                         .build();
             }
         }
