@@ -27,7 +27,7 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
     @CheckForNull
     private File pluginsDir;
 
-    @Nonnull
+    @CheckForNull
     private String runWorkspace;
 
     private boolean noSandbox;
