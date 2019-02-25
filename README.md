@@ -143,7 +143,7 @@ casc:
       dir: jenkins.yml
 ```
 
-There are more options available
+There are more options available.
 See the linked demos and the automated tests for examples.
 
 #### BOM support
