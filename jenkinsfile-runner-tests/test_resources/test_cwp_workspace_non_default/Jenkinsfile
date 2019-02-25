@@ -1,0 +1,5 @@
+stage('Write message') {
+    node {
+        writeFile file: 'message.txt', text: 'This is the message to find in the logs'
+    }
+}
