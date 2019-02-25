@@ -27,10 +27,9 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
     @CheckForNull
     private File pluginsDir;
 
-    @CheckForNull
+    @Nonnull
     private String runWorkspace;
 
-    @CheckForNull
     private boolean noSandbox;
 
     public JenkinsfileRunnerDockerBuilder(@Nonnull Config config,
@@ -49,7 +48,7 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
         return this;
     }
 
-    public JenkinsfileRunnerDockerBuilder withRunWorkspace(String runWorkspace) {
+    public JenkinsfileRunnerDockerBuilder withRunWorkspace(@Nonnull String runWorkspace) {
         this.runWorkspace = runWorkspace;
         return this;
     }

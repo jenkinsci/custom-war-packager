@@ -14,6 +14,8 @@ import javax.annotation.Nonnull;
     justification = "Jackson does it in this case")
 public class JenkinsfileRunnerSettings {
 
+    private static final String DEFAULT_WORKSPACE = "/build";
+
     @Nonnull
     private DependencyInfo source;
 
@@ -51,9 +53,9 @@ public class JenkinsfileRunnerSettings {
         return docker;
     }
 
-    @CheckForNull
+    @Nonnull
     public String getRunWorkspace() {
-        return runWorkspace;
+        return runWorkspace != null ? runWorkspace : DEFAULT_WORKSPACE;
     }
 
     public boolean isNoSandbox() {

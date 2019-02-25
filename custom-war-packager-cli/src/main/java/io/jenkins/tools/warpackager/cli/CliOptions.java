@@ -36,12 +36,6 @@ public class CliOptions {
     @Option(name = "--installArtifacts", usage = "If set, the final artifacts will be automatically installed to the local repository (current version - only WAR)")
     public boolean installArtifacts;
 
-    @Option(name = "--runWorkspace", usage = "Path to the workspace of the run to be used within the node{} context")
-    public String runWorkspace;
-
-    @Option(name = "--no-sandbox", usage = "Disable sandbox environment within workflow job execution")
-    public boolean noSandbox;
-
     @CheckForNull
     public File getConfigPath() {
         return configPath;
@@ -72,11 +66,6 @@ public class CliOptions {
         return environment;
     }
 
-    @CheckForNull
-    public String runWorkspace() {
-        return runWorkspace;
-    }
-
     public boolean isDemo() {
         return demo;
     }
@@ -85,7 +74,4 @@ public class CliOptions {
         return installArtifacts;
     }
 
-    public boolean isNoSandbox() {
-        return noSandbox;
-    }
 }
