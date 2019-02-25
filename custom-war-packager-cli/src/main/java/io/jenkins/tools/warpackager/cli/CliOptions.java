@@ -73,5 +73,4 @@ public class CliOptions {
     public boolean isInstallArtifacts() {
         return installArtifacts;
     }
-
 }
