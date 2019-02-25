@@ -96,7 +96,7 @@ test_cwp_commit() {
 }
 
 #
-# Build a JFR image and validates the Jenkinsfile can operate with the workspace (defined by default to /build).
+# Build a JFR image and validates the Jenkinsfile can operate with the workspace (defined by default to "/build").
 #
 test_cwp_workspace() {
   jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_cwp_workspace/packager-config.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
