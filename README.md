@@ -146,6 +146,8 @@ casc:
 There are more options available.
 See the linked demos and the automated tests for examples.
 
+Please note that given to the build workspace being defaulted to "/build", the Jenkinsfile-runner version used must be at least 1.0-beta-7.
+
 #### BOM support
 
 The plugin supports Bill of Materials (BOM), described in
