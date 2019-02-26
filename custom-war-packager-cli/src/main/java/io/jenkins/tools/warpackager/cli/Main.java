@@ -1,12 +1,12 @@
 package io.jenkins.tools.warpackager.cli;
 
-import java.io.File;
-import java.io.IOException;
-
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.impl.Builder;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
+
+import java.io.File;
+import java.io.IOException;
 
 public class Main {
 
@@ -52,7 +52,6 @@ public class Main {
             cfg.buildSettings.addMavenOption("-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn");
         }
 
-        final Builder bldr = new Builder(cfg);
-        bldr.build();
+        new Builder(cfg).build();
     }
 }

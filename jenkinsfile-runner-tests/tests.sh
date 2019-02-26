@@ -96,20 +96,30 @@ test_cwp_commit() {
 }
 
 #
-# Build a JFR image and validates the Jenkinsfile can operate with the workspace.
+# Build a JFR image and validates the Jenkinsfile can operate with the workspace (defined by default to "/build").
 #
 test_cwp_workspace() {
   jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_cwp_workspace/packager-config.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
   execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
 
-  export JAVA_OPTS="-Djenkins.model.Jenkins.workspacesDir=/build"
-
   run_jfr_docker_image_with_docker_options "$jenkinsfile_runner_tag" "$current_directory/test_resources/test_cwp_workspace/Jenkinsfile" "-v $working_directory/files:/build"
 
   jenkinsfile_execution_should_succeed "$?"
   file_contains_text "This is the message to find in the logs" "message.txt" "$working_directory/files"
+}
 
-  unset JAVA_OPTS
+#
+# Build a JFR image and validates the Jenkinsfile can operate with the workspace defined to a custom directory.
+#
+test_cwp_workspace_non_default() {
+  jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_cwp_workspace_non_default/packager-config.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
+  execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
+
+  run_jfr_docker_image_with_docker_options "$jenkinsfile_runner_tag" "$current_directory/test_resources/test_cwp_workspace_non_default/Jenkinsfile" "-v $working_directory/files:/anotherBuildDirectory -v $working_directory/defaultFiles:/build"
+
+  jenkinsfile_execution_should_succeed "$?"
+  file_does_not_exist_in_workspace "message.txt" "$working_directory/defaultFiles"
+  file_contains_text "This is the message to find in the logs" "message.txt" "$working_directory/files"
 }
 
 #
@@ -122,6 +132,18 @@ test_cwp_classloading() {
   execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
 
   run_jfr_docker_image_with_jfr_options "$jenkinsfile_runner_tag" "$current_directory/test_resources/test_cwp_classloading/Jenkinsfile" "--no-sandbox"
+
+  jenkinsfile_execution_should_succeed "$?"
+}
+
+#
+# Recreate the classloading test to verify how no-sandbox images can be created by specifying such in the configuration
+#
+test_cwp_sandbox_configuration() {
+  jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_cwp_sandbox_configuration/packager-config.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
+  execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
+
+  run_jfr_docker_image "$jenkinsfile_runner_tag" "$current_directory/test_resources/test_cwp_sandbox_configuration/Jenkinsfile"
 
   jenkinsfile_execution_should_succeed "$?"
 }
