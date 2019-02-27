@@ -14,18 +14,33 @@ import javax.annotation.Nonnull;
     justification = "Jackson does it in this case")
 public class JenkinsfileRunnerSettings {
 
+    private static final String DEFAULT_WORKSPACE = "/build";
+
     @Nonnull
     private DependencyInfo source;
 
     @CheckForNull
     private DockerBuildSettings docker;
 
+    @CheckForNull
+    private String runWorkspace;
+
+    private boolean noSandbox;
+
+    public void setSource(@Nonnull DependencyInfo source) {
+        this.source = source;
+    }
+
     public void setDocker(@CheckForNull DockerBuildSettings docker) {
         this.docker = docker;
     }
 
-    public void setSource(@Nonnull DependencyInfo source) {
-        this.source = source;
+    public void setRunWorkspace(@CheckForNull String runWorkspace) {
+        this.runWorkspace= runWorkspace;
+    }
+
+    public void setNoSandbox(boolean noSandbox) {
+        this.noSandbox = noSandbox;
     }
 
     @Nonnull
@@ -36,5 +51,14 @@ public class JenkinsfileRunnerSettings {
     @CheckForNull
     public DockerBuildSettings getDocker() {
         return docker;
+    }
+
+    @Nonnull
+    public String getRunWorkspace() {
+        return runWorkspace != null ? runWorkspace : DEFAULT_WORKSPACE;
+    }
+
+    public boolean isNoSandbox() {
+        return noSandbox;
     }
 }

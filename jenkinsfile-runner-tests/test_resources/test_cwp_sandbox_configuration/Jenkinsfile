@@ -1,0 +1,5 @@
+stage('Get class') {
+    node {
+        Class.forName('org.kohsuke.stapler.EvaluationTrace$ApplicationTracer')
+    }
+}
