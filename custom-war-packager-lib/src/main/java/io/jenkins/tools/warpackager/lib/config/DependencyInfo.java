@@ -1,6 +1,7 @@
 package io.jenkins.tools.warpackager.lib.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 
 import javax.annotation.CheckForNull;
@@ -16,6 +17,7 @@ import java.util.Map;
 public class DependencyInfo {
     public String groupId;
     public String artifactId;
+    public String type;
     @CheckForNull
     public SourceInfo source;
     @CheckForNull
@@ -30,6 +32,9 @@ public class DependencyInfo {
         Dependency dep = new Dependency();
         dep.setGroupId(groupId);
         dep.setArtifactId(artifactId);
+        if (StringUtils.isNotEmpty(type)) {
+            dep.setType(type);
+        }
 
         String version = versionOverrides.get(artifactId);
         if (version == null) {

@@ -193,6 +193,9 @@ war:
   source:
     version: 2.121.1
 ```
+If the pom sets the `jenkins.version` property or it contains a dependency on
+`org.jenkins-ci.main:jenkins-core` or `org.jenkins-ci.main:jenkins-war` the war section
+in yml file will be overridden and hence it can be omitted.
 
 Example is available [here](./demo/artifact-manager-s3-pom).
 

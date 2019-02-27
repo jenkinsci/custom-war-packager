@@ -8,3 +8,4 @@ demo/jenkinsfile-runner/tmp
 tmp
 jenkinsfile-runner-tests/.testing
 *.log
+.idea

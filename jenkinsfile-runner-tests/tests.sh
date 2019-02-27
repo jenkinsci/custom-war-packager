@@ -126,4 +126,33 @@ test_cwp_classloading() {
   jenkinsfile_execution_should_succeed "$?"
 }
 
+#
+# Builds a docker image from pom and checks the war exploded
+#
+test_war_from_pom() {
+  # war section
+  jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_war_from_pom/packager-config.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
+  execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
+  war_version=$(grep version "$working_directory"/out/tmp/prebuild/exploded-war/META-INF/maven/org.jenkins-ci.main/jenkins-war/pom.properties)
+  logs_contains "2.121.1" "$war_version"
+  logs_not_contains "2.130" "$war_version"
+  logs_not_contains "2.150.3" "$war_version"
+
+  # war section overridden by jenkins.version
+  jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_war_from_pom/packager-config-with-property.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
+  execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
+  war_version=$(grep version "$working_directory"/out/tmp/prebuild/exploded-war/META-INF/maven/org.jenkins-ci.main/jenkins-war/pom.properties)
+  logs_not_contains "2.121.1" "$war_version"
+  logs_contains "2.130" "$war_version"
+  logs_not_contains "2.150.3" "$war_version"
+
+  # war section overridden by dependency
+  jfr_tag=$(execute_cwp_jar_and_generate_docker_image "$working_directory" "$cwp_jar" "$version" "$current_directory/test_resources/test_war_from_pom/packager-config-with-dependency.yml" "$jenkinsfile_runner_tag" | grep 'Successfully tagged')
+  execution_should_success "$?" "$jenkinsfile_runner_tag" "$jfr_tag"
+  war_version=$(grep version "$working_directory"/out/tmp/prebuild/exploded-war/META-INF/maven/org.jenkins-ci.main/jenkins-war/pom.properties)
+  logs_not_contains "2.121.1" "$war_version"
+  logs_not_contains "2.130" "$war_version"
+  logs_contains "2.150.3" "$war_version"
+}
+
 init_framework
