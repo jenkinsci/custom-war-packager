@@ -102,6 +102,9 @@ public class Builder extends PackagerBase {
         }
 
         // Build core and plugins
+        if (config.war == null) {
+            throw new IOException("Neither Jenkins core nor Jenkins war have been defined by configuration file or BOM/POM");
+        }
 
         // Start with libraries if needed
         List<String> coreComponentVersionOverrides = new LinkedList<>();
