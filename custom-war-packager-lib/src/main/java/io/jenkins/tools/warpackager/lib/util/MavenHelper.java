@@ -70,7 +70,7 @@ public class MavenHelper {
     }
 
     private static String getOsSpecificMavenCommand() {
-        String mvnCmd = "mvn";
+        String mvnCmd = "/home/fcojfernandez/Desarrollo/apache-maven-3.5.4/bin/mvn";
 
         String osName = System.getProperty("os.name");
         if(osName != null && osName.toLowerCase().contains("windows")) {

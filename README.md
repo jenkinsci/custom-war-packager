@@ -95,6 +95,7 @@ bundle:
   artifactId: "mywar"
   description: "Just a WAR auto-generation-sample"
   vendor: "Jenkins project"
+bomIncludeWar: true
 buildSettings:
   docker:
     base: "jenkins/jenkins:2.121.1"
@@ -154,13 +155,14 @@ The plugin supports Bill of Materials (BOM), described in
 [JEP-309](https://github.com/jenkinsci/jep/tree/master/jep/309), as an input.
 
 If BOM is defined, Custom WAR Packager will load plugin and component dependencies
-from there.
+from there. In case we want BOM to specify the core version, the `bomIncludeWar` flag must be set to `true`.
 The example below takes the input from BOM and produces custom WAR and Docker packages.
 
 ```yaml
 bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
   artifactId: "bom-demo"
+bomIncludeWar: true
 buildSettings:
   bom: bom.yml
   environment: aws
@@ -186,6 +188,7 @@ The current parent will be also bundled unless the `pomIgnoreRoot` flag is set.
 bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
   artifactId: "pom-input-demo"
+bomIncludeWar: true
 buildSettings:
   pom: pom.xml
   pomIgnoreRoot: true
@@ -195,9 +198,11 @@ war:
   source:
     version: 2.121.1
 ```
-If the pom sets the `jenkins.version` property or it contains a dependency on
+In the same way as BOM does, we can specify the core version from the pom file.
+If the global flag `bomIncludeWar` is `true` and the pom sets the `jenkins-war.version`, the `jenkins.version` property or it contains a dependency on
 `org.jenkins-ci.main:jenkins-core` or `org.jenkins-ci.main:jenkins-war` the war section
-in yml file will be overridden and hence it can be omitted.
+in yml file will be omitted. Consequently, if the flag is set to `true` and the pom file
+does not configure the core, then the build fails.
 
 Example is available [here](./demo/artifact-manager-s3-pom).
 

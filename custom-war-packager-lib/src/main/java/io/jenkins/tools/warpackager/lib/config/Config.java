@@ -40,6 +40,7 @@ public class Config {
 
     public BuildSettings buildSettings;
     public PackageInfo bundle;
+    public boolean bomIncludeWar;
     // Nonnull after the build starts
     public WarInfo war;
     @CheckForNull
@@ -182,14 +183,17 @@ public class Config {
         }
 
         MavenHelper helper = new MavenHelper(this);
-        String jenkinsVersion = model.getProperties().getProperty("jenkins-war.version");
-        if (StringUtils.isBlank(jenkinsVersion)) {
-            jenkinsVersion = model.getProperties().getProperty("jenkins.version");
-        }
-        if (StringUtils.isNotBlank(jenkinsVersion)) {
-            ComponentReference core = new ComponentReference();
-            core.setVersion(jenkinsVersion);
-            war = core.toWARDependencyInfo();
+        if (bomIncludeWar) {
+            war = null;
+            String jenkinsVersion = model.getProperties().getProperty("jenkins-war.version");
+            if (StringUtils.isBlank(jenkinsVersion)) {
+                jenkinsVersion = model.getProperties().getProperty("jenkins.version");
+            }
+            if (StringUtils.isNotBlank(jenkinsVersion)) {
+                ComponentReference core = new ComponentReference();
+                core.setVersion(jenkinsVersion);
+                war = core.toWARDependencyInfo();
+            }
         }
 
         plugins = new ArrayList<>();
@@ -221,13 +225,13 @@ public class Config {
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
     private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
         if ("jar".equals(res.type)) {
-            if ("org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
+            if (bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
                 ComponentReference core = new ComponentReference();
                 core.setVersion(res.getSource().version);
                 war = core.toWARDependencyInfo();
             }
         } else if ("war".equals(res.type)) {
-            if ("org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
+            if (bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
                 ComponentReference core = new ComponentReference();
                 core.setVersion(res.getSource().version);
                 war = core.toWARDependencyInfo();
@@ -241,7 +245,10 @@ public class Config {
 
     public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
-        war = spec.getCore().toWARDependencyInfo();
+
+        if (bomIncludeWar) {
+            war = spec.getCore() != null ? spec.getCore().toWARDependencyInfo() : null;
+        }
 
         // Bundle information
         // TODO: better merge logic?
