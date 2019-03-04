@@ -9,3 +9,5 @@ tmp
 jenkinsfile-runner-tests/.testing
 *.log
 .idea
+jenkinsfile-runner-tests/.jenkinsfile-runner-test-framework/
+jenkinsfile-runner-tests/cwp.jar

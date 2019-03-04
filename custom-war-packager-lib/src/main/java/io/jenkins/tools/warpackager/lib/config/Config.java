@@ -182,7 +182,10 @@ public class Config {
         }
 
         MavenHelper helper = new MavenHelper(this);
-        String jenkinsVersion = model.getProperties().getProperty("jenkins.version");
+        String jenkinsVersion = model.getProperties().getProperty("jenkins-war.version");
+        if (StringUtils.isBlank(jenkinsVersion)) {
+            jenkinsVersion = model.getProperties().getProperty("jenkins.version");
+        }
         if (StringUtils.isNotBlank(jenkinsVersion)) {
             ComponentReference core = new ComponentReference();
             core.setVersion(jenkinsVersion);
