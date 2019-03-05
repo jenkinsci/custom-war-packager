@@ -247,7 +247,7 @@ public class Config {
         final Specification spec = bom.getSpec();
 
         if (bomIncludeWar) {
-            war = spec.getCore() != null ? spec.getCore().toWARDependencyInfo() : null;
+            war = spec.getCore().toWARDependencyInfo();
         }
 
         // Bundle information
