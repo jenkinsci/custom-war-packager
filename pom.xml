@@ -10,7 +10,7 @@
   <properties>
     <java.level>8</java.level>
     <!-- Version of Maven Components -->
-    <maven.version>3.5.0</maven.version>
+    <maven.version>3.6.0</maven.version>
   </properties>
 
   <groupId>io.jenkins.tools.custom-war-packager</groupId>
