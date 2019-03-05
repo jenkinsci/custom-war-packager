@@ -200,9 +200,8 @@ war:
 ```
 In the same way as BOM does, we can specify the core version from the pom file.
 If the global flag `bomIncludeWar` is `true` and the pom sets the `jenkins-war.version`, the `jenkins.version` property or it contains a dependency on
-`org.jenkins-ci.main:jenkins-core` or `org.jenkins-ci.main:jenkins-war` the war section
-in yml file will be omitted. Consequently, if the flag is set to `true` and the pom file
-does not configure the core, then the build fails.
+`org.jenkins-ci.main:jenkins-core` or `org.jenkins-ci.main:jenkins-war` the war section in yml file 
+will be omitted. Consequently, if the flag is set to `true` and the pom file does not configure the core, then the build fails.
 
 Example is available [here](./demo/artifact-manager-s3-pom).
 
