@@ -14,4 +14,3 @@ war:
   artifactId: "jenkins-war"
   source:
     version: 2.121.1
-
