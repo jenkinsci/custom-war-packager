@@ -1,0 +1,17 @@
+bundle:
+  groupId: "io.jenkins.tools.war-packager.demo"
+  artifactId: "pom-input-demo"
+  vendor: "Jenkins project"
+buildSettings:
+  docker:
+    base: "jenkins/jenkins:2.121.1"
+    tag: "jenkins/demo-pom-input"
+    build: true
+  pom: ./test_resources/test_war_from_pom/pom-with-property.xml
+  pomIgnoreRoot: true
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.121.1
+

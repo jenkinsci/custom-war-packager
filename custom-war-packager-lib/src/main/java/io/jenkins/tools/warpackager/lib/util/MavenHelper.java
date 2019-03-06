@@ -143,6 +143,7 @@ public class MavenHelper {
                     DependencyInfo dep = new DependencyInfo();
                     dep.groupId = dependencyData[0].trim();
                     dep.artifactId = dependencyData[1].trim();
+                    dep.type = dependencyData[2].trim();
                     dep.source = new SourceInfo();
                     dep.source.version = dependencyData[3].trim();
                     dependencies.add(dep);

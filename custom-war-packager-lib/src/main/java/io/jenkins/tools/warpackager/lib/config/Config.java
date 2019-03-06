@@ -9,6 +9,7 @@ import io.jenkins.tools.warpackager.lib.model.bom.Environment;
 import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
 import io.jenkins.tools.warpackager.lib.model.bom.Specification;
 import io.jenkins.tools.warpackager.lib.util.MavenHelper;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
@@ -39,6 +40,7 @@ public class Config {
 
     public BuildSettings buildSettings;
     public PackageInfo bundle;
+    public boolean bomIncludeWar;
     // Nonnull after the build starts
     public WarInfo war;
     @CheckForNull
@@ -181,6 +183,19 @@ public class Config {
         }
 
         MavenHelper helper = new MavenHelper(this);
+        if (bomIncludeWar) {
+            war = null;
+            String jenkinsVersion = model.getProperties().getProperty("jenkins-war.version");
+            if (StringUtils.isBlank(jenkinsVersion)) {
+                jenkinsVersion = model.getProperties().getProperty("jenkins.version");
+            }
+            if (StringUtils.isNotBlank(jenkinsVersion)) {
+                ComponentReference core = new ComponentReference();
+                core.setVersion(jenkinsVersion);
+                war = core.toWARDependencyInfo();
+            }
+        }
+
         plugins = new ArrayList<>();
 
         File destination = new File(tmpDir, "dependencies.txt");
@@ -209,7 +224,19 @@ public class Config {
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
     private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
-        if (helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi") || helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
+        if ("jar".equals(res.type)) {
+            if (bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
+                ComponentReference core = new ComponentReference();
+                core.setVersion(res.getSource().version);
+                war = core.toWARDependencyInfo();
+            }
+        } else if ("war".equals(res.type)) {
+            if (bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
+                ComponentReference core = new ComponentReference();
+                core.setVersion(res.getSource().version);
+                war = core.toWARDependencyInfo();
+            }
+        } else if (helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi") || helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
             plugins.add(res);
         } else {
             LOGGER.log(Level.INFO, "Skipping dependency, not an HPI file: " + res);
@@ -218,7 +245,10 @@ public class Config {
 
     public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
-        war = spec.getCore().toWARDependencyInfo();
+
+        if (bomIncludeWar) {
+            war = spec.getCore().toWARDependencyInfo();
+        }
 
         // Bundle information
         // TODO: better merge logic?

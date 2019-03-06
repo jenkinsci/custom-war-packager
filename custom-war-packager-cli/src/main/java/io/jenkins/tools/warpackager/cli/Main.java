@@ -26,8 +26,6 @@ public class Main {
             throw new IOException("Failed to read command-line arguments", ex);
         }
 
-
-
         final Config cfg;
         if (options.isDemo()) {
             System.out.println("Running build in the demo mode");
