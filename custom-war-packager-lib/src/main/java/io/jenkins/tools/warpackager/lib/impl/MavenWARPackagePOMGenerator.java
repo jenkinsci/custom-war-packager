@@ -97,6 +97,7 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         mavenHPIPlugin.setGroupId("org.apache.maven.plugins");
         mavenHPIPlugin.setArtifactId("maven-war-plugin");
         mavenHPIPlugin.setVersion("3.0.0");
+        mavenHPIPlugin.setConfiguration(generateMavenWarPluginConfiguration(manifestEntries));
         PluginExecution execution = new PluginExecution();
         execution.setId("package-war");
         execution.addGoal("war");
@@ -114,6 +115,15 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         if (value != null) {
             map.put(key, value);
         }
+    }
+
+    private Xpp3Dom generateMavenWarPluginConfiguration(Map<String, String> manifestEntries) {
+        Xpp3Dom webXml = new Xpp3Dom("webXml");
+        webXml.setValue(new File(sourceWar, "WEB-INF/web.xml").getAbsolutePath());
+
+        Xpp3Dom dom = new Xpp3Dom("configuration");
+        dom.addChild(webXml);
+        return dom;
     }
 
     private Xpp3Dom generateCustomWarGoalConfiguration(Map<String, String> manifestEntries) {
