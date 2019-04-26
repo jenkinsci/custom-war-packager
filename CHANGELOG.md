@@ -1,12 +1,24 @@
 Changelog
 ====
 
+### 1.6
+
+Release date: Mar 27, 2019
+
+* [JENKINS-55703](https://issues.jenkins-ci.org/browse/JENKINS-55703), 
+  [#71](https://github.com/jenkinsci/custom-war-packager/pull/71) - 
+  Add new `runWorkspace` and `no-sandbox` options which sets those same options
+  for the Jenkinsfile Runner docker image  
+* [JENKINS-55568](https://issues.jenkins-ci.org/browse/JENKINS-55568), 
+  [#72](https://github.com/jenkinsci/custom-war-packager/pull/72) - 
+  Add support of passing the Jenkins Core version from the pom file
+
 ### 1.5
 
 Release date: Dec 10, 2018
 
 * [#52](https://github.com/jenkinsci/custom-war-packager/pull/52),
-  [#62](https://github.com/jenkinsci/custom-war-packager/pull/62)- 
+  [#62](https://github.com/jenkinsci/custom-war-packager/pull/62) - 
   Add a new `pomIgnoreRoot` option which skips the root artifact when using `pom.xml` as a plugin list
 * [#51](https://github.com/jenkinsci/custom-war-packager/pull/51) -
   Performance: Cache non-Plugin dependencies when using `pom.xml` as a plugin list
