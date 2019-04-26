@@ -5,14 +5,6 @@ Changelog
 
 Release date: Mar 27, 2019
 
-* [JENKINS-54375](https://issues.jenkins-ci.org/browse/JENKINS-54375), 
-  [#64](https://github.com/jenkinsci/custom-war-packager/pull/64) - 
-  Use official Jenkinsfile Runner tags in demo
-* [JENKINS-54352](https://issues.jenkins-ci.org/browse/JENKINS-54352),
-  [#68](https://github.com/jenkinsci/custom-war-packager/pull/68),
-  [#69](https://github.com/jenkinsci/custom-war-packager/pull/69), 
-  [#70](https://github.com/jenkinsci/custom-war-packager/pull/70) - 
-  Add functional tests
 * [JENKINS-55703](https://issues.jenkins-ci.org/browse/JENKINS-55703), 
   [#71](https://github.com/jenkinsci/custom-war-packager/pull/71) - 
   Add new `runWorkspace` and `no-sandbox` options which sets those same options
