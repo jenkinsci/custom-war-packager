@@ -1,0 +1,3 @@
+    
+_extends: .github
+tag-template: parent-pom-$NEXT_MINOR_VERSION
