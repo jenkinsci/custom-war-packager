@@ -9,9 +9,5 @@ buildSettings:
     build: true
   pom: pom.xml
   pomIgnoreRoot: true
-war:
-  groupId: "org.jenkins-ci.main"
-  artifactId: "jenkins-war"
-  source:
-    version: 2.176.1
-
+# TODO: move to buildSettings
+bomIncludeWar: true
