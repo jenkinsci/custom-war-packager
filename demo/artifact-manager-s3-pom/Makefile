@@ -17,5 +17,6 @@ tmp/output/target/${ARTIFACT_ID}-${VERSION}.war:
 	    -configPath packager-config.yml -version ${VERSION}
 
 run: tmp/output/target/${ARTIFACT_ID}-${VERSION}.war
-	docker-compose rm -fv
-	docker-compose up --build --force-recreate jenkins elk
+	docker run --rm \
+	    -p 8080:8080 \
+	    jenkins-experimental/demo-pom-input
