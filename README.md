@@ -205,6 +205,33 @@ will be omitted. Consequently, if the flag is set to `true` and the pom file doe
 
 Example is available [here](./demo/artifact-manager-s3-pom).
 
+### Plugin information providers
+
+Custom WAR packager uses plugin information caching for some cases,
+e.g. for deciding whether a dependency is a plugin in pom.xml inputs.
+Right now there are 2 supported information sources: a Jenkins Update Center and a Maven repo.
+
+#### Update Center Information provider
+
+The mode was introduced in Custom WAR Packager `1.8`,
+and this is a default mode in the tool.
+
+  * Plugin information is retrieved from Jenkins update centers
+  * Default update center: http://updates.jenkins.io/update-center.json
+  * Source update center can be set using the `updateCenterUrl` flag in `buildSettings`
+  * Advanced configurations (e.g. proxy configuration) are not available for this mode at the moment
+
+#### Maven Repo Information provider
+
+Information is retrieved from Maven repositories
+
+  * The mode caches information about plugins in the Maven repo
+  * The mode is not reliable when used outside clean build environments,
+    and it is not recommended for the most of cases
+  * `pomUseMavenPluginInfoProvider: true` in `buildSettings` can be set to enable the mode
+
+Before Custom WAR Packager 
+
 ### Advanced features
 
 Features:

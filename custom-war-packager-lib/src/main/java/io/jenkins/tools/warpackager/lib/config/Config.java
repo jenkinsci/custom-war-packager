@@ -3,20 +3,20 @@ package io.jenkins.tools.warpackager.lib.config;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.jenkins.tools.warpackager.lib.impl.plugins.UpdateCenterPluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.model.bom.Environment;
 import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
 import io.jenkins.tools.warpackager.lib.model.bom.Specification;
+import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.util.MavenHelper;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -206,9 +206,10 @@ public class Config {
         }
 
         List<DependencyInfo> deps = helper.listDependenciesFromPom(tmpDir, pom, destination);
-
+        PluginInfoProvider pluginInfoProvider = getPluginInfoProvider(helper, tmpDir);
+        pluginInfoProvider.init();
         for (DependencyInfo dep : deps) {
-            processMavenDep(helper, tmpDir, dep, plugins);
+            processMavenDep(pluginInfoProvider, dep, plugins);
         }
 
         if (!pomIgnoreRoot) {
@@ -222,8 +223,12 @@ public class Config {
         }
     }
 
+    private PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
+        return buildSettings != null ? buildSettings.getPluginInfoProvider(helper, tmpDir) : UpdateCenterPluginInfoProvider.DEFAULT;
+    }
+
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
-    private void processMavenDep(MavenHelper helper, File tmpDir, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
+    private void processMavenDep(PluginInfoProvider pluginInfoProvider, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
         if ("jar".equals(res.type)) {
             if (bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
                 ComponentReference core = new ComponentReference();
@@ -236,7 +241,7 @@ public class Config {
                 core.setVersion(res.getSource().version);
                 war = core.toWARDependencyInfo();
             }
-        } else if (helper.artifactExistsInLocalCache(res, res.getSource().version, "hpi") || helper.artifactExists(tmpDir, res, res.getSource().version, "hpi")) {
+        } else if (pluginInfoProvider.isPlugin(res)) { // Consult with the plugin info provider
             plugins.add(res);
         } else {
             LOGGER.log(Level.INFO, "Skipping dependency, not an HPI file: " + res);
