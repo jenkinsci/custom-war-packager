@@ -1,0 +1,20 @@
+bundle:
+  groupId: "io.jenkins.tools.custom-war-packager.it.pom-input"
+  artifactId: "cwp-pom-input-it"
+  title: "CWP Integration Test for POM input and JENKINS-56444"
+buildSettings:
+  docker:
+    base: "jenkins/jenkins:2.176.1"
+    tag: "jenkins-experimental/custom-war-packager-casc-demo"
+    build: false
+  pom: pom.xml
+  pomIgnoreRoot: true
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.176.1
+casc:
+  - id: "casc"
+    source:
+      dir: casc.yml
