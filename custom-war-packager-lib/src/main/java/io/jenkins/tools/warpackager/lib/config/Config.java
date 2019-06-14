@@ -40,6 +40,7 @@ public class Config {
 
     public BuildSettings buildSettings;
     public PackageInfo bundle;
+    //TODO: move to build settings
     public boolean bomIncludeWar;
     // Nonnull after the build starts
     public WarInfo war;
