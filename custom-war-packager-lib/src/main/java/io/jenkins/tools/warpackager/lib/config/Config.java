@@ -229,18 +229,14 @@ public class Config {
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
     private void processMavenDep(PluginInfoProvider pluginInfoProvider, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
-        if ("jar".equals(res.type)) {
-            if (bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
-                ComponentReference core = new ComponentReference();
-                core.setVersion(res.getSource().version);
-                war = core.toWARDependencyInfo();
-            }
-        } else if ("war".equals(res.type)) {
-            if (bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
-                ComponentReference core = new ComponentReference();
-                core.setVersion(res.getSource().version);
-                war = core.toWARDependencyInfo();
-            }
+        if ("jar".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
+            ComponentReference core = new ComponentReference();
+            core.setVersion(res.getSource().version);
+            war = core.toWARDependencyInfo();
+        } else if ("war".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
+            ComponentReference core = new ComponentReference();
+            core.setVersion(res.getSource().version);
+            war = core.toWARDependencyInfo();
         } else if (pluginInfoProvider.isPlugin(res)) { // Consult with the plugin info provider
             plugins.add(res);
         } else {
