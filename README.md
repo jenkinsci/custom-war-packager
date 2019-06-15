@@ -230,7 +230,8 @@ Information is retrieved from Maven repositories
     and it is not recommended for the most of cases
   * `pomUseMavenPluginInfoProvider: true` in `buildSettings` can be set to enable the mode
 
-Before Custom WAR Packager 
+Before Custom WAR Packager `1.7`, this provider was used by default.
+Builds using this version may need an update if they rely on custom update centers or unreleased/blacklisted plugins.
 
 ### Advanced features
 
