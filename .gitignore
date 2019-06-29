@@ -1,13 +1,19 @@
 /test
-*.iml
 target
-cwp-cli-1.2.jar
-custom-war-packager-cli/tmp
-demo/jenkinsfile-runner/.build
-demo/jenkinsfile-runner/tmp
+demo/**/.build
 tmp
-jenkinsfile-runner-tests/.testing
+
 *.log
-.idea
+jenkinsfile-runner-tests/.testing
 jenkinsfile-runner-tests/.jenkinsfile-runner-test-framework/
 jenkinsfile-runner-tests/cwp.jar
+
+# IDEA
+*.iml
+.idea
+
+# VS Code
+.project
+.settings
+.classpath
+.factorypath
