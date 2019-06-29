@@ -217,7 +217,7 @@ public class Config {
             // Add the artifact itself, no validation as we assume the pom is from a plugin
             DependencyInfo res = new DependencyInfo();
             res.artifactId = model.getArtifactId();
-            res.groupId = model.getGroupId();
+            res.setGroupId(model.getGroupId());
             res.source = new SourceInfo();
             res.source.version = model.getVersion();
             plugins.add(res);
@@ -230,11 +230,11 @@ public class Config {
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
     private void processMavenDep(PluginInfoProvider pluginInfoProvider, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
-        if ("jar".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
+        if ("jar".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.getGroupId()) && "jenkins-core".equals(res.artifactId)) {
             ComponentReference core = new ComponentReference();
             core.setVersion(res.getSource().version);
             war = core.toWARDependencyInfo();
-        } else if ("war".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
+        } else if ("war".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.getGroupId()) && "jenkins-war".equals(res.artifactId)) {
             ComponentReference core = new ComponentReference();
             core.setVersion(res.getSource().version);
             war = core.toWARDependencyInfo();

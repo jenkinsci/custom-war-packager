@@ -10,12 +10,22 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * Provides information about dependencies in Custom WAR Packager.
  * @author Oleg Nenashev
  * @since TODO
  */
 @SuppressFBWarnings(value = "UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD", justification = "JSON Deserialization")
 public class DependencyInfo {
-    public String groupId;
+
+    /**
+     * GroupId of the dependency.
+     * May be {@code null} when not resolved.
+     * Many components like {@link io.jenkins.tools.warpackager.lib.impl.BOMBuilder} and
+     * {@link io.jenkins.tools.warpackager.lib.impl.MavenHPICustomWARPOMGenerator} require fully qualified dependencies,
+     * and such methods may crash when groupId cannot be resolved.
+     */
+    @CheckForNull
+    private String groupId;
     public String artifactId;
     public String type;
     @CheckForNull
@@ -23,14 +33,42 @@ public class DependencyInfo {
     @CheckForNull
     public DependencyBuildSettings build;
 
+    /**
+     * Sets a new groupId for the dependency.
+     * @param groupId Group ID to set
+     * @since 2.0.0
+     */
+    public void setGroupId(@Nonnull String groupId) {
+        this.groupId = groupId;
+    }
+
+    /**
+     * Retrieves groupId of the dependency
+     * @throws ConfigException groupId cannot be resolved
+     * @since 2.0.0
+     */
+    @Nonnull
+    public String getGroupId() throws ConfigException {
+        if (groupId == null) {
+            throw new ConfigException("Group ID is not defined for the dependency: " + this);
+        }
+        return groupId;
+    }
+
     public boolean isNeedsBuild() {
         return source != null && !source.isReleasedVersion();
     }
 
-    public Dependency toDependency(Map<String,String> versionOverrides) throws IOException {
+    /**
+     * Converts the relaxed Custom WAR packager definition to a strict Maven definition.
+     * @param versionOverrides Version overrides registry
+     * @return Maven dependency with resolved g:a:v
+     * @throws IOException Cannot resolve the dependency g:a:v
+     */
+    public Dependency toDependency(@Nonnull Map<String,String> versionOverrides) throws IOException {
 
         Dependency dep = new Dependency();
-        dep.setGroupId(groupId);
+        dep.setGroupId(getGroupId());
         dep.setArtifactId(artifactId);
         if (StringUtils.isNotEmpty(type)) {
             dep.setType(type);
@@ -55,7 +93,7 @@ public class DependencyInfo {
 
     @Override
     public String toString() {
-        return String.format("%s:%s:%s", groupId, artifactId, source);
+        return String.format("%s:%s:%s", groupId != null ? groupId : "unknown", artifactId, source);
     }
 
     @Nonnull

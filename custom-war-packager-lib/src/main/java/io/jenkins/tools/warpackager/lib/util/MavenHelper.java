@@ -1,8 +1,8 @@
 package io.jenkins.tools.warpackager.lib.util;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.ConfigException;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 
@@ -80,7 +80,8 @@ public class MavenHelper {
         return mvnCmd;
     }
 
-    public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
+    //TODO: Move to Maven Info Provider
+    public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) throws ConfigException {
         final String folder = "repository";
         String path = getDependencyPath(folder, dep, version, packaging);
         File expectedFile = new File(path);
@@ -88,11 +89,13 @@ public class MavenHelper {
         return expectedFile.exists();
     }
 
-    private static String getDependencyPath(final String folder, final DependencyInfo dep, final String version, final String packaging) {
+    //TODO: Move to Maven Info Provider
+    private static String getDependencyPath(final String folder, final DependencyInfo dep, final String version, final String packaging)
+            throws ConfigException {
         return String.format("%s/.m2/%s/%s/%s/%s/%s-%s.%s",
                     USER_HOME,
                     folder,
-                    dep.groupId.replaceAll("\\.", "/"),
+                    dep.getGroupId().replaceAll("\\.", "/"),
                     dep.artifactId,
                     version,
                     dep.artifactId,
@@ -100,11 +103,12 @@ public class MavenHelper {
                     packaging);
     }
 
+    //TODO: Move to Maven Info Provider
     public boolean artifactExists(File buildDir, DependencyInfo dep, String version, String packaging) throws IOException, InterruptedException {
         final String path = getDependencyPath("cwp_non_hpi_cache", dep, version, packaging);
         final boolean isHpi = "hpi".equals(packaging);
         final File folder = new File(path);
-        String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
+        String gai = dep.getGroupId() + ":" + dep.artifactId + ":" + version;
         if (isHpi && folder.isDirectory()) {
             final String msg = "Dependency {0} was found in the non-HPI source.  " +
                     "Delete {1} to attempt another resolution attempt.";
@@ -142,7 +146,7 @@ public class MavenHelper {
                     line = line.trim();
                     String[] dependencyData = line.split(":");
                     DependencyInfo dep = new DependencyInfo();
-                    dep.groupId = dependencyData[0].trim();
+                    dep.setGroupId(dependencyData[0].trim());
                     dep.artifactId = dependencyData[1].trim();
                     dep.type = dependencyData[2].trim();
                     dep.source = new SourceInfo();
@@ -159,7 +163,7 @@ public class MavenHelper {
     public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, File destination)
             throws IOException, InterruptedException {
         run(buildDir, "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
-                "-DgroupId=" + dep.groupId,
+                "-DgroupId=" + dep,
                 "-DartifactId=" + dep.artifactId,
                 "-Dversion=" + version,
                 "-DoutputDirectory=" + destination.getParentFile().getAbsolutePath(),

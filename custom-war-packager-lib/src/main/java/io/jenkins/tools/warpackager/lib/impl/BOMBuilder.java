@@ -1,8 +1,8 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.ConfigException;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
-import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
@@ -97,7 +97,7 @@ public class BOMBuilder {
         return metadata;
     }
 
-    private Specification buildSpec(boolean overrideVersions) {
+    private Specification buildSpec(boolean overrideVersions) throws ConfigException {
         Specification spec = new Specification();
         //TODO(oleg_nenashev): it will produce artifactId and groupId in BOM's [status/core]
         spec.setCore(ComponentReference.resolveFrom(config.war, overrideVersions, versionOverrides));
@@ -155,10 +155,10 @@ public class BOMBuilder {
         return spec;
     }
 
-    private ComponentReference toComponentReference(WARResourceInfo hook, boolean overrideVersions) {
+    private ComponentReference toComponentReference(WARResourceInfo hook, boolean overrideVersions) throws ConfigException {
         //TODO(oleg_nenashev): no artifact IDs, some hacks here. Maybe groovy hooks should require standard fields
         DependencyInfo mockDependency = new DependencyInfo();
-        mockDependency.groupId = "io.jenkins.tools.warpackager." + hook.getResourceType() + "." + hook.id;
+        mockDependency.setGroupId("io.jenkins.tools.warpackager." + hook.getResourceType() + "." + hook.id);
         mockDependency.artifactId = hook.id;
         mockDependency.source = hook.source;
 

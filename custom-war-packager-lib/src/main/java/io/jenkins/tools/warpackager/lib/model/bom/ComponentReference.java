@@ -1,6 +1,7 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.jenkins.tools.warpackager.lib.config.ConfigException;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WarInfo;
@@ -46,7 +47,7 @@ public class ComponentReference extends Reference {
 
     public WarInfo toWARDependencyInfo() {
         WarInfo dep = new WarInfo();
-        dep.groupId = "org.jenkins-ci.main";
+        dep.setGroupId("org.jenkins-ci.main");
         dep.artifactId = "jenkins-war";
 
         dep.source = new SourceInfo();
@@ -66,7 +67,7 @@ public class ComponentReference extends Reference {
 
     public DependencyInfo toDependencyInfo() {
         DependencyInfo dep = new DependencyInfo();
-        dep.groupId = groupId;
+        dep.setGroupId(groupId);
         dep.artifactId = artifactId;
 
         dep.source = new SourceInfo();
@@ -85,15 +86,17 @@ public class ComponentReference extends Reference {
     }
 
     @Nonnull
-    public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep) {
+    public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep)
+            throws ConfigException {
         return resolveFrom(dep, false, null);
     }
 
     @Nonnull
     public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep, boolean overrideVersions,
-                                                  @CheckForNull Map<String, String> versionOverrides) {
+                                                  @CheckForNull Map<String, String> versionOverrides)
+            throws ConfigException {
         ComponentReference ref = new ComponentReference();
-        ref.setGroupId(dep.groupId);
+        ref.setGroupId(dep.getGroupId());
         ref.setArtifactId(dep.artifactId);
         //TODO(oleg_nenashev): BOM says "the realized BoM after refs are resolved" when versions are resolved
         if (dep.source == null) {
