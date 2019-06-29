@@ -1,14 +1,18 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import hudson.util.VersionNumber;
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
 import io.jenkins.tools.warpackager.lib.config.JenkinsfileRunnerSettings;
 import io.jenkins.tools.warpackager.lib.config.LibraryInfo;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
-import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.impl.jenkinsfileRunner.JenkinsfileRunnerDockerBuilder;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependencies;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependency;
+import io.jenkins.tools.warpackager.lib.model.ResolvedResourceDependency;
+import io.jenkins.tools.warpackager.lib.model.ResolvedWARDependency;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
@@ -45,11 +49,7 @@ public class Builder extends PackagerBase {
     private final File buildRoot;
 
     // Context
-    private Map<String, String> versionOverrides = new HashMap<>();
     private Map<String, File> warResources = new HashMap<>();
-
-    private BOM bom = null;
-
 
     public Builder(Config config) {
         super(config);
@@ -93,7 +93,7 @@ public class Builder extends PackagerBase {
         // Load BOM if needed
         final File pathToBom = config.buildSettings.getBOM();
         if (pathToBom != null) {
-            bom = BOM.load(pathToBom);
+            BOM bom = BOM.load(pathToBom);
             LOGGER.log(Level.INFO, "Overriding settings by BOM file: {0}", pathToBom);
             config.overrideByBOM(bom, config.buildSettings.getEnvironmentName());
         }
@@ -107,13 +107,13 @@ public class Builder extends PackagerBase {
 
         verifyConfig();
 
-        resolveDependencies();
+        ResolvedDependencies resolvedDependencies = resolveDependencies();
 
         // Generate POM
         File warBuildDir = new File(tmpDir, "prebuild");
         Files.createDirectories(warBuildDir.toPath());
         MavenHPICustomWARPOMGenerator gen = new MavenHPICustomWARPOMGenerator(config, "-prebuild");
-        Model model = gen.generatePOM(versionOverrides);
+        Model model = gen.generatePOM(resolvedDependencies);
         gen.writePOM(model, warBuildDir);
 
         // Build WAR using Maven HPI plugin
@@ -127,7 +127,7 @@ public class Builder extends PackagerBase {
         new JenkinsWarPatcher(config, srcWar, explodedWar)
                 .removeMetaInf()
                 .addSystemProperties(config.systemProperties)
-                .replaceLibs(versionOverrides)
+                .replaceLibs(resolvedDependencies.getLibraries())
                 .excludeLibs()
                 .addResources(warResources);
 
@@ -141,7 +141,7 @@ public class Builder extends PackagerBase {
         // TODO: append status to the original BOM?
         BOM bom = new BOMBuilder(config)
                 .withPluginsDir(new File(explodedWar, "WEB-INF/plugins"))
-                .withStatus(versionOverrides)
+                .withResolvedDependencies(resolvedDependencies)
                 .build();
         bom.write(config.getOutputBOM());
         // TODO: also install WAR if config.buildSettings.isInstallArtifacts() is set
@@ -166,7 +166,7 @@ public class Builder extends PackagerBase {
                 throw new IOException("Jenkinsfile Runner packager can package only 'jenkins-war' so far");
             }
 
-            String jenkinsVersion = ComponentReference.resolveFrom(config.war, true, versionOverrides).getVersion();
+            String jenkinsVersion = ComponentReference.fromResolvedDependency(resolvedDependencies.getWar(), true).getVersion();
             resolveDependency(jenkinsfileRunner.getSource(), "jar",
                     Arrays.asList(
                             "-Djenkins.version=" + jenkinsVersion
@@ -191,7 +191,7 @@ public class Builder extends PackagerBase {
                 }
                 new JenkinsfileRunnerDockerBuilder(config, jenkinsfileRunnerDocker, outputDir)
                         .withPlugins(new File(explodedWar, "WEB-INF/plugins"))
-                        .withVersionOverrides(versionOverrides)
+                        .withResolvedDependencies(resolvedDependencies)
                         .withRunWorkspace(jenkinsfileRunner.getRunWorkspace())
                         .withNoSandbox(jenkinsfileRunner.isNoSandbox())
                         .build();
@@ -206,77 +206,88 @@ public class Builder extends PackagerBase {
      * Resolves dependencies which will be used for the WAR build.
      * Packaging (Jenkinsfile Runner, Docker) is not in the scope for the resolution.
      */
-    private void resolveDependencies() throws IOException, InterruptedException {
+    private ResolvedDependencies resolveDependencies() throws IOException, InterruptedException {
+
+
         // Start with libraries if needed
         List<String> coreComponentVersionOverrides = new LinkedList<>();
         if (config.war.libraries != null) {
             for (LibraryInfo ci : config.war.libraries) {
-                resolveDependency(ci.source, "jar");
-                coreComponentVersionOverrides.add("-D" + ci.getProperty() + "=" + versionOverrides.get(ci.getSource().artifactId));
+                ResolvedDependency dep = resolveDependency(ci.source, "jar");
+                //TODO: record overrides for the core(?)
+                // deps.addLibrary(dep);
+                coreComponentVersionOverrides.add("-D" + ci.getProperty() + "=" + dep.getVersion());
             }
         }
-        resolveDependency(config.war, "war", coreComponentVersionOverrides);
+        ResolvedDependencies deps = new ResolvedDependencies(new ResolvedWARDependency(
+                resolveDependency(config.war, "war", coreComponentVersionOverrides)));
+
 
         if (config.plugins != null) {
             for (DependencyInfo plugin : config.plugins) {
-                resolveDependency(plugin, "hpi");
+                deps.addPlugin(resolveDependency(plugin, "hpi"));
             }
         }
 
         // Prepare library patches
         if (config.libPatches != null) {
             for(DependencyInfo library : config.libPatches) {
-                resolveDependency(library, "jar");
+                deps.addLibrary(resolveDependency(library, "jar"));
             }
         }
 
         // Prepare Resources
         for (WARResourceInfo extraWarResource : config.getAllExtraResources()) {
-            warResources.put(extraWarResource.id,
-                    checkoutIfNeeded(extraWarResource.id, extraWarResource.source));
+            deps.addResource(resolveResource(extraWarResource));
         }
+        return deps;
     }
 
     //TODO: Merge with resolveDependency
-    private File checkoutIfNeeded(@Nonnull String id, @Nonnull SourceInfo source) throws IOException, InterruptedException {
-        File componentBuildDir = new File(buildRoot, id);
+    private ResolvedResourceDependency resolveResource(@Nonnull WARResourceInfo res) throws IOException, InterruptedException {
+        File componentBuildDir = new File(buildRoot, res.id);
         Files.createDirectories(componentBuildDir.toPath());
 
-        switch (source.getType()) {
+        switch (res.source.getType()) {
             case FILESYSTEM:
-                assert source.dir != null;
-                LOGGER.log(Level.INFO, "Will checkout {0} from local directory: {1}", new Object[] {id, source.dir});
-                return new File(source.dir);
+                assert res.source.dir != null;
+                LOGGER.log(Level.INFO, "Will checkout {0} from local directory: {1}", new Object[] {res.id, res.source.dir});
+                return new ResolvedResourceDependency(new File(res.source.dir), res);
             case GIT:
-                LOGGER.log(Level.INFO, "Will checkout {0} from git: {1}", new Object[] {id, source});
+                LOGGER.log(Level.INFO, "Will checkout {0} from git: {1}", new Object[] {res.id, res.source});
                 break;
             default:
-                throw new IOException("Unsupported checkout source: " + source.getType());
+                throw new IOException("Unsupported checkout source: " + res.source.getType());
         }
 
         // Git checkout and build
-        processFor(componentBuildDir, "git", "clone", source.git, ".");
-        String checkoutId = source.getCheckoutId();
+        processFor(componentBuildDir, "git", "clone", res.source.git, ".");
+        String checkoutId = res.source.getCheckoutId();
         if (checkoutId != null) {
             processFor(componentBuildDir, "git", "checkout", checkoutId);
         }
         String commit = readFor(componentBuildDir, "git", "log", "--format=%H", "-n", "1");
-        LOGGER.log(Level.INFO, "Checked out {0}, commitId: {1}", new Object[] {id, commit});
-        return componentBuildDir;
+        LOGGER.log(Level.INFO, "Checked out {0}, commitId: {1}", new Object[] {res.id, commit});
+        return new ResolvedResourceDependency(componentBuildDir, res);
     }
 
-    private void resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
-        resolveDependency(dep, packaging,null);
+    private ResolvedDependency resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
+        return resolveDependency(dep, packaging,null);
     }
 
-    private void resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging,
-                                   @CheckForNull List<String> extraMavenArgs)
+    private ResolvedDependency resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging,
+                                                 @CheckForNull List<String> extraMavenArgs)
             throws IOException, InterruptedException {
+        String resolvedGroupdId = dep.groupId;
+        if (resolvedGroupdId == null) {
+            // TODO: Use Group ID resolver
+            resolvedGroupdId = "unknown";
+        }
 
         //TODO: add Caching support if commit is defined
         if (!dep.isNeedsBuild()) {
             LOGGER.log(Level.INFO, "Component {0}: no build required", dep);
-            return;
+            return new ResolvedDependency(resolvedGroupdId, new VersionNumber(dep.source.version), dep);
         }
 
         File componentBuildDir = new File(buildRoot, dep.artifactId);
@@ -306,7 +317,6 @@ public class Builder extends PackagerBase {
                 //TODO if caching is disabled, a nice-looking version can be retrieved
                 // We cannot retrieve actual base version here without checkout. 256.0 prevents dependency check failures
                 newVersion = String.format("256.0-%s-%s-SNAPSHOT", checkoutId != null ? checkoutId : "default", commit);
-                versionOverrides.put(dep.artifactId, newVersion);
 
                 if (mavenHelper.artifactExists(componentBuildDir, dep, newVersion, packaging)) {
                     if (dep.build != null && dep.build.noCache) {
@@ -315,7 +325,7 @@ public class Builder extends PackagerBase {
                     } else {
                         LOGGER.log(Level.INFO, "Snapshot version exists for {0}: {1}. Skipping the build",
                                 new Object[]{dep, newVersion});
-                        return;
+                        return new ResolvedDependency(resolvedGroupdId, new VersionNumber(newVersion), dep);
                     }
                 } else {
                     LOGGER.log(Level.INFO, "Snapshot is missing for {0}: {1}. Will run the build",
@@ -332,7 +342,6 @@ public class Builder extends PackagerBase {
                 File sourceDir = new File(dep.source.dir);
                 org.apache.commons.io.FileUtils.copyDirectory(sourceDir, componentBuildDir);
                 newVersion = String.format("256.0-%s-SNAPSHOT", new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-                versionOverrides.put(dep.artifactId, newVersion);
                 break;
             default:
                 throw new IOException("Unsupported checkout source: " + dep.source.getType());
@@ -353,5 +362,7 @@ public class Builder extends PackagerBase {
         LOGGER.log(Level.INFO, "Set new version for {0}: {1}", new Object[] {dep.artifactId, newVersion});
         mavenHelper.run(componentBuildDir, "versions:set", "-DnewVersion=" + newVersion);
         mavenHelper.run(componentBuildDir, combined);
+
+        return new ResolvedDependency(resolvedGroupdId, new VersionNumber(newVersion), dep);
     }
 }

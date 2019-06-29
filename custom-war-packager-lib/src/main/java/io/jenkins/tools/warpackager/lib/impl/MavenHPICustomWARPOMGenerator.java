@@ -1,13 +1,13 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
-import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependencies;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependency;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
@@ -32,7 +32,7 @@ public class MavenHPICustomWARPOMGenerator extends POMGenerator {
         this.outputFileSuffix = outputFileSuffix;
     }
 
-    public Model generatePOM(Map<String, String> versionOverrides) throws IOException {
+    public Model generatePOM(ResolvedDependencies deps) throws IOException {
         Model model = new Model();
         model.setModelVersion("4.0.0");
         model.setGroupId(config.bundle.groupId);
@@ -45,15 +45,15 @@ public class MavenHPICustomWARPOMGenerator extends POMGenerator {
         addUTF8SourceEncodingProperty(model);
         
         // WAR Dependency
-        Dependency dep = config.war.toDependency(versionOverrides);
+        Dependency dep = deps.getWar().toMavenDependency();
         dep.setScope("test");
         dep.setType("war");
         model.addDependency(dep);
 
         // Plugins
         if (config.plugins != null) {
-            for (DependencyInfo plugin : config.plugins) {
-                Dependency pluginDep = plugin.toDependency(versionOverrides);
+            for (ResolvedDependency plugin : deps.getPlugins()) {
+                Dependency pluginDep = plugin.toMavenDependency();
                 pluginDep.setScope("runtime");
                 model.addDependency(pluginDep);
             }

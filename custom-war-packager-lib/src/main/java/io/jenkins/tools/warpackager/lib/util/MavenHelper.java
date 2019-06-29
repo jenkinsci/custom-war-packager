@@ -5,20 +5,18 @@ import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.ConfigException;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependency;
 
 import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.processFor;
@@ -95,7 +93,7 @@ public class MavenHelper {
         return String.format("%s/.m2/%s/%s/%s/%s/%s-%s.%s",
                     USER_HOME,
                     folder,
-                    dep.getGroupId().replaceAll("\\.", "/"),
+                    dep.groupId.replaceAll("\\.", "/"),
                     dep.artifactId,
                     version,
                     dep.artifactId,
@@ -108,7 +106,7 @@ public class MavenHelper {
         final String path = getDependencyPath("cwp_non_hpi_cache", dep, version, packaging);
         final boolean isHpi = "hpi".equals(packaging);
         final File folder = new File(path);
-        String gai = dep.getGroupId() + ":" + dep.artifactId + ":" + version;
+        String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
         if (isHpi && folder.isDirectory()) {
             final String msg = "Dependency {0} was found in the non-HPI source.  " +
                     "Delete {1} to attempt another resolution attempt.";
@@ -131,9 +129,9 @@ public class MavenHelper {
         return found;
     }
 
-    public void downloadJAR(File buildDir, DependencyInfo dep, String version, File destination)
+    public void downloadJAR(File buildDir, ResolvedDependency dep, String version, File destination)
             throws IOException, InterruptedException {
-        downloadArtifact(buildDir, dep, version, "jar", destination);
+        downloadArtifact(buildDir, dep, "jar", destination);
     }
 
     public List<DependencyInfo> listDependenciesFromPom(File buildDir, File pom, File destination) throws IOException, InterruptedException {
@@ -160,12 +158,12 @@ public class MavenHelper {
         }
     }
 
-    public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, File destination)
+    public void downloadArtifact(File buildDir, ResolvedDependency dep, String packaging, File destination)
             throws IOException, InterruptedException {
         run(buildDir, "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
-                "-DgroupId=" + dep,
-                "-DartifactId=" + dep.artifactId,
-                "-Dversion=" + version,
+                "-DgroupId=" + dep.getGroupId(),
+                "-DartifactId=" + dep.getArtifactId(),
+                "-Dversion=" + dep.getVersion(),
                 "-DoutputDirectory=" + destination.getParentFile().getAbsolutePath(),
                 "-DoutputFileName=" + destination.getName(),
                 "-Dtype=" + packaging,

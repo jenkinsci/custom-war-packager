@@ -25,7 +25,7 @@ public class DependencyInfo {
      * and such methods may crash when groupId cannot be resolved.
      */
     @CheckForNull
-    private String groupId;
+    public String groupId;
     public String artifactId;
     public String type;
     @CheckForNull
@@ -47,43 +47,16 @@ public class DependencyInfo {
      * @throws ConfigException groupId cannot be resolved
      * @since 2.0.0
      */
-    @Nonnull
-    public String getGroupId() throws ConfigException {
-        if (groupId == null) {
-            throw new ConfigException("Group ID is not defined for the dependency: " + this);
-        }
-        return groupId;
-    }
+//    @Nonnull
+//    public String getGroupId() throws ConfigException {
+//        if (groupId == null) {
+//            throw new ConfigException("Group ID is not defined for the dependency: " + this);
+//        }
+//        return groupId;
+//    }
 
     public boolean isNeedsBuild() {
         return source != null && !source.isReleasedVersion();
-    }
-
-    /**
-     * Converts the relaxed Custom WAR packager definition to a strict Maven definition.
-     * @param versionOverrides Version overrides registry
-     * @return Maven dependency with resolved g:a:v
-     * @throws IOException Cannot resolve the dependency g:a:v
-     */
-    public Dependency toDependency(@Nonnull Map<String,String> versionOverrides) throws IOException {
-
-        Dependency dep = new Dependency();
-        dep.setGroupId(getGroupId());
-        dep.setArtifactId(artifactId);
-        if (StringUtils.isNotEmpty(type)) {
-            dep.setType(type);
-        }
-
-        String version = versionOverrides.get(artifactId);
-        if (version == null) {
-            if (source == null || source.version == null) {
-                throw new IOException("Source version has not been resolved: " + source);
-            }
-            version = source.version;
-        }
-
-        dep.setVersion(version);
-        return dep;
     }
 
     @CheckForNull
