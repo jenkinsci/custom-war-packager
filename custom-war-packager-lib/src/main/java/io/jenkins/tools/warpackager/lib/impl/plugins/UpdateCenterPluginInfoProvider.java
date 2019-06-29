@@ -16,7 +16,7 @@ import java.util.logging.Logger;
 
 public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
 
-    public static final String DEFAULT_JENKINS_UC_URL = "http://updates.jenkins.io/update-center.json";
+    public static final String DEFAULT_JENKINS_UC_URL = "https://updates.jenkins.io/update-center.json";
     private static final Logger LOGGER = Logger.getLogger(UpdateCenterPluginInfoProvider.class.getName());
 
     private String updateCenterUrl;
@@ -33,9 +33,10 @@ public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
 
     @Override
     public boolean isPlugin(@Nonnull DependencyInfo dependency) throws IOException, InterruptedException {
+        boolean isPlugin = groupIdCache.containsKey(dependency.artifactId);
         LOGGER.log(Level.FINE, "Checking whether {0} is a plugin: {1}",
-                new Object[] {dependency.artifactId, groupIdCache.containsKey(dependency.artifactId)});
-        return groupIdCache.containsKey(dependency.artifactId);
+                new Object[] {dependency.artifactId, isPlugin});
+        return isPlugin;
     }
 
     private static Map<String, String> extractUpdateCenterData(URL url) throws IOException {

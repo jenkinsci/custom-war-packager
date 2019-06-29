@@ -213,7 +213,7 @@ Right now there are 2 supported information sources: a Jenkins Update Center and
 
 #### Update Center Information provider
 
-The mode was introduced in Custom WAR Packager `1.8`,
+The mode was introduced in Custom WAR Packager `2.0.0`,
 and this is a default mode in the tool.
 
   * Plugin information is retrieved from Jenkins update centers
@@ -223,14 +223,16 @@ and this is a default mode in the tool.
 
 #### Maven Repo Information provider
 
-Information is retrieved from Maven repositories
+Information is retrieved from Maven repositories,
+and hence it allows installing unreleased or blacklisted plugins which are not available through update centers.
+`pomUseMavenPluginInfoProvider: true` in `buildSettings` can be set to enable this mode.
 
   * The mode caches information about plugins in the Maven repo
   * The mode is not reliable when used outside clean build environments,
-    and it is not recommended for the most of cases
-  * `pomUseMavenPluginInfoProvider: true` in `buildSettings` can be set to enable the mode
-
-Before Custom WAR Packager 
+    because false positive and false negative decisions may be cached
+    in the case of infrastructure issues
+  * This mode is not recommended for most of the cases.
+    Use at your own risk.
 
 ### Advanced features
 
