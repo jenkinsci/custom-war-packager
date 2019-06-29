@@ -46,6 +46,7 @@ public class Builder extends PackagerBase {
 
     // Context
     private Map<String, String> versionOverrides = new HashMap<>();
+    private Map<String, File> warResources = new HashMap<>();
 
     private BOM bom = null;
 
@@ -65,6 +66,16 @@ public class Builder extends PackagerBase {
             if (dep == null) {
                 throw new IOException("CasC section is declared, but CasC plugin is not declared in the plugins list");
             }
+        }
+
+        // Verify settings
+        if (config.bundle == null) {
+            throw new IOException("Bundle Information must be defined by configuration file or BOM");
+        }
+
+        // Build core and plugins
+        if (config.war == null) {
+            throw new IOException("Neither Jenkins core nor Jenkins war have been defined by configuration file or BOM/POM");
         }
     }
 
@@ -96,44 +107,7 @@ public class Builder extends PackagerBase {
 
         verifyConfig();
 
-        // Verify settings
-        if (config.bundle == null) {
-            throw new IOException("Bundle Information must be defined by configuration file or BOM");
-        }
-
-        // Build core and plugins
-        if (config.war == null) {
-            throw new IOException("Neither Jenkins core nor Jenkins war have been defined by configuration file or BOM/POM");
-        }
-
-        // Start with libraries if needed
-        List<String> coreComponentVersionOverrides = new LinkedList<>();
-        if (config.war.libraries != null) {
-            for (LibraryInfo ci : config.war.libraries) {
-                buildIfNeeded(ci.source, "jar");
-                coreComponentVersionOverrides.add("-D" + ci.getProperty() + "=" + versionOverrides.get(ci.getSource().artifactId));
-            }
-        }
-        buildIfNeeded(config.war, "war", coreComponentVersionOverrides);
-        if (config.plugins != null) {
-            for (DependencyInfo plugin : config.plugins) {
-                buildIfNeeded(plugin, "hpi");
-            }
-        }
-
-        // Prepare library patches
-        if (config.libPatches != null) {
-            for(DependencyInfo library : config.libPatches) {
-                buildIfNeeded(library, "jar");
-            }
-        }
-
-        // Prepare Resources
-        Map<String, File> warResources = new HashMap<>();
-        for (WARResourceInfo extraWarResource : config.getAllExtraResources()) {
-            warResources.put(extraWarResource.id,
-                    checkoutIfNeeded(extraWarResource.id, extraWarResource.source));
-        }
+        resolveDependencies();
 
         // Generate POM
         File warBuildDir = new File(tmpDir, "prebuild");
@@ -193,7 +167,7 @@ public class Builder extends PackagerBase {
             }
 
             String jenkinsVersion = ComponentReference.resolveFrom(config.war, true, versionOverrides).getVersion();
-            buildIfNeeded(jenkinsfileRunner.getSource(), "jar",
+            resolveDependency(jenkinsfileRunner.getSource(), "jar",
                     Arrays.asList(
                             "-Djenkins.version=" + jenkinsVersion
                             /*, "-Djenkins.testharness.version=2.38"*/));
@@ -228,7 +202,42 @@ public class Builder extends PackagerBase {
         // File dstWar = new File(warBuildDir, "target/" + config.bundle.artifactId + ".war");
     }
 
-    //TODO: Merge with buildIfNeeded
+    /**
+     * Resolves dependencies which will be used for the WAR build.
+     * Packaging (Jenkinsfile Runner, Docker) is not in the scope for the resolution.
+     */
+    private void resolveDependencies() throws IOException, InterruptedException {
+        // Start with libraries if needed
+        List<String> coreComponentVersionOverrides = new LinkedList<>();
+        if (config.war.libraries != null) {
+            for (LibraryInfo ci : config.war.libraries) {
+                resolveDependency(ci.source, "jar");
+                coreComponentVersionOverrides.add("-D" + ci.getProperty() + "=" + versionOverrides.get(ci.getSource().artifactId));
+            }
+        }
+        resolveDependency(config.war, "war", coreComponentVersionOverrides);
+
+        if (config.plugins != null) {
+            for (DependencyInfo plugin : config.plugins) {
+                resolveDependency(plugin, "hpi");
+            }
+        }
+
+        // Prepare library patches
+        if (config.libPatches != null) {
+            for(DependencyInfo library : config.libPatches) {
+                resolveDependency(library, "jar");
+            }
+        }
+
+        // Prepare Resources
+        for (WARResourceInfo extraWarResource : config.getAllExtraResources()) {
+            warResources.put(extraWarResource.id,
+                    checkoutIfNeeded(extraWarResource.id, extraWarResource.source));
+        }
+    }
+
+    //TODO: Merge with resolveDependency
     private File checkoutIfNeeded(@Nonnull String id, @Nonnull SourceInfo source) throws IOException, InterruptedException {
         File componentBuildDir = new File(buildRoot, id);
         Files.createDirectories(componentBuildDir.toPath());
@@ -256,12 +265,12 @@ public class Builder extends PackagerBase {
         return componentBuildDir;
     }
 
-    private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
-        buildIfNeeded(dep, packaging,null);
+    private void resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
+        resolveDependency(dep, packaging,null);
     }
 
-    private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging,
-                               @CheckForNull List<String> extraMavenArgs)
+    private void resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging,
+                                   @CheckForNull List<String> extraMavenArgs)
             throws IOException, InterruptedException {
 
         //TODO: add Caching support if commit is defined
