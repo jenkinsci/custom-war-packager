@@ -218,7 +218,7 @@ and this is a default mode in the tool.
 
   * Plugin information is retrieved from Jenkins update centers
   * Default update center: http://updates.jenkins.io/update-center.json
-  * Source update center can be set using the `updateCenterUrl` flag in `buildSettings`
+  * Custom update center URL can be set using the `updateCenterUrl` flag in `buildSettings`
   * Advanced configurations (e.g. proxy configuration) are not available for this mode at the moment
 
 #### Maven Repo Information provider
