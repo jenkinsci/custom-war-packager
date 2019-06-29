@@ -6,6 +6,7 @@ import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
 import io.jenkins.tools.warpackager.lib.model.ResolvedLibraryDependency;
+import io.jenkins.tools.warpackager.lib.model.ResolvedResourceDependency;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -180,14 +181,14 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    public JenkinsWarPatcher addResources(@Nonnull Map<String, File> resources) throws IOException {
-        for (Map.Entry<String, File> resourceSrc : resources.entrySet()) {
-            final String resourceId = resourceSrc.getKey();
+    public JenkinsWarPatcher addResources(@Nonnull Collection<ResolvedResourceDependency> resources) throws IOException {
+        for (ResolvedResourceDependency resourceSrc : resources) {
+            final String resourceId = resourceSrc.getOriginalDependency().id;
             WARResourceInfo resource = config.findResourceById(resourceId);
             if (resource == null) {
                 throw new IOException("Cannot find metadata for the resource with ID=" + resourceId);
             }
-            addResource(resource, resourceSrc.getValue());
+            addResource(resource, resourceSrc.getResourcePath());
         }
 
         return this;
