@@ -233,13 +233,16 @@ and hence it allows installing unreleased or blacklisted plugins which are not a
     in the case of infrastructure issues
   * This mode is not recommended for most of the cases.
     Use at your own risk.
-    
+
 ```yaml
 buildSettings:
   pom: pom.xml
   pomUseMavenPluginInfoProvider: true
   pomIgnoreRoot: true
 ```
+
+Before Custom WAR Packager `2.0.0`, this provider was used by default.
+Builds using this version may need an update if they rely on custom update centers or unreleased/blacklisted plugins.
 
 ### Advanced features
 
