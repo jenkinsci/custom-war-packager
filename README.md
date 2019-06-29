@@ -233,6 +233,13 @@ and hence it allows installing unreleased or blacklisted plugins which are not a
     in the case of infrastructure issues
   * This mode is not recommended for most of the cases.
     Use at your own risk.
+    
+```yaml
+buildSettings:
+  pom: pom.xml
+  pomUseMavenPluginInfoProvider: true
+  pomIgnoreRoot: true
+```
 
 ### Advanced features
 
