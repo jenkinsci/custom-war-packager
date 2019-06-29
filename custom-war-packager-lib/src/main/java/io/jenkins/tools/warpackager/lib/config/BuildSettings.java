@@ -1,5 +1,10 @@
 package io.jenkins.tools.warpackager.lib.config;
 
+import io.jenkins.tools.warpackager.lib.impl.plugins.MavenPluginInfoProvider;
+import io.jenkins.tools.warpackager.lib.impl.plugins.UpdateCenterPluginInfoProvider;
+import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
+import io.jenkins.tools.warpackager.lib.util.MavenHelper;
+
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.File;
@@ -37,6 +42,9 @@ public class BuildSettings {
     private DockerBuildSettings docker;
     @CheckForNull
     private JenkinsfileRunnerSettings jenkinsfileRunner;
+    @CheckForNull
+    private String updateCenterUrl;
+    private boolean pomUseMavenPluginInfoProvider;
 
     /**
      * If {@code true}, the final artifacts will be installed to the local repo.
@@ -66,6 +74,10 @@ public class BuildSettings {
 
     public void setPomIgnoreRoot(boolean pomIgnoreRoot) {
         this.pomIgnoreRoot = pomIgnoreRoot;
+    }
+
+    public void setPomUseMavenPluginInfoProvider(boolean pomUseMavenPluginInfoProvider) {
+        this.pomUseMavenPluginInfoProvider = pomUseMavenPluginInfoProvider;
     }
 
     public void setEnvironmentName(@CheckForNull String environmentName) {
@@ -139,5 +151,13 @@ public class BuildSettings {
     @CheckForNull
     public JenkinsfileRunnerSettings getJenkinsfileRunner() {
         return jenkinsfileRunner;
+    }
+
+    @Nonnull
+    public PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
+        if (pomUseMavenPluginInfoProvider) {
+            return new MavenPluginInfoProvider(helper, tmpDir);
+        }
+        return updateCenterUrl != null ? new UpdateCenterPluginInfoProvider(updateCenterUrl) : UpdateCenterPluginInfoProvider.DEFAULT;
     }
 }

@@ -1,0 +1,19 @@
+bundle:
+  groupId: "io.jenkins.tools.custom-war-packager.it"
+  artifactId: "custom-uc"
+  description: "CWP Integration Test: Custom Update Center source"
+# TODO: This test does not really do anything except a smoke test
+# Some infrastructure patches are needed to test the custom UC (e.g. a stable name for an experimental-only plugin)
+buildSettings:
+  pom: "pom.xml"
+  updateCenterUrl: "https://updates.jenkins.io/experimental/update-center.json"
+  pomIgnoreRoot: "true"
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.176.1
+casc:
+  - id: "casc"
+    source:
+      dir: casc.yml

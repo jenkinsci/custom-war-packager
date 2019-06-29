@@ -1,0 +1,77 @@
+jenkins:
+  systemMessage: "Custom War Packager - Demo of Configuration-as-Code plugin"
+
+  crumbIssuer:
+    standard:
+      excludeClientIPFromCrumb: true
+  agentProtocols:
+    - "JNLP4-connect"
+    - "Ping"
+
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "admin"
+        - id: "user"
+          password: "user"
+
+  # Ownership-based Security configuration sample.
+  # It requires RoleStrategy and Ownership plugins to be installed.
+  authorizationStrategy:
+    roleBased:
+      roles:
+        global:
+          - name: "admin"
+            description: "Jenkins administrators"
+            permissions:
+              - "Overall/Administer"
+            assignments:
+              - "admin"
+          - name: "readonly"
+            description: "Read-only users"
+            permissions:
+              - "Overall/Read"
+              - "Job/Read"
+              - "Agent/Build"
+            assignments:
+              - "authenticated"
+        items:
+          - name: "@OwnerNoSid"
+            description: "Primary Owners"
+            pattern: ".*"
+            permissions:
+              - "Job/Configure"
+              - "Job/Build"
+              - "Job/Delete"
+            assignments:
+              - "authenticated"
+          - name: "@CoOwnerNoSid"
+            description: "Secondary Owners"
+            pattern: ".*"
+            permissions:
+              - "Job/Configure"
+              - "Job/Build"
+            assignments:
+              - "authenticated"
+        agents:
+          - name: "@OwnerNoSid"
+            description: "Primary Owners"
+            pattern: ".*"
+            permissions:
+              - "Agent/Configure"
+              - "Agent/Build"
+              - "Agent/Delete"
+              - "Agent/Build"
+            assignments:
+              - "authenticated"
+          - name: "@CoOwnerNoSid"
+            description: "Secondary Owners"
+            pattern: ".*"
+            permissions:
+              - "Agent/Connect"
+              - "Agent/Build"
+            assignments:
+              - "authenticated"
+

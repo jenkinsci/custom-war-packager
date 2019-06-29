@@ -106,7 +106,7 @@ public class MavenHelper {
         final File folder = new File(path);
         String gai = dep.groupId + ":" + dep.artifactId + ":" + version;
         if (isHpi && folder.isDirectory()) {
-            final String msg = "Dependency {0} was found in the non-HPI cache.  " +
+            final String msg = "Dependency {0} was found in the non-HPI source.  " +
                     "Delete {1} to attempt another resolution attempt.";
             LOGGER.log(Level.INFO, msg, new Object[]{gai, path});
             return false;
@@ -134,7 +134,8 @@ public class MavenHelper {
 
     public List<DependencyInfo> listDependenciesFromPom(File buildDir, File pom, File destination) throws IOException, InterruptedException {
         List<DependencyInfo> dependencies = new LinkedList<>();
-        int listed = run(buildDir, true, "dependency:list", "-B", "-DoutputFile=" + destination.getAbsolutePath(),  "-DincludeScope=runtime", "-DexcludeClassifiers=tests", "-f", pom.getAbsolutePath(), "-q");
+        LOGGER.log(Level.INFO, "Listing dependencies from POM file: {0}", pom);
+        int listed = run(buildDir, true, "dependency:list", "-B", "-DoutputFile=" + destination.getAbsolutePath(),  "-DincludeScope=runtime", "-DexcludeClassifiers=tests", "-f", pom.getAbsolutePath());
         if (listed == 0) {
             try (Stream<String> stream = Files.lines(destination.toPath())) {
                 stream.skip(2).filter(line -> !line.isEmpty()).forEach(line -> {
