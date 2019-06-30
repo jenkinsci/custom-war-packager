@@ -1,7 +1,10 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
+import hudson.util.VersionNumber;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.impl.BOMBuilder;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependencies;
+import io.jenkins.tools.warpackager.lib.model.ResolvedWARDependency;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
@@ -42,8 +45,9 @@ public class BOMTest {
     @Test
     public void shouldProduceBOMfromConfig() throws Exception {
         Config cfg = Config.loadDemoConfig();
-        Map<String, String> overrides = new HashMap<>();
-        BOMBuilder bldr = new BOMBuilder(cfg).withStatus(overrides);
+        ResolvedDependencies deps = new ResolvedDependencies(new ResolvedWARDependency(cfg.war.groupId,
+                new VersionNumber(cfg.war.source.version), cfg.war));
+        BOMBuilder bldr = new BOMBuilder(cfg).withResolvedDependencies(deps);
         BOM bom = bldr.build();
 
         File target = new File(tmp.getRoot(), "bom.yml");
