@@ -3,6 +3,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 import hudson.util.VersionNumber;
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.ConfigException;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
 import io.jenkins.tools.warpackager.lib.config.JenkinsfileRunnerSettings;
 import io.jenkins.tools.warpackager.lib.config.LibraryInfo;
@@ -15,6 +16,7 @@ import io.jenkins.tools.warpackager.lib.model.ResolvedResourceDependency;
 import io.jenkins.tools.warpackager.lib.model.ResolvedWARDependency;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
+import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,9 +78,10 @@ public class Builder extends PackagerBase {
     }
 
     public void build() throws IOException, InterruptedException {
-
         // Cleanup the temporary directory
         final File tmpDir = config.buildSettings.getTmpDir();
+        PluginInfoProvider pluginInfoProvider = config.getPluginInfoProvider(mavenHelper, tmpDir);
+        pluginInfoProvider.init();
 
         if (tmpDir.exists()) {
             LOGGER.log(Level.INFO, "Cleaning up the temporary directory {0}", tmpDir);
@@ -97,12 +101,12 @@ public class Builder extends PackagerBase {
         if (pathToPom != null) {
             File downloadDir = new File(tmpDir, "hpiDownloads");
             Files.createDirectory(downloadDir.toPath());
-            config.overrideByPOM(downloadDir, pathToPom, config.buildSettings.isPomIgnoreRoot());
+            config.overrideByPOM(downloadDir, pathToPom, config.buildSettings.isPomIgnoreRoot(), pluginInfoProvider);
         }
 
         verifyConfig();
 
-        ResolvedDependencies resolvedDependencies = resolveDependencies();
+        ResolvedDependencies resolvedDependencies = resolveDependencies(pluginInfoProvider);
 
         // Generate POM
         File warBuildDir = new File(tmpDir, "prebuild");
@@ -165,7 +169,7 @@ public class Builder extends PackagerBase {
             resolveDependency(jenkinsfileRunner.getSource(), "jar",
                     Arrays.asList(
                             "-Djenkins.version=" + jenkinsVersion
-                            /*, "-Djenkins.testharness.version=2.38"*/));
+                            /*, "-Djenkins.testharness.version=2.38"*/), null);
             File outputDir = config.buildSettings.getOutputDir();
 
             org.apache.commons.io.FileUtils.copyDirectory(
@@ -200,9 +204,9 @@ public class Builder extends PackagerBase {
     /**
      * Resolves dependencies which will be used for the WAR build.
      * Packaging (Jenkinsfile Runner, Docker) is not in the scope for the resolution.
+     * @param pluginInfoProvider Info provider for plugins, which may be used to resolve group IDs
      */
-    private ResolvedDependencies resolveDependencies() throws IOException, InterruptedException {
-
+    private ResolvedDependencies resolveDependencies(@CheckForNull PluginInfoProvider pluginInfoProvider) throws IOException, InterruptedException {
 
         // Start with libraries if needed
         List<String> coreComponentVersionOverrides = new LinkedList<>();
@@ -215,12 +219,12 @@ public class Builder extends PackagerBase {
             }
         }
         ResolvedDependencies deps = new ResolvedDependencies(new ResolvedWARDependency(
-                resolveDependency(config.war, "war", coreComponentVersionOverrides)));
+                resolveDependency(config.war, "war", coreComponentVersionOverrides, null)));
 
 
         if (config.plugins != null) {
             for (DependencyInfo plugin : config.plugins) {
-                deps.addPlugin(resolveDependency(plugin, "hpi"));
+                deps.addPlugin(resolveDependency(plugin, "hpi", Collections.emptyList(), pluginInfoProvider));
             }
         }
 
@@ -267,16 +271,19 @@ public class Builder extends PackagerBase {
     }
 
     private ResolvedDependency resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
-        return resolveDependency(dep, packaging,null);
+        return resolveDependency(dep, packaging, null, null);
     }
 
     private ResolvedDependency resolveDependency(@Nonnull DependencyInfo dep, @Nonnull String packaging,
-                                                 @CheckForNull List<String> extraMavenArgs)
+                                                 @CheckForNull List<String> extraMavenArgs,
+                                                 @CheckForNull PluginInfoProvider pluginInfoProvider)
             throws IOException, InterruptedException {
         String resolvedGroupdId = dep.groupId;
+        if (resolvedGroupdId == null && pluginInfoProvider != null) {
+            resolvedGroupdId = pluginInfoProvider.locateGroupId(dep);
+        }
         if (resolvedGroupdId == null) {
-            // TODO: Use Group ID resolver
-            resolvedGroupdId = "unknown";
+            throw new ConfigException("Cannot resolve groupID for the dependency " + dep);
         }
 
         //TODO: add Caching support if commit is defined

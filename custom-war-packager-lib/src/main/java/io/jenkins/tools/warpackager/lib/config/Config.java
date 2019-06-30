@@ -174,7 +174,8 @@ public class Config {
     //TODO: add MANY options to make it configurable
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH", justification = "plugins is initialized before")
-    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom, final boolean pomIgnoreRoot) throws IOException, InterruptedException {
+    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom, final boolean pomIgnoreRoot,
+                              @Nonnull PluginInfoProvider pluginInfoProvider) throws IOException, InterruptedException {
         MavenXpp3Reader rdr = new MavenXpp3Reader();
         Model model;
         try(FileInputStream istream = new FileInputStream(pom)) {
@@ -207,8 +208,6 @@ public class Config {
         }
 
         List<DependencyInfo> deps = helper.listDependenciesFromPom(tmpDir, pom, destination);
-        PluginInfoProvider pluginInfoProvider = getPluginInfoProvider(helper, tmpDir);
-        pluginInfoProvider.init();
         for (DependencyInfo dep : deps) {
             processMavenDep(pluginInfoProvider, dep, plugins);
         }
@@ -224,7 +223,7 @@ public class Config {
         }
     }
 
-    private PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
+    public PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
         return buildSettings != null ? buildSettings.getPluginInfoProvider(helper, tmpDir) : UpdateCenterPluginInfoProvider.DEFAULT;
     }
 
