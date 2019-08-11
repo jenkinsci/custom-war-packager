@@ -15,7 +15,7 @@
 
   <groupId>io.jenkins.tools.custom-war-packager</groupId>
   <artifactId>parent-pom</artifactId>
-  <version>1.8-SNAPSHOT</version>
+  <version>2.0-alpha-1-SNAPSHOT</version>
   <name>Jenkins Custom WAR Packager Parent POM</name>
   <description>Parent POM for packaging custom Jenkins WARs</description>
   <packaging>pom</packaging>
