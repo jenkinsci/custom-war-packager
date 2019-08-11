@@ -1,6 +1,13 @@
 Changelog
 ====
 
+| WARNING: Changelogs have been moved to [GitHub Releases](https://github.com/jenkinsci/custom-war-packager/releases) |
+| --- |
+
+## New releases
+
+See [GitHub Releases](https://github.com/jenkinsci/custom-war-packager/releases).
+
 ### 1.6
 
 Release date: Mar 27, 2019
