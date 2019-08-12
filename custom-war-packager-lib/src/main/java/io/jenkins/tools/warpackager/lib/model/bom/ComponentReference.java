@@ -4,10 +4,9 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WarInfo;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependency;
 
-import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
-import java.util.Map;
 
 /**
  * @author Oleg Nenashev
@@ -46,7 +45,7 @@ public class ComponentReference extends Reference {
 
     public WarInfo toWARDependencyInfo() {
         WarInfo dep = new WarInfo();
-        dep.groupId = "org.jenkins-ci.main";
+        dep.setGroupId("org.jenkins-ci.main");
         dep.artifactId = "jenkins-war";
 
         dep.source = new SourceInfo();
@@ -66,7 +65,7 @@ public class ComponentReference extends Reference {
 
     public DependencyInfo toDependencyInfo() {
         DependencyInfo dep = new DependencyInfo();
-        dep.groupId = groupId;
+        dep.setGroupId(groupId);
         dep.artifactId = artifactId;
 
         dep.source = new SourceInfo();
@@ -85,28 +84,17 @@ public class ComponentReference extends Reference {
     }
 
     @Nonnull
-    public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep) {
-        return resolveFrom(dep, false, null);
-    }
-
-    @Nonnull
-    public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep, boolean overrideVersions,
-                                                  @CheckForNull Map<String, String> versionOverrides) {
+    public static ComponentReference fromResolvedDependency(@Nonnull ResolvedDependency dep, boolean useResolvedVersion) {
         ComponentReference ref = new ComponentReference();
-        ref.setGroupId(dep.groupId);
-        ref.setArtifactId(dep.artifactId);
-        //TODO(oleg_nenashev): BOM says "the realized BoM after refs are resolved" when versions are resolved
-        if (dep.source == null) {
-            throw new IllegalStateException("Source is not defined for dependency " + dep);
-        }
+        ref.setGroupId(dep.getGroupId());
+        ref.setArtifactId(dep.getArtifactId());
 
-        // Not putting ref then
-        ref.setRef(dep.source.getCheckoutId());
-        String effectiveVersion = dep.source.version;
-        if (overrideVersions && versionOverrides != null && versionOverrides.containsKey(dep.artifactId)) {
-            effectiveVersion = versionOverrides.get(dep.artifactId);
+        DependencyInfo original = dep.getOriginalDependency();
+        if (original.source != null) {
+            ref.setRef(original.source.getCheckoutId());
+            String versionToReference = useResolvedVersion ? dep.getVersion().toString() : original.source.version;
+            ref.setVersion(versionToReference);
         }
-        ref.setVersion(effectiveVersion);
 
         return ref;
     }

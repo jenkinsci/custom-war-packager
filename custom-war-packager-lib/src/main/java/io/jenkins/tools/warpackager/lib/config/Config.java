@@ -174,7 +174,8 @@ public class Config {
     //TODO: add MANY options to make it configurable
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH", justification = "plugins is initialized before")
-    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom, final boolean pomIgnoreRoot) throws IOException, InterruptedException {
+    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom, final boolean pomIgnoreRoot,
+                              @Nonnull PluginInfoProvider pluginInfoProvider) throws IOException, InterruptedException {
         MavenXpp3Reader rdr = new MavenXpp3Reader();
         Model model;
         try(FileInputStream istream = new FileInputStream(pom)) {
@@ -207,8 +208,6 @@ public class Config {
         }
 
         List<DependencyInfo> deps = helper.listDependenciesFromPom(tmpDir, pom, destination);
-        PluginInfoProvider pluginInfoProvider = getPluginInfoProvider(helper, tmpDir);
-        pluginInfoProvider.init();
         for (DependencyInfo dep : deps) {
             processMavenDep(pluginInfoProvider, dep, plugins);
         }
@@ -217,19 +216,20 @@ public class Config {
             // Add the artifact itself, no validation as we assume the pom is from a plugin
             DependencyInfo res = new DependencyInfo();
             res.artifactId = model.getArtifactId();
-            res.groupId = model.getGroupId();
+            res.setGroupId(model.getGroupId());
             res.source = new SourceInfo();
             res.source.version = model.getVersion();
             plugins.add(res);
         }
     }
 
-    private PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
+    public PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
         return buildSettings != null ? buildSettings.getPluginInfoProvider(helper, tmpDir) : UpdateCenterPluginInfoProvider.DEFAULT;
     }
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
     private void processMavenDep(PluginInfoProvider pluginInfoProvider, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
+        //TODO: add groupId resolution if null
         if ("jar".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
             ComponentReference core = new ComponentReference();
             core.setVersion(res.getSource().version);

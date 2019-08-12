@@ -1,24 +1,22 @@
 package io.jenkins.tools.warpackager.lib.util;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.ConfigException;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependency;
 
 import javax.annotation.CheckReturnValue;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.processFor;
@@ -80,7 +78,8 @@ public class MavenHelper {
         return mvnCmd;
     }
 
-    public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) {
+    //TODO: Move to Maven Info Provider
+    public boolean artifactExistsInLocalCache(DependencyInfo dep, String version, String packaging) throws ConfigException {
         final String folder = "repository";
         String path = getDependencyPath(folder, dep, version, packaging);
         File expectedFile = new File(path);
@@ -88,7 +87,9 @@ public class MavenHelper {
         return expectedFile.exists();
     }
 
-    private static String getDependencyPath(final String folder, final DependencyInfo dep, final String version, final String packaging) {
+    //TODO: Move to Maven Info Provider
+    private static String getDependencyPath(final String folder, final DependencyInfo dep, final String version, final String packaging)
+            throws ConfigException {
         return String.format("%s/.m2/%s/%s/%s/%s/%s-%s.%s",
                     USER_HOME,
                     folder,
@@ -100,6 +101,7 @@ public class MavenHelper {
                     packaging);
     }
 
+    //TODO: Move to Maven Info Provider
     public boolean artifactExists(File buildDir, DependencyInfo dep, String version, String packaging) throws IOException, InterruptedException {
         final String path = getDependencyPath("cwp_non_hpi_cache", dep, version, packaging);
         final boolean isHpi = "hpi".equals(packaging);
@@ -127,9 +129,9 @@ public class MavenHelper {
         return found;
     }
 
-    public void downloadJAR(File buildDir, DependencyInfo dep, String version, File destination)
+    public void downloadJAR(File buildDir, ResolvedDependency dep, String version, File destination)
             throws IOException, InterruptedException {
-        downloadArtifact(buildDir, dep, version, "jar", destination);
+        downloadArtifact(buildDir, dep, "jar", destination);
     }
 
     public List<DependencyInfo> listDependenciesFromPom(File buildDir, File pom, File destination) throws IOException, InterruptedException {
@@ -142,7 +144,7 @@ public class MavenHelper {
                     line = line.trim();
                     String[] dependencyData = line.split(":");
                     DependencyInfo dep = new DependencyInfo();
-                    dep.groupId = dependencyData[0].trim();
+                    dep.setGroupId(dependencyData[0].trim());
                     dep.artifactId = dependencyData[1].trim();
                     dep.type = dependencyData[2].trim();
                     dep.source = new SourceInfo();
@@ -156,12 +158,12 @@ public class MavenHelper {
         }
     }
 
-    public void downloadArtifact(File buildDir, DependencyInfo dep, String version, String packaging, File destination)
+    public void downloadArtifact(File buildDir, ResolvedDependency dep, String packaging, File destination)
             throws IOException, InterruptedException {
         run(buildDir, "com.googlecode.maven-download-plugin:download-maven-plugin:1.4.0:artifact",
-                "-DgroupId=" + dep.groupId,
-                "-DartifactId=" + dep.artifactId,
-                "-Dversion=" + version,
+                "-DgroupId=" + dep.getGroupId(),
+                "-DartifactId=" + dep.getArtifactId(),
+                "-Dversion=" + dep.getVersion(),
                 "-DoutputDirectory=" + destination.getParentFile().getAbsolutePath(),
                 "-DoutputFileName=" + destination.getName(),
                 "-Dtype=" + packaging,

@@ -1,10 +1,13 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import hudson.util.VersionNumber;
 import io.jenkins.tools.warpackager.lib.config.Config;
+import io.jenkins.tools.warpackager.lib.config.ConfigException;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
-import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependencies;
+import io.jenkins.tools.warpackager.lib.model.ResolvedLibraryDependency;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
@@ -33,8 +36,8 @@ public class BOMBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(BOMBuilder.class.getName());
 
-    @CheckForNull
-    private Map<String, String> versionOverrides;
+    @Nonnull
+    private ResolvedDependencies resolvedDependencies; // to be used for BOM status
 
     @CheckForNull
     private Map<String, ComponentReference> bundledPlugins;
@@ -63,8 +66,8 @@ public class BOMBuilder {
         return this;
     }
 
-    public BOMBuilder withStatus(Map<String, String> versionOverrides) {
-        this.versionOverrides = versionOverrides;
+    public BOMBuilder withResolvedDependencies(ResolvedDependencies deps) {
+        this.resolvedDependencies = deps;
         return this;
     }
 
@@ -73,10 +76,10 @@ public class BOMBuilder {
 
         LOGGER.log(Level.INFO, "Building BOM");
         bom.setMetadata(buildMetadata());
-        bom.setSpec(buildSpec(false));
-        if (versionOverrides != null) { // We can produce status
+        bom.setSpec(buildSpec());
+        if (resolvedDependencies != null) { // We can produce status
             LOGGER.log(Level.INFO, "Generating 'status' section of the BOM");
-            bom.setStatus(buildSpec(true));
+            bom.setStatus(buildStatus());
         }
         return bom;
     }
@@ -97,72 +100,91 @@ public class BOMBuilder {
         return metadata;
     }
 
-    private Specification buildSpec(boolean overrideVersions) {
+    //TODO(oleg_nenashev): Before 2.0.0 it was able to resolve from settings, but now it is reverted, because groupId might be missing. Recover it?
+    private Specification buildSpec() throws ConfigException {
         Specification spec = new Specification();
         //TODO(oleg_nenashev): it will produce artifactId and groupId in BOM's [status/core]
-        spec.setCore(ComponentReference.resolveFrom(config.war, overrideVersions, versionOverrides));
+        spec.setCore(ComponentReference.fromResolvedDependency(resolvedDependencies.getWar(), false));
 
         // Plugins
         List<ComponentReference> plugins = new ArrayList<>();
-        if (overrideVersions && bundledPlugins != null && !bundledPlugins.isEmpty()){
-            // Writing 'status', put explicit versions for all bundled plugins
-            for (Map.Entry<String, ComponentReference> bundled : bundledPlugins.entrySet()) {
-                ComponentReference ref = bundled.getValue();
-
-                DependencyInfo requiredPlugin = config.findPlugin(ref.getArtifactId());
-                SourceInfo requiredVersionSource = requiredPlugin != null ? requiredPlugin.source : null;
-                String requiredVersion = requiredVersionSource != null ? requiredVersionSource.version : null;
-
-                // TODO: due to whatever reason timestamped Snapshots do not have full version in the manifest
-                // Plugin-Version points to SNAPSHOT. So here we override it
-                String bundledHPIVersion = ref.getVersion();
-                if (requiredVersion != null && bundledHPIVersion != null &&
-                        !requiredVersion.equals(bundledHPIVersion) && bundledHPIVersion.contains("-SNAPSHOT")) {
-                    LOGGER.log(Level.WARNING, "Plugin {0}: Required version {1} differ from what is in the bundled HPI: {2}. " +
-                            "Assuming that it is a timestamped snapshot, using specification value",
-                            new Object[] {ref.getArtifactId(), requiredVersion, bundledHPIVersion});
-                    ComponentReference override = new ComponentReference();
-                    override.setGroupId(ref.getGroupId());
-                    override.setArtifactId(ref.getArtifactId());
-                    override.setVersion(requiredVersion);
-                    ref = override;
-                }
-                plugins.add(ref);
-            }
-        } else if (config.plugins != null) {
-            // We use default resolution
-            for (DependencyInfo plugin : config.plugins) {
-                plugins.add(ComponentReference.resolveFrom(plugin, overrideVersions, versionOverrides));
-            }
+        for (DependencyInfo plugin : config.plugins) {
+            plugins.add(ComponentReference.fromResolvedDependency(
+                    resolvedDependencies.getPlugin(plugin.artifactId), false));
         }
         spec.setPlugins(plugins);
 
         // Components - everything else
         //TODO(oleg_nenashev): BOM should support whatever type definition
-        List<ComponentReference> components = new ArrayList<>();
-        if (config.libPatches != null) {
-            for (DependencyInfo dep : config.libPatches) {
-                components.add(ComponentReference.resolveFrom(dep, overrideVersions, versionOverrides));
-            }
-        }
-        if (config.groovyHooks != null) {
-            for (WARResourceInfo extraResource : config.getAllExtraResources()) {
-                components.add(toComponentReference(extraResource, overrideVersions));
-            }
-        }
-        spec.setComponents(components);
+
+        spec.setComponents(resolveBOMComponents(false));
 
         return spec;
     }
 
-    private ComponentReference toComponentReference(WARResourceInfo hook, boolean overrideVersions) {
+    private Specification buildStatus() throws ConfigException {
+        Specification spec = new Specification();
+        //TODO(oleg_nenashev): it will produce artifactId and groupId in BOM's [status/core]. What is the expected format?
+        spec.setCore(ComponentReference.fromResolvedDependency(resolvedDependencies.getWar(), true));
+
+        // Plugins
+        List<ComponentReference> plugins = new ArrayList<>();
+        // Writing 'status', put explicit versions for all bundled plugins
+        for (Map.Entry<String, ComponentReference> bundled : bundledPlugins.entrySet()) {
+            ComponentReference ref = bundled.getValue();
+
+            DependencyInfo requiredPlugin = config.findPlugin(ref.getArtifactId());
+            SourceInfo requiredVersionSource = requiredPlugin != null ? requiredPlugin.source : null;
+            String requiredVersion = requiredVersionSource != null ? requiredVersionSource.version : null;
+
+            // TODO: due to whatever reason timestamped Snapshots do not have full version in the manifest
+            // Plugin-Version points to SNAPSHOT. So here we override it
+            String bundledHPIVersion = ref.getVersion();
+            if (requiredVersion != null && bundledHPIVersion != null &&
+                    !requiredVersion.equals(bundledHPIVersion) && bundledHPIVersion.contains("-SNAPSHOT")) {
+                LOGGER.log(Level.WARNING, "Plugin {0}: Required version {1} differ from what is in the bundled HPI: {2}. " +
+                                "Assuming that it is a timestamped snapshot, using specification value",
+                        new Object[] {ref.getArtifactId(), requiredVersion, bundledHPIVersion});
+                ComponentReference override = new ComponentReference();
+                override.setGroupId(ref.getGroupId());
+                override.setArtifactId(ref.getArtifactId());
+                override.setVersion(requiredVersion);
+                ref = override;
+            }
+            plugins.add(ref);
+        }
+        spec.setPlugins(plugins);
+
+        spec.setComponents(resolveBOMComponents(true));
+        return spec;
+    }
+
+    private List<ComponentReference> resolveBOMComponents(boolean useResolvedVersion) throws ConfigException {
+        List<ComponentReference> components = new ArrayList<>();
+        if (config.libPatches != null) {
+            for (DependencyInfo dep : config.libPatches) {
+                components.add(ComponentReference.fromResolvedDependency(
+                        resolvedDependencies.getLibrary(dep.artifactId), useResolvedVersion));
+            }
+        }
+        if (config.groovyHooks != null) {
+            for (WARResourceInfo extraResource : config.getAllExtraResources()) {
+                components.add(toComponentReference(extraResource, useResolvedVersion));
+            }
+        }
+        return components;
+    }
+
+    private ComponentReference toComponentReference(WARResourceInfo hook, boolean overrideVersions) throws ConfigException {
         //TODO(oleg_nenashev): no artifact IDs, some hacks here. Maybe groovy hooks should require standard fields
         DependencyInfo mockDependency = new DependencyInfo();
-        mockDependency.groupId = "io.jenkins.tools.warpackager." + hook.getResourceType() + "." + hook.id;
+        mockDependency.setGroupId("io.jenkins.tools.warpackager." + hook.getResourceType() + "." + hook.id);
         mockDependency.artifactId = hook.id;
         mockDependency.source = hook.source;
+        ResolvedLibraryDependency dep = new ResolvedLibraryDependency(mockDependency.groupId, new VersionNumber("1.0"), mockDependency);
 
-        ComponentReference ref = ComponentReference.resolveFrom(mockDependency, overrideVersions, versionOverrides);
+        ComponentReference ref = ComponentReference.fromResolvedDependency(dep, overrideVersions);
+
         //TODO(oleg_nenashev): we cannot produce version
         if (overrideVersions && ref.getVersion() == null) {
             ref.setVersion("unknown");

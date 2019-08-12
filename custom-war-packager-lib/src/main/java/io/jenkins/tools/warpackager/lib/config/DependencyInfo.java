@@ -10,11 +10,21 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
+ * Provides information about dependencies in Custom WAR Packager.
  * @author Oleg Nenashev
  * @since TODO
  */
 @SuppressFBWarnings(value = "UWF_UNWRITTEN_PUBLIC_OR_PROTECTED_FIELD", justification = "JSON Deserialization")
 public class DependencyInfo {
+
+    /**
+     * GroupId of the dependency.
+     * May be {@code null} when not resolved.
+     * Many components like {@link io.jenkins.tools.warpackager.lib.impl.BOMBuilder} and
+     * {@link io.jenkins.tools.warpackager.lib.impl.MavenHPICustomWARPOMGenerator} require fully qualified dependencies,
+     * and such methods may crash when groupId cannot be resolved.
+     */
+    @CheckForNull
     public String groupId;
     public String artifactId;
     public String type;
@@ -23,29 +33,30 @@ public class DependencyInfo {
     @CheckForNull
     public DependencyBuildSettings build;
 
-    public boolean isNeedsBuild() {
-        return source != null && !source.isReleasedVersion();
+    /**
+     * Sets a new groupId for the dependency.
+     * @param groupId Group ID to set
+     * @since 2.0.0
+     */
+    public void setGroupId(@Nonnull String groupId) {
+        this.groupId = groupId;
     }
 
-    public Dependency toDependency(Map<String,String> versionOverrides) throws IOException {
+    /**
+     * Retrieves groupId of the dependency
+     * @throws ConfigException groupId cannot be resolved
+     * @since 2.0.0
+     */
+//    @Nonnull
+//    public String getGroupId() throws ConfigException {
+//        if (groupId == null) {
+//            throw new ConfigException("Group ID is not defined for the dependency: " + this);
+//        }
+//        return groupId;
+//    }
 
-        Dependency dep = new Dependency();
-        dep.setGroupId(groupId);
-        dep.setArtifactId(artifactId);
-        if (StringUtils.isNotEmpty(type)) {
-            dep.setType(type);
-        }
-
-        String version = versionOverrides.get(artifactId);
-        if (version == null) {
-            if (source == null || source.version == null) {
-                throw new IOException("Source version has not been resolved: " + source);
-            }
-            version = source.version;
-        }
-
-        dep.setVersion(version);
-        return dep;
+    public boolean isNeedsBuild() {
+        return source != null && !source.isReleasedVersion();
     }
 
     @CheckForNull
@@ -55,7 +66,7 @@ public class DependencyInfo {
 
     @Override
     public String toString() {
-        return String.format("%s:%s:%s", groupId, artifactId, source);
+        return String.format("%s:%s:%s", groupId != null ? groupId : "unknown", artifactId, source);
     }
 
     @Nonnull

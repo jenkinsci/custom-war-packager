@@ -1,0 +1,15 @@
+bundle:
+  groupId: "io.jenkins.tools.custom-war-packager.it"
+  artifactId: "input-simplified"
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.176.1
+plugins:
+  - artifactId: "matrix-project"
+    source:
+      version: 1.9
+  - artifactId: "configuration-as-code"
+    source:
+      version: 1.21

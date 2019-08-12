@@ -5,6 +5,7 @@ import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 
+import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.URL;
@@ -58,5 +59,11 @@ public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
             groupIDs.putIfAbsent(e.getKey(), groupId);
         }
         return groupIDs;
+    }
+
+    @CheckForNull
+    @Override
+    public String locateGroupId(DependencyInfo dependency) throws IOException, InterruptedException {
+        return groupIdCache.get(dependency.artifactId);
     }
 }

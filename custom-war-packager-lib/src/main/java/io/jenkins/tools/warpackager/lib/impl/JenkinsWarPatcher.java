@@ -5,6 +5,8 @@ package io.jenkins.tools.warpackager.lib.impl;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
+import io.jenkins.tools.warpackager.lib.model.ResolvedLibraryDependency;
+import io.jenkins.tools.warpackager.lib.model.ResolvedResourceDependency;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -29,6 +31,7 @@ import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.List;
@@ -100,14 +103,14 @@ public class JenkinsWarPatcher extends PackagerBase {
         return new File(dstDir, "WEB-INF/lib");
     }
 
-    public JenkinsWarPatcher replaceLibs(Map<String, String> versionOverrides) throws IOException, InterruptedException {
-        if (config.libPatches == null) {
+    public JenkinsWarPatcher replaceLibs(Collection<ResolvedLibraryDependency> libraries) throws IOException, InterruptedException {
+        if (libraries.isEmpty()) {
             // nothing to replace
             return this;
         }
 
-        for (DependencyInfo lib : config.libPatches) {
-            replaceLib(lib, versionOverrides);
+        for (ResolvedLibraryDependency lib : libraries) {
+            replaceLib(lib);
         }
 
         return this;
@@ -126,42 +129,32 @@ public class JenkinsWarPatcher extends PackagerBase {
         return this;
     }
 
-    private void replaceLib(DependencyInfo lib, Map<String, String> versionOverrides) throws IOException, InterruptedException {
-        if (lib.source == null) {
-            throw new IOException("Source is not defined for " + lib);
-        }
-
+    private void replaceLib(@Nonnull ResolvedLibraryDependency lib) throws IOException, InterruptedException {
         File libsDir = getLibsDir();
-        String effectiveVersion = versionOverrides.get(lib.artifactId);
-        if (effectiveVersion == null) {
-            if (!lib.source.isReleasedVersion()) {
-                throw new IOException("Cannot resolve new version for library " + lib);
-            }
-            effectiveVersion = lib.source.version;
-        }
+        String effectiveVersion = lib.getVersion().toString();
 
         List<Path> paths = Files.find(libsDir.toPath(), 1, (path, basicFileAttributes) -> {
             //TODO: this matcher is a bit lame, it may suffer from false positives
             String fileName = String.valueOf(path.getFileName());
-            if (fileName.matches(lib.artifactId + "-\\d+.*")) {
+            if (fileName.matches(lib.getArtifactId() + "-\\d+.*")) {
                 return true;
             }
             return false;
         }).collect(Collectors.toList());
         if (paths.size() > 1) {
-            throw new IOException("Bug in Jenkins WAR Packager, cannot find unique lib JAR for artifact " + lib.artifactId
+            throw new IOException("Bug in Jenkins WAR Packager, cannot find unique lib JAR for artifact " + lib.getArtifactId()
                     + ". Candidates: " + StringUtils.join(paths, ","));
         } else if (paths.size() == 1) {
             Path oldFile = paths.get(0);
             LOGGER.log(Level.INFO, "Replacing the existing library {0} by version {1}. Original File: {2}",
-                    new Object[] {lib.artifactId, effectiveVersion, oldFile.getFileName()});
+                    new Object[] {lib.getArtifactId(), effectiveVersion, oldFile.getFileName()});
             Files.delete(oldFile);
         } else {
             LOGGER.log(Level.INFO, "Adding new library {0} with version {1}",
-                    new Object[] {lib.artifactId, effectiveVersion});
+                    new Object[] {lib.getArtifactId(), effectiveVersion});
         }
 
-        File newJarFile = new File(libsDir, lib.artifactId + "-" + effectiveVersion + ".jar");
+        File newJarFile = new File(libsDir, lib.getArtifactId() + "-" + effectiveVersion + ".jar");
         mavenHelper.downloadJAR(dstDir, lib, effectiveVersion, newJarFile);
     }
 
@@ -188,14 +181,14 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    public JenkinsWarPatcher addResources(@Nonnull Map<String, File> resources) throws IOException {
-        for (Map.Entry<String, File> resourceSrc : resources.entrySet()) {
-            final String resourceId = resourceSrc.getKey();
+    public JenkinsWarPatcher addResources(@Nonnull Collection<ResolvedResourceDependency> resources) throws IOException {
+        for (ResolvedResourceDependency resourceSrc : resources) {
+            final String resourceId = resourceSrc.getOriginalDependency().id;
             WARResourceInfo resource = config.findResourceById(resourceId);
             if (resource == null) {
                 throw new IOException("Cannot find metadata for the resource with ID=" + resourceId);
             }
-            addResource(resource, resourceSrc.getValue());
+            addResource(resource, resourceSrc.getResourcePath());
         }
 
         return this;

@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.impl.jenkinsfileRunner;
 
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
+import io.jenkins.tools.warpackager.lib.model.ResolvedDependencies;
 import io.jenkins.tools.warpackager.lib.util.DockerfileBuilder;
 
 import javax.annotation.CheckForNull;
@@ -22,7 +23,7 @@ import java.util.Map;
 public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
 
     @CheckForNull
-    private Map<String, String> versionOverrides;
+    private ResolvedDependencies resolvedDependencies;
 
     @CheckForNull
     private File pluginsDir;
@@ -43,8 +44,8 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
         return this;
     }
 
-    public JenkinsfileRunnerDockerBuilder withVersionOverrides(Map<String, String> versionOverrides) {
-        this.versionOverrides = versionOverrides;
+    public JenkinsfileRunnerDockerBuilder withResolvedDependencies(ResolvedDependencies resolvedDependencies) {
+        this.resolvedDependencies = resolvedDependencies;
         return this;
     }
 
