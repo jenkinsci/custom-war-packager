@@ -1,4 +1,4 @@
 # https://github.com/jenkinsci/.github/blob/master/.github/release-drafter.adoc    
 _extends: .github
-version-template: parent-pom-$MAJOR.$MINOR-alpha-$PATCH
-tag-template: parent-pom-$NEXT_PATCH_VERSION
+version-template: $MAJOR.$MINOR-alpha-$PATCH
+tag-template: v$NEXT_PATCH_VERSION
