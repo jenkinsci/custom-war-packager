@@ -40,8 +40,6 @@ public class Config {
 
     public BuildSettings buildSettings;
     public PackageInfo bundle;
-    //TODO: move to build settings
-    public boolean bomIncludeWar;
     // Nonnull after the build starts
     public WarInfo war;
     @CheckForNull
@@ -184,7 +182,7 @@ public class Config {
         }
 
         MavenHelper helper = new MavenHelper(this);
-        if (bomIncludeWar) {
+        if (buildSettings.isPomIncludeWar()) {
             war = null;
             String jenkinsVersion = model.getProperties().getProperty("jenkins-war.version");
             if (StringUtils.isBlank(jenkinsVersion)) {
@@ -230,11 +228,11 @@ public class Config {
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE", justification = "Impossible in this case as every DependencyInfo has it's Source")
     private void processMavenDep(PluginInfoProvider pluginInfoProvider, DependencyInfo res, Collection<DependencyInfo> plugins) throws InterruptedException, IOException {
-        if ("jar".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
+        if ("jar".equals(res.type) && buildSettings.isPomIncludeWar() && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-core".equals(res.artifactId)) {
             ComponentReference core = new ComponentReference();
             core.setVersion(res.getSource().version);
             war = core.toWARDependencyInfo();
-        } else if ("war".equals(res.type) && bomIncludeWar && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
+        } else if ("war".equals(res.type) && buildSettings.isPomIncludeWar() && "org.jenkins-ci.main".equals(res.groupId) && "jenkins-war".equals(res.artifactId)) {
             ComponentReference core = new ComponentReference();
             core.setVersion(res.getSource().version);
             war = core.toWARDependencyInfo();
@@ -248,7 +246,7 @@ public class Config {
     public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
 
-        if (bomIncludeWar) {
+        if (buildSettings.isPomIncludeWar()) {
             war = spec.getCore().toWARDependencyInfo();
         }
 

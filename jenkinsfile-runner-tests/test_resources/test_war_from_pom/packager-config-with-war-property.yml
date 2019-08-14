@@ -2,7 +2,6 @@ bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
   artifactId: "pom-input-demo"
   vendor: "Jenkins project"
-bomIncludeWar: true
 buildSettings:
   docker:
     base: "jenkins/jenkins:2.121.1"
@@ -10,3 +9,4 @@ buildSettings:
     build: true
   pom: ./test_resources/test_war_from_pom/pom-with-war-property.xml
   pomIgnoreRoot: true
+  pomIncludeWar: true

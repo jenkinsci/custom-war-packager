@@ -95,7 +95,6 @@ bundle:
   artifactId: "mywar"
   description: "Just a WAR auto-generation-sample"
   vendor: "Jenkins project"
-bomIncludeWar: true
 buildSettings:
   docker:
     base: "jenkins/jenkins:2.121.1"
@@ -162,9 +161,9 @@ The example below takes the input from BOM and produces custom WAR and Docker pa
 bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
   artifactId: "bom-demo"
-bomIncludeWar: true
 buildSettings:
   bom: bom.yml
+  bomIncludeWar: true
   environment: aws
   docker:
     base: "jenkins/jenkins:2.121.2"
@@ -188,18 +187,19 @@ The current parent will be also bundled unless the `pomIgnoreRoot` flag is set.
 bundle:
   groupId: "io.jenkins.tools.war-packager.demo"
   artifactId: "pom-input-demo"
-bomIncludeWar: true
 buildSettings:
   pom: pom.xml
   pomIgnoreRoot: true
+  pomIncludeWar: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
     version: 2.121.1
 ```
+
 In the same way as BOM does, we can specify the core version from the pom file.
-If the global flag `bomIncludeWar` is `true` and the pom sets the `jenkins-war.version`, the `jenkins.version` property or it contains a dependency on
+If the global flag `pomIncludeWar` is `true` and the pom sets the `jenkins-war.version`, the `jenkins.version` property or it contains a dependency on
 `org.jenkins-ci.main:jenkins-core` or `org.jenkins-ci.main:jenkins-war` the war section in yml file 
 will be omitted. Consequently, if the flag is set to `true` and the pom file does not configure the core, then the build fails.
 
