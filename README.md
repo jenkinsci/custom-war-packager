@@ -1,6 +1,12 @@
 Jenkins Custom WAR Packager
 ===
 
+![GitHub release](https://img.shields.io/github/release/jenkinsci/custom-war-packager?label=Stable%20release)
+![GitHub release](https://img.shields.io/github/release-pre/jenkinsci/custom-war-packager?label=2.0%20Alpha)
+
+| WARNING: This page documents the 2.x version which is in alpha state now. The new baseline includes incompatible changes in the YAML configuration file format. If you use Custom WAR Packager 1.x, see [the 1.x branch](https://github.com/jenkinsci/custom-war-packager/tree/1.x). |
+| --- |
+
 Custom WAR Packager (CWP) allows building ready-to-fly Jenkins packages using a YAML specification.
 The tool can produce Docker images, WAR files, and [Jenkinsfile Runner](https://github.com/jenkinsci/jenkinsfile-runner) docker images (aka single-shot Jenkins masters).
 These bundles may include Jenkins core, plugins, extra libraries, and self-configuration via [Groovy Hook Scripts](https://wiki.jenkins.io/display/JENKINS/Groovy+Hook+Script)
