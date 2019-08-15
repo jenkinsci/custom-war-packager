@@ -35,7 +35,6 @@ public class BuildSettings {
     private File bom;
     @CheckForNull
     private File pom;
-    private boolean pomIgnoreRoot;
     @CheckForNull
     private String environmentName;
     @CheckForNull
@@ -44,7 +43,14 @@ public class BuildSettings {
     private JenkinsfileRunnerSettings jenkinsfileRunner;
     @CheckForNull
     private String updateCenterUrl;
+
+    // Additional settings for BOM inputs
+    private boolean bomIncludeWar;
+
+    // Additional settings for POM inputs
+    private boolean pomIgnoreRoot;
     private boolean pomUseMavenPluginInfoProvider;
+    private boolean pomIncludeWar;
 
     /**
      * If {@code true}, the final artifacts will be installed to the local repo.
@@ -159,5 +165,21 @@ public class BuildSettings {
             return new MavenPluginInfoProvider(helper, tmpDir);
         }
         return updateCenterUrl != null ? new UpdateCenterPluginInfoProvider(updateCenterUrl) : UpdateCenterPluginInfoProvider.DEFAULT;
+    }
+
+    public boolean isBomIncludeWar() {
+        return bomIncludeWar;
+    }
+
+    public boolean isPomIncludeWar() {
+        return pomIncludeWar;
+    }
+
+    public void setBomIncludeWar(boolean bomIncludeWar) {
+        this.bomIncludeWar = bomIncludeWar;
+    }
+
+    public void setPomIncludeWar(boolean pomIncludeWar) {
+        this.pomIncludeWar = pomIncludeWar;
     }
 }

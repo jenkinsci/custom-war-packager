@@ -9,5 +9,4 @@ buildSettings:
     build: true
   pom: pom.xml
   pomIgnoreRoot: true
-# TODO: move to buildSettings
-bomIncludeWar: true
+  pomIncludeWar: true
