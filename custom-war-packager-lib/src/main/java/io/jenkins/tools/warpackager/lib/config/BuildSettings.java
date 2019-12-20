@@ -159,6 +159,15 @@ public class BuildSettings {
         return jenkinsfileRunner;
     }
 
+    @CheckForNull
+    public String getUpdateCenterUrl() {
+        return updateCenterUrl;
+    }
+
+    public void setUpdateCenterUrl(String updateCenterUrl) {
+        this.updateCenterUrl = updateCenterUrl;
+    }
+
     @Nonnull
     public PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
         if (pomUseMavenPluginInfoProvider) {
