@@ -36,6 +36,9 @@ public class CliOptions {
     @Option(name = "--installArtifacts", usage = "If set, the final artifacts will be automatically installed to the local repository (current version - only WAR)")
     public boolean installArtifacts;
 
+    @Option(name = "--updateCenterUrl", usage = "URL of the update center. If defined, it will override settings in Config YAML")
+    public String updateCenterUrl;
+
     @CheckForNull
     public File getConfigPath() {
         return configPath;
@@ -72,5 +75,10 @@ public class CliOptions {
 
     public boolean isInstallArtifacts() {
         return installArtifacts;
+    }
+
+    @CheckForNull
+    public String getUpdateCenterUrl() {
+        return updateCenterUrl;
     }
 }
