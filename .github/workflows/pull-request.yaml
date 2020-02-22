@@ -26,7 +26,3 @@ jobs:
       with:
         name: custom-war-packager-cli
         path: custom-war-packager-cli/target/custom-war-packager-cli-2.0-alpha-3-SNAPSHOT-jar-with-dependencies.jar
-
-    - name: Deploy
-      run: |
-        mvn deploy -Dregistry=https://maven.pkg.github.com/jenkinsci -Dtoken=${{ secrets.GITHUB_TOKEN }}
