@@ -21,6 +21,12 @@ jobs:
       run: |
         mvn clean package -DskipTests
 
+    - name: Upload artifact
+      uses: actions/upload-artifact@v1.0.0
+      with:
+        name: custom-war-packager-cli
+        path: custom-war-packager-cli/target/custom-war-packager-cli-2.0-alpha-3-SNAPSHOT-jar-with-dependencies.jar
+
     - name: Deploy
       run: |
-        mvn deploy -Dregistry=https://maven.pkg.github.com/jenkins-zh -Dtoken=${{ secrets.GITHUB_TOKEN }}
+        mvn deploy -Dregistry=https://maven.pkg.github.com/jenkinsci -Dtoken=${{ secrets.GITHUB_TOKEN }}
