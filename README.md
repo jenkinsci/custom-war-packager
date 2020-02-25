@@ -33,6 +33,8 @@ The tool offers a CLI interface and a Maven Plugin wrapper.
 
 #### CLI
 
+You can find the binary file from [here](https://repo.jenkins-ci.org/list/releases/io/jenkins/tools/custom-war-packager/custom-war-packager-cli/). 
+For the CLI use case, you should pick up a jar file with dependencies.
 
 ```shell
 java -jar custom-war-packager-cli.jar -configPath=mywar.yml -version=1.0-SNAPSHOT -tmpDir=tmp
