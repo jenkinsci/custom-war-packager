@@ -43,6 +43,8 @@ public class BuildSettings {
     private JenkinsfileRunnerSettings jenkinsfileRunner;
     @CheckForNull
     private String updateCenterUrl;
+    @CheckForNull
+    private JenkinsRepositorySettings jenkinsRepository;
 
     // Additional settings for BOM inputs
     private boolean bomIncludeWar;
@@ -157,6 +159,20 @@ public class BuildSettings {
     @CheckForNull
     public JenkinsfileRunnerSettings getJenkinsfileRunner() {
         return jenkinsfileRunner;
+    }
+
+    @CheckForNull
+    public String getUpdateCenterUrl() {
+        return updateCenterUrl;
+    }
+
+    @CheckForNull
+    public JenkinsRepositorySettings getJenkinsRepository() {
+        return jenkinsRepository;
+    }
+
+    public void setUpdateCenterUrl(String updateCenterUrl) {
+        this.updateCenterUrl = updateCenterUrl;
     }
 
     @Nonnull
