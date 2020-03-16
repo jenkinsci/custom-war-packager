@@ -26,6 +26,7 @@ The demo is packaged with Docker, and it provides a ready-to-fly Docker Compose 
 * [Core components build](./demo/stapler) - demonstrates how to modify core components (libraries, modules)
 * [Custom WAR Packager CI Demo](https://github.com/oleg-nenashev/jenkins-custom-war-packager-ci-demo) - Standalone demo with an integrated CI flow
 * [Jenkinsfile Runner](./demo/jenkinsfile-runner) - Packaging of Docker image for Jenkinsfile Runner
+* [Custom Jenkins distribution formula for the Chinese users](https://github.com/jenkins-zh/docker-zh) - Build your own Jenkins automatically
 
 ### Usage
 
