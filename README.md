@@ -1,5 +1,5 @@
 Jenkins Custom WAR Packager
-===
+===========================
 
 ![GitHub release](https://img.shields.io/github/release/jenkinsci/custom-war-packager?label=Stable%20release)
 ![GitHub release](https://img.shields.io/github/release-pre/jenkinsci/custom-war-packager?label=2.0%20Alpha)
@@ -14,7 +14,9 @@ or [Configuration-as-Code Plugin](https://github.com/jenkinsci/configuration-as-
 
 See [this blog post](https://jenkins.io/blog/2018/10/16/custom-war-packager/) for more information.
 
-### Demo
+Demo
+----
+---
 
 * [Jenkins WAR - all latest](./demo/all-latest-core) - bundles master branches for core and some key libraries/modules
 * [Jenkins WAR - all latest with Maven](./demo/all-latest-core-maven) - same as a above, but with Maven
@@ -28,11 +30,13 @@ The demo is packaged with Docker, and it provides a ready-to-fly Docker Compose 
 * [Jenkinsfile Runner](./demo/jenkinsfile-runner) - Packaging of Docker image for Jenkinsfile Runner
 * [Custom Jenkins distribution formula for the Chinese users](https://github.com/jenkins-zh/docker-zh) - Build your own Jenkins automatically
 
-### Usage
+Usage
+----
+---
 
 The tool offers a CLI interface and a Maven Plugin wrapper.
 
-#### CLI
+### **CLI**
 
 You can find the binary file from [here](https://repo.jenkins-ci.org/list/releases/io/jenkins/tools/custom-war-packager/custom-war-packager-cli/). 
 For the CLI use case, you should pick up a jar file with dependencies.
@@ -51,7 +55,7 @@ java -jar war-packager-cli.jar -demo
 
 Invoke the tool without options to get a full CLI options list.
 
-#### Maven
+### **Maven**
 
 Maven plugin runs the packager and generates the artifact.
 The artifact will be put to "target/custom-war-packager-maven-plugin/output/target/${bundle.artifactId}.war"
@@ -86,7 +90,7 @@ Note that this plugin invokes Maven-in-Maven,
 and that it won't pass build options to the plugin.
 Configuration file can be used to configure the downstream builder.
 
-#### Prerequisites
+### **Prerequisites**
 
 * Maven 3.5.0 or above
 * Java 8
@@ -94,7 +98,7 @@ Configuration file can be used to configure the downstream builder.
 
 Custom WAR Packager offers a [Docker Image](./packaging/docker-builder/README.md) which bundles all the required tools.
 
-#### Configuration file
+### **Configuration file**
 
 Example:
 
@@ -157,7 +161,7 @@ See the linked demos and the automated tests for examples.
 
 Please note that given to the build workspace being defaulted to "/build", the Jenkinsfile-runner version used must be at least 1.0-beta-7.
 
-#### BOM support
+### **BOM support**
 
 The plugin supports Bill of Materials (BOM), described in
 [JEP-309](https://github.com/jenkinsci/jep/tree/master/jep/309), as an input.
@@ -183,7 +187,7 @@ buildSettings:
 An example of such configuration is available
 [here](https://github.com/jenkinsci/artifact-manager-s3-plugin/pull/20).
 
-#### Plugins from POM
+### **Plugins from POM**
 
 In order to simplify packaging for development versions,
 it is possible to link Custom War Packager to the POM file
@@ -214,13 +218,15 @@ will be omitted. Consequently, if the flag is set to `true` and the pom file doe
 
 Example is available [here](./demo/artifact-manager-s3-pom).
 
-### Plugin information providers
+Plugin information providers
+----------------------------
+---
 
 Custom WAR packager uses plugin information caching for some cases,
 e.g. for deciding whether a dependency is a plugin in pom.xml inputs.
 Right now there are 2 supported information sources: a Jenkins Update Center and a Maven repo.
 
-#### Update Center Information provider
+### **Update Center Information provider**
 
 The mode was introduced in Custom WAR Packager `2.0.0`,
 and this is a default mode in the tool.
@@ -230,7 +236,7 @@ and this is a default mode in the tool.
   * Custom update center URL can be set using the `updateCenterUrl` flag in `buildSettings`
   * Advanced configurations (e.g. proxy configuration) are not available for this mode at the moment
 
-#### Maven Repo Information provider
+### **Maven Repo Information provider**
 
 Information is retrieved from Maven repositories,
 and hence it allows installing unreleased or blacklisted plugins which are not available through update centers.
@@ -253,14 +259,18 @@ buildSettings:
 Before Custom WAR Packager `2.0.0`, this provider was used by default.
 Builds using this version may need an update if they rely on custom update centers or unreleased/blacklisted plugins.
 
-### Advanced features
+Advanced features
+-----------------
+---
 
 Features:
 
 * Rebuilding Jenkins core with custom dependencies (e.g., Remoting or Stapler)
 * Adding extra libraries to the Jenkins core so that they can be used in extensions
 
-### Limitations
+Limitations
+-----------
+---
 
 Currently, the tool is in the alpha state.
 It has some serious limitations:
