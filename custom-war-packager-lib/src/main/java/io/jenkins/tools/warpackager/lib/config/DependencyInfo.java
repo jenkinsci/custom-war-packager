@@ -22,6 +22,7 @@ public class DependencyInfo {
     public SourceInfo source;
     @CheckForNull
     public DependencyBuildSettings build;
+    public boolean excludeDependencies = false;
 
     public boolean isNeedsBuild() {
         return source != null && !source.isReleasedVersion();

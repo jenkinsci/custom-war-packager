@@ -4,6 +4,7 @@ import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Exclusion;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
@@ -55,6 +56,12 @@ public class MavenHPICustomWARPOMGenerator extends POMGenerator {
             for (DependencyInfo plugin : config.plugins) {
                 Dependency pluginDep = plugin.toDependency(versionOverrides);
                 pluginDep.setScope("runtime");
+                if (plugin.excludeDependencies) {
+                    Exclusion exclusion = new Exclusion();
+                    exclusion.setGroupId("*");
+                    exclusion.setArtifactId("*");
+                    pluginDep.addExclusion(exclusion);
+                }
                 model.addDependency(pluginDep);
             }
         }
