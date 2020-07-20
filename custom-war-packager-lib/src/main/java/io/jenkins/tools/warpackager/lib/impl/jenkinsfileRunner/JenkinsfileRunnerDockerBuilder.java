@@ -79,6 +79,15 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
             throw new IllegalStateException(ex);
         }
 
+        // Base image for unpacking resources
+  //      ps.println("FROM " + dockerSettings.getBase() + " as builder");
+  //      ps.println("RUN mkdir -p /app/jenkins/ref");
+  //      ps.println("ADD target/" + config.getOutputWar().getName() + " /app/jenkins/ref/jenkins.war");
+ //       ps.println("RUN mkdir /app && unzip /usr/share/jenkins/jenkins.war -d /app/jenkins/ref/war");
+ //       if (pluginsDir != null) {
+ //           ps.println("COPY plugins /usr/share/jenkins/ref/plugins");
+ //       }
+
         ps.println("FROM " + dockerSettings.getBase());
         // TODO(oleg_nenashev): probably this is the most crappy Dockerfile Generation logic you have ever seen
         ps.println("USER root");

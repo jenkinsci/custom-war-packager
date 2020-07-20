@@ -15,16 +15,16 @@ buildSettings:
         noCache: true
       source:
         git: https://github.com/jenkinsci/jenkinsfile-runner.git
-        branch: parent-1.0-beta-4
+        branch: 1.0-beta-14
     docker:
-      base: "jenkins/jenkins:2.138.2"
+      base: "openjdk:8-jdk"
       tag: "jenkins-experimental/cwp-jenkinsfile-runner-demo"
       build: true
 war:
   groupId: "org.jenkins-ci.main"
   artifactId: "jenkins-war"
   source:
-    version: "2.138.2"
+    version: "2.235.2"
 plugins:
   - groupId: "org.jenkins-ci.plugins.workflow"
     artifactId: "workflow-job"

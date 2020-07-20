@@ -1,9 +1,11 @@
-
-stage('Read Evergreen YAML') {
-    node {
-        // Discover core version using Pipeline utility steps
-        sh 'wget https://raw.githubusercontent.com/jenkins-infra/evergreen/master/services/essentials.yaml'
-        def essentialsYaml = readYaml(file: "essentials.yaml")
-        echo "Jenkins Evergreen uses the following Core version: ${essentialsYaml.spec.core.version}"
+pipeline {
+    agent any
+    stages {
+        stage('Build') {
+            steps {
+                echo 'Hello world!'
+                echo "An environment variable configured via JCasC: ${env.SOME_CASC_ENV_VAR}"
+            }
+        }
     }
 }
