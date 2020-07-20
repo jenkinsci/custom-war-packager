@@ -14,6 +14,7 @@ import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
+import org.codehaus.plexus.util.StringUtils;
 
 import javax.annotation.CheckForNull;
 import javax.annotation.Nonnull;
@@ -291,6 +292,9 @@ public class Builder extends PackagerBase {
                 final String checkoutId = dep.source.getCheckoutId();
                 if (commit == null) { // we use ls-remote to fetch the commit ID
                     String res = readFor(componentBuildDir, "git", "ls-remote", gitRemote, checkoutId != null ? checkoutId : "master");
+                    if (StringUtils.isBlank(res)) {
+                        throw new IOException("Failed to find the required checkout Id: " + checkoutId);
+                    }
                     commit = res.split("\\s+")[0];
                 }
 
