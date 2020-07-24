@@ -78,7 +78,7 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
         } catch (UnsupportedEncodingException ex) {
             throw new IllegalStateException(ex);
         }
-
+        
         ps.println("FROM " + dockerSettings.getBase());
         // TODO(oleg_nenashev): probably this is the most crappy Dockerfile Generation logic you have ever seen
         ps.println("USER root");
