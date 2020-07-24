@@ -15,7 +15,7 @@
 
   <groupId>io.jenkins.tools.custom-war-packager</groupId>
   <artifactId>parent-pom</artifactId>
-  <version>2.0-alpha-3-SNAPSHOT</version>
+  <version>2.0-alpha-3</version>
   <name>Jenkins Custom WAR Packager Parent POM</name>
   <description>Parent POM for packaging custom Jenkins WARs</description>
   <packaging>pom</packaging>
@@ -40,7 +40,7 @@
     <connection>scm:git:ssh://git@github.com/jenkinsci/custom-war-packager.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/jenkinsci/custom-war-packager.git</developerConnection>
     <url>http://github.com/jenkinsci/custom-war-packager</url>
-    <tag>HEAD</tag>
+    <tag>v2.0-alpha-3</tag>
   </scm>
 
   <repositories>
