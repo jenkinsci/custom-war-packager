@@ -25,8 +25,8 @@ public class BuildSettings {
     public static final File DEFAULT_TMP_DIR = new File(DEFAULT_TMP_DIR_NAME);
     public static final String DEFAULT_VERSION = "1.0-SNAPSHOT";
 
-    private File tmpDir;
-    private String version;
+    private File tmpDir = DEFAULT_TMP_DIR;
+    private String version = DEFAULT_VERSION;
     @CheckForNull
     private File mvnSettingsFile;
     @CheckForNull
@@ -64,16 +64,40 @@ public class BuildSettings {
         this.tmpDir = tmpDir;
     }
 
+    public void overrideTmpDir(@CheckForNull File tmpDir) {
+        if(tmpDir != null) {
+            setTmpDir(tmpDir);
+        }
+    }
+
     public void setVersion(String version) {
         this.version = version;
     }
 
-    public void setMvnSettingsFile(@CheckForNull File mvnSettingsFile) {
+    public void overrideDefaultVersion(@CheckForNull String version) {
+        if(version != null) {
+            setVersion(version);
+        }
+    }
+
+    public void setMvnSettingsFile(File mvnSettingsFile) {
         this.mvnSettingsFile = mvnSettingsFile;
     }
 
-    public void setBOM(@CheckForNull File bom) {
+    public void overrideMvnSettingsFile(@CheckForNull File mvnSettingsFile) {
+        if(mvnSettingsFile != null) {
+            setMvnSettingsFile(mvnSettingsFile);
+        }
+    }
+
+    public void setBOM(File bom) {
         this.bom = bom;
+    }
+
+    public void overrideBOM(@CheckForNull File bom) {
+        if(bom != null) {
+            setBOM(bom);
+        }
     }
 
     public void setPOM(@CheckForNull File pom) {
@@ -88,12 +112,22 @@ public class BuildSettings {
         this.pomUseMavenPluginInfoProvider = pomUseMavenPluginInfoProvider;
     }
 
-    public void setEnvironmentName(@CheckForNull String environmentName) {
+    public void setEnvironmentName(String environmentName) {
         this.environmentName = environmentName;
+    }
+
+    public void overrideEnvironmentName(@CheckForNull String environmentName) {
+        if(environmentName != null) {
+            setEnvironmentName(environmentName);
+        }
     }
 
     public void setInstallArtifacts(boolean installArtifacts) {
         this.installArtifacts = installArtifacts;
+    }
+
+    public void overrideInstallArtifacts(boolean installArtifacts) {
+        this.installArtifacts |= installArtifacts;
     }
 
     @Nonnull
@@ -173,6 +207,12 @@ public class BuildSettings {
 
     public void setUpdateCenterUrl(String updateCenterUrl) {
         this.updateCenterUrl = updateCenterUrl;
+    }
+
+    public void overrideUpdateCenterUrl(@CheckForNull String updateCenterUrl) {
+        if(updateCenterUrl != null) {
+            setUpdateCenterUrl(updateCenterUrl);
+        }
     }
 
     @Nonnull

@@ -5,6 +5,7 @@ import io.jenkins.tools.warpackager.lib.impl.Builder;
 import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 
+import javax.annotation.Nonnull;
 import java.io.File;
 import java.io.IOException;
 
@@ -26,6 +27,11 @@ public class Main {
             throw new IOException("Failed to read command-line arguments", ex);
         }
 
+        new Builder(buildConfiguration(options)).build();
+    }
+
+    @Nonnull
+    private static Config buildConfiguration(CliOptions options) throws IOException {
         final Config cfg;
         if (options.isDemo()) {
             System.out.println("Running build in the demo mode");
@@ -39,18 +45,17 @@ public class Main {
         }
 
         // Override Build Settings by CLI arguments
-        cfg.buildSettings.setTmpDir(options.getTmpDir());
-        cfg.buildSettings.setVersion(options.getVersion());
-        cfg.buildSettings.setMvnSettingsFile(options.getMvnSettingsFile());
-        cfg.buildSettings.setBOM(options.getBOMPath());
-        cfg.buildSettings.setEnvironmentName(options.getEnvironment());
-        cfg.buildSettings.setInstallArtifacts(options.isInstallArtifacts());
-        cfg.buildSettings.setUpdateCenterUrl(options.getUpdateCenterUrl());
+        cfg.buildSettings.overrideTmpDir(options.getTmpDir());
+        cfg.buildSettings.overrideDefaultVersion(options.getVersion());
+        cfg.buildSettings.overrideMvnSettingsFile(options.getMvnSettingsFile());
+        cfg.buildSettings.overrideBOM(options.getBOMPath());
+        cfg.buildSettings.overrideEnvironmentName(options.getEnvironment());
+        cfg.buildSettings.overrideInstallArtifacts(options.isInstallArtifacts());
+        cfg.buildSettings.overrideUpdateCenterUrl(options.getUpdateCenterUrl());
         if (options.batchMode) {
             cfg.buildSettings.addMavenOption("--batch-mode");
             cfg.buildSettings.addMavenOption("-Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=warn");
         }
-
-        new Builder(cfg).build();
+        return cfg;
     }
 }

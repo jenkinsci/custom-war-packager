@@ -44,14 +44,14 @@ public class CliOptions {
         return configPath;
     }
 
-    @Nonnull
+    @CheckForNull
     public File getTmpDir() {
-        return tmpDir != null ? tmpDir : BuildSettings.DEFAULT_TMP_DIR;
+        return tmpDir;
     }
 
-    @Nonnull
+    @CheckForNull
     public String getVersion() {
-        return version != null ? version : BuildSettings.DEFAULT_VERSION;
+        return version;
     }
 
     @CheckForNull
