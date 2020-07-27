@@ -246,7 +246,7 @@ public class Config {
     public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
 
-        if (buildSettings.isPomIncludeWar()) {
+        if (buildSettings.isBomIncludeWar()) {
             war = spec.getCore().toWARDependencyInfo();
         }
 
