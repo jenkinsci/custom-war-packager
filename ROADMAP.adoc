@@ -1,0 +1,77 @@
+= Custom War/Docker Packager roadmap
+:toc:
+:toc-placement: preamble
+:toclevels: 3
+
+This page summarizes key activities around Custom WAR Packager.
+Everyone is welcome to contribute to the projects referenced in this document, and to propose more changes.
+
+== Custom WAR Packager 2.x
+
+Custom WAR Packager was introduced in April 2018, and at that point its main purpose was to package WAR files for Jenkins ATH and Plugin Compatibility Tester.
+We kept expanding it to support more features (Docker image packaging, Jenkinsfile Runner packaging, etc.).
+Finally we ended up with a really handy tool which serves multiple production use-cases as well as Jenkins testing needs.
+The tool has outgrown the original design of the test tool.
+
+All of the changes retained the backward compatibility of the YAML configuration format.
+The configuration format became too complicated and, at the same time, it is not extensible well enough (see the `buildSettings` specification for example).
+JENKINS-55832 was a final trigger. It drastically decreased the clean build time, but there was no way to keep CWP compatible by default.
+I decided to start working on Custom WAR Packager 2.0 which will introduce a new configuration format and better extensibility for CWP as a library.
+
+Key configuration format changes::
+
+* Multiple "source" inputs, not just a single one (YAML, pom, or BOM).
+* Multiple destination settings so that WAR, Docker and JFR can be configured separately.
+* Make WAR file and optional packaging format so that we can introduce features which cannot be packaged into WAR (e.g. Pipeline Libraries in the current state).
+* Support for "environments" so that multiple custom packages can be created from a single definition.
+* Deeper integration with https://plugins.jenkins.io/configuration-as-code[Configuration-as-Code Plugin], including templating and conditional configurations.
+* Support for defining Jenkins Pipeline Libraries and other shared resources.
+* Add support for the https://github.com/jenkinsci/bom[Plugin Bill of Materials] which simplifies the plugin version management.
+
+Key internal changes::
+
+* Increase reliability of packaging by verifying plugin compatibility.
+* Integrate the plugin management codebase with the https://github.com/jenkinsci/plugin-installation-manager-tool[Plugin Installation Manager tool].
+* Change the default source of plugin information to Jenkins Update Centers to speedup builds.
+* Change the Jenkinsfile Runner packaging backend to use the new https://github.com/jenkinsci/jenkinsfile-runner/tree/master/packaging-parent-pom[Packaging Parent POM].
+
+Status::
+
+Custom WAR Packager 2.x is available for preview (alpha release).
+Not all planned features have been implemented yet.
+
+== Custom Jenkins Distribution build service
+
+There is parallel project which has been started as a part of Google Summer of Code 2020
+(https://www.jenkins.io/projects/gsoc/2020/projects/custom-jenkins-distribution-build-service/[project page]).
+
+The main idea behind the project is to build a customizable Jenkins distribution service that could be used to build tailor-made Jenkins distributions.
+The service would provide users with a simple interface to select the configurations they want to build the instance with eg: plugins, authorization matrices etc.
+Furthermore it would include a section for sharing community created distros so that users can find and
+download already built Jenkins war/configuration files to use out of the box.
+
+Status::
+
+The project is available for preview as a self-hosted service.
+
+== Jenkins Image Controller
+
+Another application of Custom WAR Packager, specifically designed for Kubernetes environments.
+It would allow building Jenkins and Jenkinsfile Runner images based on source code definitions in a repository,
+e.g. upon a request or upon an SCM change.
+Such operator functionality can be a part of link:https://github.com/jenkinsci/kubernetes-operator[Jenkins Operator for Kubernetes], or a standalone project.
+
+Status::
+
+The project has not been started yet.
+
+== 1.x branch (Maintenance Mode)
+
+Custom WAR Packager 1.x is in the maintenance mode.
+There are no features planned for this branch, but there might be some bugfixes backported to it.
+The recent alpha releases of Custom WAR Packager 2.x are considered to be stable enough.
+Users are advised to use them if they want to get access to new features and performance improvements.
+
+== References
+
+* https://jenkins.io/project/roadmap[Jenkins Public Roadmap]
