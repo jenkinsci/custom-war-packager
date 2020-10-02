@@ -43,7 +43,10 @@ for (int i = 0; i < platforms.size(); ++i) {
 
                     if (label == 'linux') {
                       archiveArtifacts artifacts: '**/target/**/*.jar'
-                      findbugs pattern: '**/target/findbugsXml.xml'
+                      recordIssues(
+                        enabledForFailure: true, aggregatingResults: true, 
+                        tools: [java(), spotBugs(pattern: '**/target/findbugsXml.xml')]
+                      )
                     }
                 }
             }
