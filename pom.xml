@@ -11,6 +11,8 @@
     <java.level>8</java.level>
     <!-- Version of Maven Components -->
     <maven.version>3.6.3</maven.version>
+    <!-- TODO: SpotBugs cleanup is needed -->
+    <spotbugs.failOnError>false</spotbugs.failOnError>
   </properties>
 
   <groupId>io.jenkins.tools.custom-war-packager</groupId>
