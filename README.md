@@ -157,6 +157,27 @@ See the linked demos and the automated tests for examples.
 
 Please note that given to the build workspace being defaulted to "/build", the Jenkinsfile-runner version used must be at least 1.0-beta-7.
 
+#### Build multi-platform images
+[Docker Buildx](https://docs.docker.com/buildx/working-with-buildx/) provides the ability to build a multi-platform image.
+
+Simply you can follow three steps to build a multi-platform image:
+1. Enable CLI experimental features of you docker daemon.
+2. Create a appropriate driver via `docker buildx create --use`.
+3. Set it in the YAML config file. Basically, you need to add `buildx` and `platform`.
+
+Example:
+
+```
+buildSettings:
+  docker:
+    base: "jenkins/jenkins:2.121.1"
+    tag: "jenkins/demo-external-task-logging-elk"
+    platform: linux/amd64,linux/arm64
+    output: push
+    buildx: true
+    build: true
+```
+
 #### BOM support
 
 The plugin supports Bill of Materials (BOM), described in
