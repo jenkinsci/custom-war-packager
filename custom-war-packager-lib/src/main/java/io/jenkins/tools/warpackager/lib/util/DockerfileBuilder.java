@@ -61,12 +61,15 @@ public abstract class DockerfileBuilder {
             String output;
             switch (dockerSettings.getOutput()) {
                 case "push":
+                    // the image push into remote registry directly
                     output = "--push";
                     break;
                 case "load":
+                    // store the docker image into local docker daemon, it can be listed via docker images
                     output = "--load";
                     break;
                 default:
+                    // the image exists as a local cache, it cannot be listed via docker images
                     output = "";
                     break;
             }
