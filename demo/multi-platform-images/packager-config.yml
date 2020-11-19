@@ -1,0 +1,19 @@
+bundle:
+  groupId: "io.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  vendor: "Jenkins project"
+  title: "Jenkins WAR - Multi-platform Image"
+  description: "Bundles stapler "
+war:
+  groupId: "org.jenkins-ci.main"
+  artifactId: "jenkins-war"
+  source:
+    version: 2.249.1
+buildSettings:
+  docker:
+    base: "jenkins4eval/jenkins:2.249.1"
+    tag: "jenkins/multi-platform"
+    platform: linux/amd64,linux/arm64
+    output: push
+    buildx: true
+    build: true

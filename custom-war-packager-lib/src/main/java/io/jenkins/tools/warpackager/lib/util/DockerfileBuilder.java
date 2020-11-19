@@ -57,7 +57,27 @@ public abstract class DockerfileBuilder {
             throw new IOException("Cannot build Docker image, tag is not defined");
         }
         LOGGER.log(Level.INFO, "Building Docker image {0}", tag);
-        SystemCommandHelper.processFor(outputDir, "docker", "build", "-t", tag, ".");
+        if (dockerSettings.isBuildx()) {
+            String output;
+            switch (dockerSettings.getOutput()) {
+                case "push":
+                    // the image push into remote registry directly
+                    output = "--push";
+                    break;
+                case "load":
+                    // store the docker image into local docker daemon, it can be listed via docker images
+                    output = "--load";
+                    break;
+                default:
+                    // the image exists as a local cache, it cannot be listed via docker images
+                    output = "";
+                    break;
+            }
+            SystemCommandHelper.processFor(outputDir, "docker", "buildx", "build", "--platform",
+                    dockerSettings.getPlatform(), output, "-t", tag, ".");
+        } else {
+            SystemCommandHelper.processFor(outputDir, "docker", "build", "-t", tag, ".");
+        }
     }
 
     protected abstract String generateDockerfile() throws IOException, InterruptedException;

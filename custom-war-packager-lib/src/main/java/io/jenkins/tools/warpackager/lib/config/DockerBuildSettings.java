@@ -20,6 +20,10 @@ public class DockerBuildSettings {
 
     private boolean build;
 
+    private boolean buildx;
+
+    private String output;
+
     @CheckForNull
     private String tag;
 
@@ -27,6 +31,8 @@ public class DockerBuildSettings {
      * String custom field to store whatever you want.
      */
     private String customSettings;
+
+    private String platform;
 
     public void setBase(@CheckForNull String base) {
         this.base = base;
@@ -40,12 +46,24 @@ public class DockerBuildSettings {
         this.build = build;
     }
 
+    public void setBuildx(boolean buildx) {
+        this.buildx = buildx;
+    }
+
+    public void setOutput(String output) {
+        this.output = output;
+    }
+
     public void setTag(@CheckForNull String tag) {
         this.tag = tag;
     }
 
     public void setCustomSettings(String customSettings) {
         this.customSettings = customSettings;
+    }
+
+    public void setPlatform(String platform) {
+        this.platform = platform;
     }
 
     @Nonnull
@@ -62,6 +80,14 @@ public class DockerBuildSettings {
         return build;
     }
 
+    public boolean isBuildx() {
+        return buildx;
+    }
+
+    public String getOutput() {
+        return output;
+    }
+
     @CheckForNull
     public String getTag() {
         return tag;
@@ -69,5 +95,9 @@ public class DockerBuildSettings {
 
     public String getCustomSettings() {
         return customSettings;
+    }
+
+    public String getPlatform() {
+        return platform;
     }
 }
