@@ -16,7 +16,7 @@
   <description>Generates a Custom WAR file from the specified YAML configuration file</description>
   
   <properties>
-      <fasterxml.jackson.core.version>2.12.2</fasterxml.jackson.core.version>
+      <fasterxml.jackson.core.version>2.12.3</fasterxml.jackson.core.version>
   </properties>
   
   <dependencies>
