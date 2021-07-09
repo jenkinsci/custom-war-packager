@@ -53,7 +53,7 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         addIfNotNull(manifestEntries,"Implementation-Vendor", config.bundle.vendor);
         addIfNotNull(manifestEntries,"Implementation-Version", config.buildSettings.getVersion());
 
-        // Maven HPI Plugin
+        // Maven WAR Plugin
         /* Sample:
             <build>
               <plugins>
@@ -96,7 +96,7 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         Plugin mavenHPIPlugin = new Plugin();
         mavenHPIPlugin.setGroupId("org.apache.maven.plugins");
         mavenHPIPlugin.setArtifactId("maven-war-plugin");
-        mavenHPIPlugin.setVersion("3.0.0");
+        mavenHPIPlugin.setVersion("3.3.1");
         mavenHPIPlugin.setConfiguration(generateMavenWarPluginConfiguration(manifestEntries));
         PluginExecution execution = new PluginExecution();
         execution.setId("package-war");
