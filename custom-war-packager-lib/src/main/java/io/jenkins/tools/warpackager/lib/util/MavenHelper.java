@@ -132,15 +132,20 @@ public class MavenHelper {
         downloadArtifact(buildDir, dep, version, "jar", destination);
     }
 
+    @SuppressFBWarnings(value = "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE", justification = "SpotBugs bug")
     public List<DependencyInfo> listDependenciesFromPom(File buildDir, File pom, File destination) throws IOException, InterruptedException {
         List<DependencyInfo> dependencies = new LinkedList<>();
         LOGGER.log(Level.INFO, "Listing dependencies from POM file: {0}", pom);
-        int listed = run(buildDir, true, "dependency:list", "-B", "-DoutputFile=" + destination.getAbsolutePath(),  "-DincludeScope=runtime", "-DexcludeClassifiers=tests", "-f", pom.getAbsolutePath());
+        int listed = run(buildDir, true, "dependency:list", "-B", "-DoutputFile=" + destination.getAbsolutePath(), "-f", pom.getAbsolutePath());
         if (listed == 0) {
             try (Stream<String> stream = Files.lines(destination.toPath())) {
                 stream.skip(2).filter(line -> !line.isEmpty()).forEach(line -> {
                     line = line.trim();
                     String[] dependencyData = line.split(":");
+                    if (dependencyData.length == 6) {
+                        return; // ignore artifacts with classifier
+                    }
+                    assert dependencyData.length == 5 : line;
                     DependencyInfo dep = new DependencyInfo();
                     dep.groupId = dependencyData[0].trim();
                     dep.artifactId = dependencyData[1].trim();
