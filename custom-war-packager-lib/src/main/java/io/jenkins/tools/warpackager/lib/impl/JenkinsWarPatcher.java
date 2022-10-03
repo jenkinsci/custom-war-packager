@@ -71,6 +71,9 @@ public class JenkinsWarPatcher extends PackagerBase {
                 ZipEntry e = it.nextElement();
                 if (!excludes.contains(e.getName()) && !e.isDirectory()) {
                     File f = new File(dstDir, e.getName());
+                    if (!f.toPath().normalize().startsWith(dstDir.toPath().normalize())) {
+                        throw new IOException("Bad zip entry");
+                    }
                     createParentDirIfNotExists(f);
                     try(InputStream content = zip.getInputStream(e) ; FileOutputStream out = new FileOutputStream(f)) {
                         out.write(IOUtils.toByteArray(content));
