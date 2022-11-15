@@ -33,7 +33,7 @@ public class DependencyInfo {
 
         Dependency dep = new Dependency();
         if(groupId==null){
-           PluginInfoProvider pluginInfoProvider = (UpdateCenterPluginInfoProvider) PluginInfoProvider.DEFAULT;
+           PluginInfoProvider pluginInfoProvider = PluginInfoProvider.DEFAULT;
            pluginInfoProvider.init();
            groupId = pluginInfoProvider.getGroupId(artifactId);
         }
