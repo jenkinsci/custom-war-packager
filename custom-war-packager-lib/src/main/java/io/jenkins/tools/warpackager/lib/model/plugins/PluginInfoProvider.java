@@ -23,7 +23,7 @@ public interface PluginInfoProvider {
      * @throws IOException Execution failure
      * @throws InterruptedException Execution was interrupted
      */
-    default void init() throws IOException, InterruptedException {
+    default void init() throws IOException{
         //NOOP
     }
 
@@ -36,4 +36,12 @@ public interface PluginInfoProvider {
      * @throws InterruptedException Execution was interrupted
      */
     public boolean isPlugin(@Nonnull DependencyInfo dependency) throws IOException, InterruptedException;
+
+    /**
+     * Fetches groupId given artifactId
+     * @param artifactId
+     * @return
+     */
+    public String getGroupId(String artifactId);
+
 }

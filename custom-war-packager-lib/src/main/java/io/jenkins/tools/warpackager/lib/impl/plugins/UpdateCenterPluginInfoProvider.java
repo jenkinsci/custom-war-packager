@@ -27,7 +27,7 @@ public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
     }
 
     @Override
-    public void init() throws IOException, InterruptedException {
+    public void init() throws IOException {
         groupIdCache = extractUpdateCenterData(new URL(updateCenterUrl));
     }
 
@@ -58,5 +58,10 @@ public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
             groupIDs.putIfAbsent(e.getKey(), groupId);
         }
         return groupIDs;
+    }
+
+
+    public String getGroupId(String artifactId){
+        return groupIdCache.get(artifactId);
     }
 }
