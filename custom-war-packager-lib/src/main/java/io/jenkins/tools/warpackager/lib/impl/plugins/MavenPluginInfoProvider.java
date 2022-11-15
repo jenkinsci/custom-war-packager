@@ -32,4 +32,14 @@ public class MavenPluginInfoProvider implements PluginInfoProvider {
         return helper.artifactExistsInLocalCache(dep, sourceInfo.version, "hpi") ||
                 helper.artifactExists(tmpDir, dep, sourceInfo.version, "hpi");
     }
+
+    /**
+     * Does not support fetching groupId for a given artifactId
+     * @param artifactId
+     * @return
+     */
+    @Override
+    public String getGroupId(String artifactId) {
+        return null;
+    }
 }

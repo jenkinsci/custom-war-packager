@@ -1,6 +1,8 @@
 package io.jenkins.tools.warpackager.lib.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import io.jenkins.tools.warpackager.lib.impl.plugins.UpdateCenterPluginInfoProvider;
+import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 
@@ -30,6 +32,11 @@ public class DependencyInfo {
     public Dependency toDependency(Map<String,String> versionOverrides) throws IOException {
 
         Dependency dep = new Dependency();
+        if(groupId==null){
+           PluginInfoProvider pluginInfoProvider = (UpdateCenterPluginInfoProvider) PluginInfoProvider.DEFAULT;
+           pluginInfoProvider.init();
+           groupId = pluginInfoProvider.getGroupId(artifactId);
+        }
         dep.setGroupId(groupId);
         dep.setArtifactId(artifactId);
         if (StringUtils.isNotEmpty(type)) {

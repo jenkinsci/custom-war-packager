@@ -10,8 +10,7 @@ war:
   source:
     version: 2.107
 plugins:
-  - groupId: "org.jenkins-ci.plugins"
-    artifactId: "matrix-project"
+  - artifactId: "matrix-project"
     source:
       version: 1.9
   - groupId: "org.jenkins-ci.plugins"
