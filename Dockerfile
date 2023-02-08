@@ -1,9 +1,9 @@
-FROM maven:alpine as maven
+FROM maven:3.8.6-eclipse-temurin-11 as maven
 WORKDIR /app
 COPY ./ ./
 RUN mvn package -DskipTests
 
-FROM maven:alpine
+FROM maven:3.8.6-eclipse-temurin-11
 ENV VERSION=1.3-SNAPSHOT
 RUN apk --no-cache add git
 WORKDIR /app

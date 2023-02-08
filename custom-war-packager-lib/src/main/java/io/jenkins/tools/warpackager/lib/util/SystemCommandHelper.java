@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
@@ -10,9 +11,11 @@ import java.util.Arrays;
 import java.util.stream.Stream;
 
 /**
+ * Wraps system commands needed for the tool.
  * @author Oleg Nenashev
  * @since TODO
  */
+@SuppressFBWarnings(value = "COMMAND_INJECTION", justification = "As designed, system command helper class")
 public class SystemCommandHelper {
 
     // https://stackoverflow.com/a/228499

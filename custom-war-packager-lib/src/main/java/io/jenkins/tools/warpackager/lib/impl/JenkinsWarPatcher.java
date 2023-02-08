@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 //TODO: This code should finally go to the Standard Maven HPI Plugin
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
@@ -41,10 +42,11 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 /**
- * Custom stub for patching WAR files
+ * Custom logic for patching WAR files
  * @author Oleg Nenashev
  * @since TODO
  */
+@SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
 public class JenkinsWarPatcher extends PackagerBase {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsWarPatcher.class.getName());
@@ -64,6 +66,7 @@ public class JenkinsWarPatcher extends PackagerBase {
     }
 
     @Nonnull
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     private void explode(@Nonnull Set<String> excludes) throws IOException {
         try (ZipFile zip = new ZipFile(srcWar)) {
             Enumeration<? extends ZipEntry> it = zip.entries();
@@ -87,6 +90,7 @@ public class JenkinsWarPatcher extends PackagerBase {
         return this;
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     private void deleteMetaINFFiles(String ... filenames) throws IOException {
         for (String filename : filenames) {
             File p = new File(dstDir, "META-INF/" + filename);
@@ -216,6 +220,8 @@ public class JenkinsWarPatcher extends PackagerBase {
     }
 
     @Nonnull
+    @SuppressFBWarnings(value = {"XXE_DOCUMENT", "XXE_DTD_TRANSFORM_FACTORY"},
+            justification = "By design, private method for the utility tool")
     private Document readXMLResource(String path) throws IOException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try (ZipFile zip = new ZipFile(srcWar)) {
@@ -244,7 +250,8 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    @Nonnull
+    @SuppressFBWarnings(value = {"XXE_DTD_TRANSFORM_FACTORY", "XXE_XSLT_TRANSFORM_FACTORY"},
+            justification = "By design, private method for the utility tool")
     private void writeXMLResource(String path, Document doc) throws IOException {
         File out = new File(dstDir, path);
         createParentDirIfNotExists(out);

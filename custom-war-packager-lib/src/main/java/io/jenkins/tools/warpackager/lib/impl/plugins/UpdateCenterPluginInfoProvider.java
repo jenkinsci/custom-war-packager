@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.impl.plugins;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
 import net.sf.json.JSONObject;
@@ -39,9 +40,11 @@ public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
         return isPlugin;
     }
 
+    @SuppressFBWarnings(value = "URLCONNECTION_SSRF_FD",
+            justification = "Utility tool. The user takes the risk when connecting to custom update centers")
     private static Map<String, String> extractUpdateCenterData(URL url) throws IOException {
         Map<String, String> groupIDs = new HashMap<>();
-        String jsonp = null;
+        final String jsonp;
         try {
             jsonp = IOUtils.toString(url.openStream());
         } catch(IOException e){

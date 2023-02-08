@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.mavenplugin;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -20,6 +21,7 @@ import static org.apache.maven.plugins.annotations.ResolutionScope.*;
  * @since TODO
  */
 @Mojo(name="custom-war", defaultPhase = PACKAGE, requiresDependencyResolution = RUNTIME)
+@SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "Maven plugin with parameterization, as designed")
 public class PackageMojo extends BuildMojo {
 
     @Component

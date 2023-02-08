@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
@@ -69,6 +70,7 @@ public class Builder extends PackagerBase {
         }
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     public void build() throws IOException, InterruptedException {
 
         // Cleanup the temporary directory
@@ -230,6 +232,7 @@ public class Builder extends PackagerBase {
     }
 
     //TODO: Merge with buildIfNeeded
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     private File checkoutIfNeeded(@Nonnull String id, @Nonnull SourceInfo source) throws IOException, InterruptedException {
         File componentBuildDir = new File(buildRoot, id);
         Files.createDirectories(componentBuildDir.toPath());
@@ -261,6 +264,7 @@ public class Builder extends PackagerBase {
         buildIfNeeded(dep, packaging,null);
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging,
                                @CheckForNull List<String> extraMavenArgs)
             throws IOException, InterruptedException {
