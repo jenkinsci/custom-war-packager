@@ -21,7 +21,7 @@ for (int i = 0; i < platforms.size(); ++i) {
 
                 stage('Build') {
                     withEnv([
-                        "JAVA_HOME=${tool 'jdk8'}",
+                        "JAVA_HOME=${tool 'jdk11'}",
                         "PATH+MVN=${tool 'mvn'}/bin",
                         'PATH+JDK=$JAVA_HOME/bin',
                     ]) {
