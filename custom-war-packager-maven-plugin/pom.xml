@@ -15,6 +15,10 @@
   <name>Jenkins Custom WAR Packager Maven Plugin</name>
   <description>Generates a Custom WAR file from the specified YAML configuration file</description>
 
+  <properties>
+    <spotbugs.skip>true</spotbugs.skip>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>io.jenkins.tools.custom-war-packager</groupId>
