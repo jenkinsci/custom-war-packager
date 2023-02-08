@@ -4,13 +4,13 @@
   <parent>
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
-    <version>1.54</version>
+    <version>1.94</version>
   </parent>
 
   <properties>
-    <java.level>8</java.level>
+    <java.level>11</java.level>
     <!-- Version of Maven Components -->
-    <maven.version>3.8.1</maven.version>
+    <maven.version>3.8.6</maven.version>
   </properties>
 
   <groupId>io.jenkins.tools.custom-war-packager</groupId>
@@ -59,9 +59,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.google.code.findbugs</groupId>
-      <artifactId>annotations</artifactId>
-      <version>3.0.1u2</version>
+      <groupId>com.github.spotbugs</groupId>
+      <artifactId>spotbugs-annotations</artifactId>
+      <version>4.7.3</version>
     </dependency>
 
     <!-- Test deps -->

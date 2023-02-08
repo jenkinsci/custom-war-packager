@@ -55,6 +55,7 @@ public class Config {
     @CheckForNull
     public Collection<CasCConfig> casc;
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     private static Config load(@Nonnull InputStream istream, boolean isEssentialsYML) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final Config loaded;
@@ -110,10 +111,12 @@ public class Config {
     }
 
     // TODO: make the destination configurable
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     public File getOutputWar() {
         return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + "-" + buildSettings.getVersion() + ".war");
     }
 
+    @SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
     public File getOutputBOM() {
         return new File(buildSettings.getTmpDir(), "/output/target/" + bundle.artifactId + "-" + buildSettings.getVersion() + ".bom.yml");
     }

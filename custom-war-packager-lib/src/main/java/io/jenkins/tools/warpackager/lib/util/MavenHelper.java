@@ -25,8 +25,10 @@ import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.processF
 import static io.jenkins.tools.warpackager.lib.util.SystemCommandHelper.runFor;
 
 /**
+ * Maven interop utility class
  * @author Oleg Nenashev
  */
+@SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "As designed, the method is driven by config")
 public class MavenHelper {
 
     private static final String USER_HOME_PROPERTY = System.getProperty("user.home");

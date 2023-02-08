@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.mavenplugin;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.impl.Builder;
@@ -25,6 +26,7 @@ import static org.apache.maven.plugins.annotations.ResolutionScope.RUNTIME;
  * @since TODO
  */
 @Mojo(name="build", defaultPhase = PACKAGE, requiresProject = false)
+@SuppressFBWarnings(value = "PATH_TRAVERSAL_IN", justification = "Maven plugin with parameterization, as designed")
 public class BuildMojo extends AbstractMojo {
 
     /**
