@@ -1,12 +1,12 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
 import io.jenkins.tools.warpackager.lib.util.DockerfileBuilder;
 import io.jenkins.tools.warpackager.lib.util.SystemCommandHelper;
 import org.apache.commons.io.IOUtils;
 
-import javax.annotation.Nonnull;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -26,15 +26,15 @@ public class JenkinsDockerfileBuilder extends DockerfileBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(JenkinsDockerfileBuilder.class.getName());
 
-    public JenkinsDockerfileBuilder(@Nonnull Config config,
-                                    @Nonnull DockerBuildSettings docker,
-                                    @Nonnull File outputDir) throws IOException {
+    public JenkinsDockerfileBuilder(@NonNull Config config,
+                                    @NonNull DockerBuildSettings docker,
+                                    @NonNull File outputDir) throws IOException {
         super(config,
               docker,
               outputDir);
     }
 
-    public JenkinsDockerfileBuilder withPlugins(@Nonnull File pluginsDir) {
+    public JenkinsDockerfileBuilder withPlugins(@NonNull File pluginsDir) {
         if (!pluginsDir.exists()) {
             LOGGER.log(Level.INFO, "No plugins to include");
             return this;
@@ -44,7 +44,7 @@ public class JenkinsDockerfileBuilder extends DockerfileBuilder {
         return this;
     }
 
-    public JenkinsDockerfileBuilder withInitScripts(@Nonnull File rootDir) {
+    public JenkinsDockerfileBuilder withInitScripts(@NonNull File rootDir) {
         final File[] files = rootDir.listFiles();
         if (files == null || files.length == 0) {
             return this; // never happens anyway

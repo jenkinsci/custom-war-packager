@@ -3,11 +3,11 @@ package io.jenkins.tools.warpackager.lib.model.bom;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -27,7 +27,7 @@ public class BOM {
     @CheckForNull
     Metadata metadata;
 
-    @Nonnull
+    @NonNull
     @JsonProperty(required = true)
     public Specification spec;
 
@@ -38,7 +38,7 @@ public class BOM {
         this.metadata = metadata;
     }
 
-    public void setSpec(@Nonnull Specification spec) {
+    public void setSpec(@NonNull Specification spec) {
         this.spec = spec;
     }
 
@@ -51,7 +51,7 @@ public class BOM {
         return metadata;
     }
 
-    @Nonnull
+    @NonNull
     public Specification getSpec() {
         return spec;
     }
@@ -61,18 +61,18 @@ public class BOM {
         return status;
     }
 
-    public void write(@Nonnull File configPath) throws IOException {
+    public void write(@NonNull File configPath) throws IOException {
         try (FileOutputStream ostream = new FileOutputStream(configPath)) {
             write(ostream);
         }
     }
 
-    public void write(@Nonnull OutputStream ostream) throws IOException {
+    public void write(@NonNull OutputStream ostream) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         mapper.writeValue(ostream, this);
     }
 
-    public static BOM load(@Nonnull File configPath) throws IOException {
+    public static BOM load(@NonNull File configPath) throws IOException {
         if (configPath.exists() && configPath.isFile()) {
             try (FileInputStream istream = new FileInputStream(configPath)) {
                 return load(istream);
@@ -81,7 +81,7 @@ public class BOM {
         throw new FileNotFoundException("Cannot find the BOM file " + configPath);
     }
 
-    public static BOM load(@Nonnull InputStream istream) throws IOException {
+    public static BOM load(@NonNull InputStream istream) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         BOM loaded = mapper.readValue(istream, BOM.class);
         //if (loaded.spec == null) {

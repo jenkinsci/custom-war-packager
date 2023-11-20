@@ -1,10 +1,10 @@
 package io.jenkins.tools.warpackager.lib.model.plugins;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.impl.plugins.MavenPluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.impl.plugins.UpdateCenterPluginInfoProvider;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 
 /**
@@ -35,5 +35,5 @@ public interface PluginInfoProvider {
      * @throws IOException Execution failure
      * @throws InterruptedException Execution was interrupted
      */
-    public boolean isPlugin(@Nonnull DependencyInfo dependency) throws IOException, InterruptedException;
+    public boolean isPlugin(@NonNull DependencyInfo dependency) throws IOException, InterruptedException;
 }

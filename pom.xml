@@ -5,10 +5,10 @@
     <groupId>org.jenkins-ci</groupId>
     <artifactId>jenkins</artifactId>
     <version>1.54</version>
+    <relativePath/>
   </parent>
 
   <properties>
-    <java.level>8</java.level>
     <!-- Version of Maven Components -->
     <maven.version>3.8.1</maven.version>
   </properties>
@@ -73,7 +73,6 @@
     <dependency>
       <groupId>org.jenkins-ci</groupId>
       <artifactId>test-annotations</artifactId>
-      <version>1.3</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

@@ -1,10 +1,10 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.PackageInfo;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
@@ -34,12 +34,12 @@ public class Metadata {
         this.labels = labels;
     }
 
-    @Nonnull
+    @NonNull
     public Map<String, String> getAnnotations() {
         return annotations != null ? annotations : Collections.emptyMap();
     }
 
-    @Nonnull
+    @NonNull
     public Map<String, String> getLabels() {
         return labels != null ? labels : Collections.emptyMap();
     }

@@ -5,6 +5,7 @@
     <groupId>io.jenkins.tools.custom-war-packager</groupId>
     <artifactId>parent-pom</artifactId>
     <version>2.0-alpha-7-SNAPSHOT</version>
+    <relativePath/>
   </parent>
 
   <artifactId>jenkinsfile-runner-tests</artifactId>

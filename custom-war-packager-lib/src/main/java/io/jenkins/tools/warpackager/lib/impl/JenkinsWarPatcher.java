@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.impl;
 
 //TODO: This code should finally go to the Standard Maven HPI Plugin
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.WARResourceInfo;
@@ -13,8 +14,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Transformer;
@@ -52,7 +52,7 @@ public class JenkinsWarPatcher extends PackagerBase {
     private final File srcWar;
     private final File dstDir;
 
-    public JenkinsWarPatcher(@Nonnull Config config, @Nonnull File src, @Nonnull File dstDir) throws IOException {
+    public JenkinsWarPatcher(@NonNull Config config, @NonNull File src, @NonNull File dstDir) throws IOException {
         super(config);
         if (src.equals(dstDir)) {
             throw new IOException("Source and destination are the same: " + src);
@@ -63,8 +63,8 @@ public class JenkinsWarPatcher extends PackagerBase {
         explode(new HashSet<>(Arrays.asList("WEB-INF/web.xml")));
     }
 
-    @Nonnull
-    private void explode(@Nonnull Set<String> excludes) throws IOException {
+    @NonNull
+    private void explode(@NonNull Set<String> excludes) throws IOException {
         try (ZipFile zip = new ZipFile(srcWar)) {
             Enumeration<? extends ZipEntry> it = zip.entries();
             while (it.hasMoreElements()) {
@@ -188,7 +188,7 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    public JenkinsWarPatcher addResources(@Nonnull Map<String, File> resources) throws IOException {
+    public JenkinsWarPatcher addResources(@NonNull Map<String, File> resources) throws IOException {
         for (Map.Entry<String, File> resourceSrc : resources.entrySet()) {
             final String resourceId = resourceSrc.getKey();
             WARResourceInfo resource = config.findResourceById(resourceId);
@@ -201,7 +201,7 @@ public class JenkinsWarPatcher extends PackagerBase {
         return this;
     }
 
-    public void addResource(@Nonnull WARResourceInfo resource, File path) throws IOException {
+    public void addResource(@NonNull WARResourceInfo resource, File path) throws IOException {
         File targetDir = new File(dstDir, resource.getDestination());
         if (!targetDir.exists()) {
             Files.createDirectories(targetDir.toPath());
@@ -215,7 +215,7 @@ public class JenkinsWarPatcher extends PackagerBase {
 
     }
 
-    @Nonnull
+    @NonNull
     private Document readXMLResource(String path) throws IOException {
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try (ZipFile zip = new ZipFile(srcWar)) {
@@ -244,7 +244,7 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    @Nonnull
+    @NonNull
     private void writeXMLResource(String path, Document doc) throws IOException {
         File out = new File(dstDir, path);
         createParentDirIfNotExists(out);
@@ -259,7 +259,7 @@ public class JenkinsWarPatcher extends PackagerBase {
         }
     }
 
-    private static void createParentDirIfNotExists(@Nonnull File file) throws IOException {
+    private static void createParentDirIfNotExists(@NonNull File file) throws IOException {
         Path p = file.toPath();
         Path parent = p.getParent();
         if (parent == null) {
@@ -320,7 +320,7 @@ public class JenkinsWarPatcher extends PackagerBase {
     }
 
     @CheckForNull
-    private static Node findByName(@Nonnull Node parent, @Nonnull String name) {
+    private static Node findByName(@NonNull Node parent, @NonNull String name) {
         NodeList nodes = parent.getChildNodes();
         for (int i = 0 ; i < nodes.getLength() ; ++i) {
             Node node = nodes.item(i);
@@ -332,7 +332,7 @@ public class JenkinsWarPatcher extends PackagerBase {
     }
 
     @CheckForNull
-    private static void setByName(@Nonnull Node parent, @Nonnull String name, @Nonnull String value) {
+    private static void setByName(@NonNull Node parent, @NonNull String name, @NonNull String value) {
         Node node = findByName(parent, name);
         if (node != null) {
             node.setTextContent(value);

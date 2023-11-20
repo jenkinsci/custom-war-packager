@@ -1,10 +1,10 @@
 package io.jenkins.tools.warpackager.lib.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
 import org.apache.commons.io.IOUtils;
 
-import javax.annotation.Nonnull;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,9 +28,9 @@ public abstract class DockerfileBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(DockerfileBuilder.class.getName());
 
-    public DockerfileBuilder(@Nonnull Config config,
-                             @Nonnull DockerBuildSettings dockerSettings,
-                             @Nonnull File outputDir) throws IOException {
+    public DockerfileBuilder(@NonNull Config config,
+                             @NonNull DockerBuildSettings dockerSettings,
+                             @NonNull File outputDir) throws IOException {
         this.config = config;
         this.dockerSettings = dockerSettings;
         if (dockerSettings == null) {

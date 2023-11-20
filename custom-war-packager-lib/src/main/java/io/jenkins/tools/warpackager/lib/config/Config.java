@@ -2,6 +2,7 @@ package io.jenkins.tools.warpackager.lib.config;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.impl.plugins.UpdateCenterPluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.model.bom.BOM;
@@ -15,8 +16,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.io.xpp3.MavenXpp3Reader;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -55,7 +55,7 @@ public class Config {
     @CheckForNull
     public Collection<CasCConfig> casc;
 
-    private static Config load(@Nonnull InputStream istream, boolean isEssentialsYML) throws IOException {
+    private static Config load(@NonNull InputStream istream, boolean isEssentialsYML) throws IOException {
         ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
         final Config loaded;
         if (isEssentialsYML) {
@@ -100,7 +100,7 @@ public class Config {
      * @return Loaded configuration
      * @throws IOException Loading error
      */
-    public static Config loadConfig(@Nonnull File configPath) throws IOException {
+    public static Config loadConfig(@NonNull File configPath) throws IOException {
         if (configPath.exists() && configPath.isFile()) {
             try (FileInputStream istream = new FileInputStream(configPath)) {
                 return load(istream, "essentials.yml".equals(configPath.getName()));
@@ -119,7 +119,7 @@ public class Config {
     }
 
     @CheckForNull
-    public GroovyHookInfo getHookById(@Nonnull String id) {
+    public GroovyHookInfo getHookById(@NonNull String id) {
         if (groovyHooks == null) {
             return null;
         }
@@ -144,7 +144,7 @@ public class Config {
     }
 
     @CheckForNull
-    public WARResourceInfo findResourceById(@Nonnull String id) {
+    public WARResourceInfo findResourceById(@NonNull String id) {
         for (WARResourceInfo hook : getAllExtraResources()) {
             if (id.equals(hook.id)) {
                 return hook;
@@ -154,7 +154,7 @@ public class Config {
     }
 
     @CheckForNull
-    public DependencyInfo findPlugin(@Nonnull String artifactId) {
+    public DependencyInfo findPlugin(@NonNull String artifactId) {
         if (plugins == null) {
             return null;
         }
@@ -172,7 +172,7 @@ public class Config {
     //TODO: add MANY options to make it configurable
 
     @SuppressFBWarnings(value = "NP_NULL_ON_SOME_PATH", justification = "plugins is initialized before")
-    public void overrideByPOM(@Nonnull File tmpDir, @Nonnull File pom, final boolean pomIgnoreRoot) throws IOException, InterruptedException {
+    public void overrideByPOM(@NonNull File tmpDir, @NonNull File pom, final boolean pomIgnoreRoot) throws IOException, InterruptedException {
         MavenXpp3Reader rdr = new MavenXpp3Reader();
         Model model;
         try(FileInputStream istream = new FileInputStream(pom)) {
@@ -243,7 +243,7 @@ public class Config {
         }
     }
 
-    public void overrideByBOM(@Nonnull BOM bom, @CheckForNull String environmentName) throws IOException {
+    public void overrideByBOM(@NonNull BOM bom, @CheckForNull String environmentName) throws IOException {
         final Specification spec = bom.getSpec();
 
         if (buildSettings.isBomIncludeWar()) {

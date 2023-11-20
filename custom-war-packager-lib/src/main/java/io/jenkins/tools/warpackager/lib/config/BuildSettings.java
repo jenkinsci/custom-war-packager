@@ -1,12 +1,12 @@
 package io.jenkins.tools.warpackager.lib.config;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.impl.plugins.MavenPluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.impl.plugins.UpdateCenterPluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
 import io.jenkins.tools.warpackager.lib.util.MavenHelper;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -96,17 +96,17 @@ public class BuildSettings {
         this.installArtifacts = installArtifacts;
     }
 
-    @Nonnull
+    @NonNull
     public File getTmpDir() {
         return tmpDir != null ? tmpDir : DEFAULT_TMP_DIR;
     }
 
-    @Nonnull
+    @NonNull
     public File getOutputDir() {
         return new File(getTmpDir(), "output");
     }
 
-    @Nonnull
+    @NonNull
     public String getVersion() {
         return version != null ? version : DEFAULT_VERSION;
     }
@@ -139,14 +139,14 @@ public class BuildSettings {
         return installArtifacts;
     }
 
-    public void addMavenOption(@Nonnull String option) {
+    public void addMavenOption(@NonNull String option) {
         if (mvnOptions == null) {
             mvnOptions = new ArrayList<>();
         }
         mvnOptions.add(option);
     }
 
-    @Nonnull
+    @NonNull
     public List<String> getMvnOptions() {
         return mvnOptions != null ? Collections.unmodifiableList(mvnOptions) : Collections.emptyList();
     }
@@ -175,7 +175,7 @@ public class BuildSettings {
         this.updateCenterUrl = updateCenterUrl;
     }
 
-    @Nonnull
+    @NonNull
     public PluginInfoProvider getPluginInfoProvider(MavenHelper helper, File tmpDir) {
         if (pomUseMavenPluginInfoProvider) {
             return new MavenPluginInfoProvider(helper, tmpDir);

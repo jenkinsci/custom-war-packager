@@ -1,11 +1,11 @@
 package io.jenkins.tools.warpackager.lib.impl.jenkinsfileRunner;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
 import io.jenkins.tools.warpackager.lib.util.DockerfileBuilder;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
@@ -32,13 +32,13 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
 
     private boolean noSandbox;
 
-    public JenkinsfileRunnerDockerBuilder(@Nonnull Config config,
-                                          @Nonnull DockerBuildSettings dockerBuildSettings,
-                                          @Nonnull File targetDir) throws IOException {
+    public JenkinsfileRunnerDockerBuilder(@NonNull Config config,
+                                          @NonNull DockerBuildSettings dockerBuildSettings,
+                                          @NonNull File targetDir) throws IOException {
         super(config, dockerBuildSettings, targetDir);
     }
 
-    public JenkinsfileRunnerDockerBuilder withPlugins(@Nonnull File pluginsDir) {
+    public JenkinsfileRunnerDockerBuilder withPlugins(@NonNull File pluginsDir) {
         this.pluginsDir = pluginsDir;
         return this;
     }
@@ -48,7 +48,7 @@ public class JenkinsfileRunnerDockerBuilder extends DockerfileBuilder {
         return this;
     }
 
-    public JenkinsfileRunnerDockerBuilder withRunWorkspace(@Nonnull String runWorkspace) {
+    public JenkinsfileRunnerDockerBuilder withRunWorkspace(@NonNull String runWorkspace) {
         this.runWorkspace = runWorkspace;
         return this;
     }

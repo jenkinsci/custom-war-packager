@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.mavenplugin;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.impl.Builder;
@@ -9,8 +10,7 @@ import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 
@@ -85,7 +85,7 @@ public class BuildMojo extends AbstractMojo {
         build(cfg, new File("tmp"));
     }
 
-    protected void build(@Nonnull Config cfg, @Nonnull File buildDir) throws MojoExecutionException {
+    protected void build(@NonNull Config cfg, @NonNull File buildDir) throws MojoExecutionException {
         cfg.buildSettings.setVersion(warVersion);
         cfg.buildSettings.setInstallArtifacts(installArtifacts);
         if (mvnSettingsFile != null) {
