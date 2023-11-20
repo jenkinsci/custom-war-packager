@@ -2,7 +2,7 @@ package io.jenkins.tools.warpackager.lib.config;
 
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 /**
  * @author Oleg Nenashev

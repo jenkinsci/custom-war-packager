@@ -1,7 +1,8 @@
 package io.jenkins.tools.warpackager.lib.config;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 /**
  * Settings for Jenkins repository
@@ -41,24 +42,24 @@ public class JenkinsRepositorySettings {
         this.incrementalsUrl = incrementalsUrl;
     }
 
-    @Nonnull
+    @NonNull
     public String getId() {
         return id != null ? id : DEFAULT_ID;
     }
 
 
-    @Nonnull
+    @NonNull
     public String getUrl() {
         return url != null ? url : DEFAULT_URL;
     }
 
-    @Nonnull
+    @NonNull
     public String getIncrementalsId() {
         return incrementalsId != null ? incrementalsId : DEFAULT_INCREMENTALS_ID;
     }
 
 
-    @Nonnull
+    @NonNull
     public String getIncrementalsUrl() {
         return incrementalsUrl != null ? incrementalsUrl : DEFAULT_INCREMENTALS_URL;
     }

@@ -1,11 +1,11 @@
 package io.jenkins.tools.warpackager.lib.config;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.model.Dependency;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.IOException;
 import java.util.Map;
 
@@ -58,7 +58,7 @@ public class DependencyInfo {
         return String.format("%s:%s:%s", groupId, artifactId, source);
     }
 
-    @Nonnull
+    @NonNull
     public DependencyBuildSettings getBuildSettings() {
         return build != null ? build : DependencyBuildSettings.DEFAULT;
     }

@@ -2,7 +2,7 @@ package io.jenkins.tools.warpackager.lib.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 /**
  * Wrapper for {@code essentials.yml} configuration files.

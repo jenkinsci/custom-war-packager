@@ -1,10 +1,10 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.util.Collections;
 import java.util.List;
 
@@ -15,7 +15,7 @@ import java.util.List;
 @SuppressFBWarnings(value = "NP_NONNULL_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR", justification = "Fields come from JSON")
 public class Environment {
 
-    @Nonnull
+    @NonNull
     @JsonProperty(required = true)
     String name;
 
@@ -25,22 +25,22 @@ public class Environment {
     @CheckForNull
     List<ComponentReference> plugins;
 
-    @Nonnull
+    @NonNull
     public String getName() {
         return name;
     }
 
-    @Nonnull
+    @NonNull
     public List<ComponentReference> getComponents() {
         return components != null ? components : Collections.emptyList();
     }
 
-    @Nonnull
+    @NonNull
     public List<ComponentReference> getPlugins() {
         return plugins != null ? plugins : Collections.emptyList();
     }
 
-    public void setName(@Nonnull String name) {
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 

@@ -1,6 +1,6 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
-import javax.annotation.CheckForNull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 /**
  * @author Oleg Nenashev

@@ -1,9 +1,9 @@
 package io.jenkins.tools.warpackager.lib.config;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.util.Collections;
 import java.util.Map;
 
@@ -25,7 +25,7 @@ public class PackageInfo {
     @CheckForNull
     public String description;
 
-    public void toKeyValueMap(@Nonnull Map<String, String> dest) {
+    public void toKeyValueMap(@NonNull Map<String, String> dest) {
         // TODO(oleg_nenashev): add support of Name from BOM? how is it different from artifactID, what are the requirements?
         dest.put("name", artifactId);
         dest.put("artifactId", artifactId);

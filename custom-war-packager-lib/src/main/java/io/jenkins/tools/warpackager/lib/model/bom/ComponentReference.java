@@ -1,12 +1,12 @@
 package io.jenkins.tools.warpackager.lib.model.bom;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.SourceInfo;
 import io.jenkins.tools.warpackager.lib.config.WarInfo;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.util.Map;
 
 /**
@@ -18,29 +18,29 @@ public class ComponentReference extends Reference {
 
     //TODO: properties are not required for the core
 
-    @Nonnull
+    @NonNull
   //  @JsonProperty(required = true)
     String groupId;
 
-    @Nonnull
+    @NonNull
   //  @JsonProperty(required = true)
     String artifactId;
 
-    @Nonnull
+    @NonNull
     public String getArtifactId() {
         return artifactId;
     }
 
-    @Nonnull
+    @NonNull
     public String getGroupId() {
         return groupId;
     }
 
-    public void setArtifactId(@Nonnull String artifactId) {
+    public void setArtifactId(@NonNull String artifactId) {
         this.artifactId = artifactId;
     }
 
-    public void setGroupId(@Nonnull String groupId) {
+    public void setGroupId(@NonNull String groupId) {
         this.groupId = groupId;
     }
 
@@ -84,13 +84,13 @@ public class ComponentReference extends Reference {
         return dep;
     }
 
-    @Nonnull
-    public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep) {
+    @NonNull
+    public static ComponentReference resolveFrom(@NonNull DependencyInfo dep) {
         return resolveFrom(dep, false, null);
     }
 
-    @Nonnull
-    public static ComponentReference resolveFrom(@Nonnull DependencyInfo dep, boolean overrideVersions,
+    @NonNull
+    public static ComponentReference resolveFrom(@NonNull DependencyInfo dep, boolean overrideVersions,
                                                   @CheckForNull Map<String, String> versionOverrides) {
         ComponentReference ref = new ComponentReference();
         ref.setGroupId(dep.groupId);

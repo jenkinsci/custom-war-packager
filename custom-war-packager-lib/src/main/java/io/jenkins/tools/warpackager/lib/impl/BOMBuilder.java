@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.config.GroovyHookInfo;
@@ -11,8 +12,7 @@ import io.jenkins.tools.warpackager.lib.model.bom.Metadata;
 import io.jenkins.tools.warpackager.lib.model.bom.Specification;
 import io.jenkins.tools.warpackager.lib.util.SimpleManifest;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class BOMBuilder {
     @CheckForNull
     private Map<String, ComponentReference> bundledPlugins;
 
-    public BOMBuilder(@Nonnull Config config) {
+    public BOMBuilder(@NonNull Config config) {
         this.config = config;
     }
 

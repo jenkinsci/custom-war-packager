@@ -23,9 +23,9 @@
  */
 package io.jenkins.tools.warpackager.lib.util;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.model.bom.ComponentReference;
 
-import javax.annotation.Nonnull;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -120,7 +120,7 @@ public class SimpleManifest {
         }
     }
 
-    public static ComponentReference readPluginManifest(@Nonnull File sourceHPI) throws IOException, InterruptedException {
+    public static ComponentReference readPluginManifest(@NonNull File sourceHPI) throws IOException, InterruptedException {
         Map<String, String> manifest = SimpleManifest.parseFile(sourceHPI).getMain();
 
         ComponentReference res = new ComponentReference();

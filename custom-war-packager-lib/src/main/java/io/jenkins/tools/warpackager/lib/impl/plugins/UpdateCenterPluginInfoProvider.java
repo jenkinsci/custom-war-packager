@@ -1,11 +1,11 @@
 package io.jenkins.tools.warpackager.lib.impl.plugins;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import io.jenkins.tools.warpackager.lib.model.plugins.PluginInfoProvider;
 import net.sf.json.JSONObject;
 import org.apache.commons.io.IOUtils;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.net.URL;
 import java.util.HashMap;
@@ -22,7 +22,7 @@ public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
     private String updateCenterUrl;
     private Map<String, String> groupIdCache;
 
-    public UpdateCenterPluginInfoProvider(@Nonnull String updateCenterUrl) {
+    public UpdateCenterPluginInfoProvider(@NonNull String updateCenterUrl) {
         this.updateCenterUrl = updateCenterUrl;
     }
 
@@ -32,7 +32,7 @@ public class UpdateCenterPluginInfoProvider implements PluginInfoProvider {
     }
 
     @Override
-    public boolean isPlugin(@Nonnull DependencyInfo dependency) throws IOException, InterruptedException {
+    public boolean isPlugin(@NonNull DependencyInfo dependency) throws IOException, InterruptedException {
         boolean isPlugin = groupIdCache.containsKey(dependency.artifactId);
         LOGGER.log(Level.FINE, "Checking whether {0} is a plugin: {1}",
                 new Object[] {dependency.artifactId, isPlugin});

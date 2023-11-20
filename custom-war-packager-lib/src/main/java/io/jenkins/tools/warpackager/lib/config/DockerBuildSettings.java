@@ -1,7 +1,8 @@
 package io.jenkins.tools.warpackager.lib.config;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
+
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 /**
  * Settings for Docker packaging
@@ -66,12 +67,12 @@ public class DockerBuildSettings {
         this.platform = platform;
     }
 
-    @Nonnull
+    @NonNull
     public String getBase() {
         return base != null ? base : DEFAULT_BASE;
     }
 
-    @Nonnull
+    @NonNull
     public String getOutputDir() {
         return outputDir != null ? outputDir : DEFAULT_OUTPUT_DIR;
     }

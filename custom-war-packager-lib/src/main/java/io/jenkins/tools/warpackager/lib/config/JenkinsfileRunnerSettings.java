@@ -1,9 +1,9 @@
 package io.jenkins.tools.warpackager.lib.config;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 
 /**
  * Defines build settings for Jenkinsfile Runner.
@@ -16,7 +16,7 @@ public class JenkinsfileRunnerSettings {
 
     private static final String DEFAULT_WORKSPACE = "/build";
 
-    @Nonnull
+    @NonNull
     private DependencyInfo source;
 
     @CheckForNull
@@ -27,7 +27,7 @@ public class JenkinsfileRunnerSettings {
 
     private boolean noSandbox;
 
-    public void setSource(@Nonnull DependencyInfo source) {
+    public void setSource(@NonNull DependencyInfo source) {
         this.source = source;
     }
 
@@ -43,7 +43,7 @@ public class JenkinsfileRunnerSettings {
         this.noSandbox = noSandbox;
     }
 
-    @Nonnull
+    @NonNull
     public DependencyInfo getSource() {
         return source;
     }
@@ -53,7 +53,7 @@ public class JenkinsfileRunnerSettings {
         return docker;
     }
 
-    @Nonnull
+    @NonNull
     public String getRunWorkspace() {
         return runWorkspace != null ? runWorkspace : DEFAULT_WORKSPACE;
     }

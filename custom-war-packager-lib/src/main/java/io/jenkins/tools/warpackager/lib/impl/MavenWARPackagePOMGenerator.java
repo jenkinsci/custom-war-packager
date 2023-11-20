@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DependencyInfo;
 import org.apache.maven.model.Build;
@@ -11,8 +12,7 @@ import org.apache.maven.model.Repository;
 import org.apache.maven.model.io.xpp3.MavenXpp3Writer;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -111,7 +111,7 @@ public class MavenWARPackagePOMGenerator extends POMGenerator {
         return model;
     }
 
-    private static void addIfNotNull(@Nonnull Map<String, String> map, @Nonnull String key, @CheckForNull String value) {
+    private static void addIfNotNull(@NonNull Map<String, String> map, @NonNull String key, @CheckForNull String value) {
         if (value != null) {
             map.put(key, value);
         }

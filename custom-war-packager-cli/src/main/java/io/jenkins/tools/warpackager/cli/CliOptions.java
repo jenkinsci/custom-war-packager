@@ -1,10 +1,10 @@
 package io.jenkins.tools.warpackager.cli;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.BuildSettings;
 import org.kohsuke.args4j.Option;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 
 public class CliOptions {
@@ -44,12 +44,12 @@ public class CliOptions {
         return configPath;
     }
 
-    @Nonnull
+    @NonNull
     public File getTmpDir() {
         return tmpDir != null ? tmpDir : BuildSettings.DEFAULT_TMP_DIR;
     }
 
-    @Nonnull
+    @NonNull
     public String getVersion() {
         return version != null ? version : BuildSettings.DEFAULT_VERSION;
     }

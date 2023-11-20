@@ -1,5 +1,6 @@
 package io.jenkins.tools.warpackager.lib.impl;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import io.jenkins.tools.warpackager.lib.config.CasCConfig;
 import io.jenkins.tools.warpackager.lib.config.Config;
 import io.jenkins.tools.warpackager.lib.config.DockerBuildSettings;
@@ -16,8 +17,7 @@ import org.apache.maven.model.Model;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.StringUtils;
 
-import javax.annotation.CheckForNull;
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.CheckForNull;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -230,7 +230,7 @@ public class Builder extends PackagerBase {
     }
 
     //TODO: Merge with buildIfNeeded
-    private File checkoutIfNeeded(@Nonnull String id, @Nonnull SourceInfo source) throws IOException, InterruptedException {
+    private File checkoutIfNeeded(@NonNull String id, @NonNull SourceInfo source) throws IOException, InterruptedException {
         File componentBuildDir = new File(buildRoot, id);
         Files.createDirectories(componentBuildDir.toPath());
 
@@ -257,11 +257,11 @@ public class Builder extends PackagerBase {
         return componentBuildDir;
     }
 
-    private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging) throws IOException, InterruptedException {
+    private void buildIfNeeded(@NonNull DependencyInfo dep, @NonNull String packaging) throws IOException, InterruptedException {
         buildIfNeeded(dep, packaging,null);
     }
 
-    private void buildIfNeeded(@Nonnull DependencyInfo dep, @Nonnull String packaging,
+    private void buildIfNeeded(@NonNull DependencyInfo dep, @NonNull String packaging,
                                @CheckForNull List<String> extraMavenArgs)
             throws IOException, InterruptedException {
 
